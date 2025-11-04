@@ -4,7 +4,72 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>TOC Builder - Nested Lists</title>
+
   <link rel="stylesheet" href="stylesheet.css" />
+
+  <style>
+    /* Essential layout overrides for this page */
+
+    /* Use monospace font only for textarea and output boxes */
+    textarea {
+      width: 45%;
+      height: 90vh;
+      font-family: monospace;
+      font-size: 14px;
+      white-space: pre-wrap;
+      overflow: auto;
+      resize: vertical;
+    }
+
+    #generateBtn {
+      align-self: center;
+      height: 40px;
+      padding: 5px 15px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .output-container {
+      display: flex;
+      flex-direction: column;
+      width: 45%;
+      gap: 20px;
+    }
+
+    .box {
+      border: 1px solid #ccc;
+      padding: 10px;
+      height: 44vh;
+      overflow: auto;
+      background-color: #fafafa;
+      font-family: monospace;
+      border-radius: 6px;
+    }
+
+    .preview {
+      font-family: sans-serif;
+    }
+
+    /* Style preview links */
+    .preview a {
+      text-decoration: none;
+      color: #1a0dab;
+    }
+
+    .preview a:hover {
+      text-decoration: underline;
+    }
+
+    /* Container to hold textarea, button, and outputs side by side */
+    .toc-builder-container {
+      display: flex;
+      gap: 20px;
+      padding: 20px;
+      box-sizing: border-box;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+  </style>
 </head>
 <body>
 
@@ -42,9 +107,9 @@
 </script>
 
 <div class="toc-builder-container">
-  <textarea id="inputBox" class="toc-input" placeholder="Paste your &lt;body&gt; HTML here..."></textarea>
+  <textarea id="inputBox" placeholder="Paste your &lt;body&gt; HTML here..."></textarea>
 
-  <button id="generateBtn" class="button toc-button">Make&nbsp;TOC&nbsp;&rarr;</button>
+  <button id="generateBtn">Make&nbsp;TOC&nbsp;&rarr;</button>
 
   <div class="output-container">
     <div class="box preview" id="previewBox" aria-live="polite" aria-atomic="true" role="region">
@@ -57,7 +122,6 @@
 </div>
 
 <script>
-  // Build nested UL from flat headings list
   function buildNestedList(headings) {
     const rootUl = document.createElement('ul');
     const stack = [{ level: 0, ul: rootUl }];
@@ -126,7 +190,7 @@
     previewBox.innerHTML = '<strong>TOC Preview</strong><br />';
     previewBox.appendChild(nestedList);
 
-    outputBox.textContent = '<div class="toc-output-wrapper">Page Contents:' + nestedList.outerHTML + '</div><br />';
+    outputBox.textContent = '<div style="border:1px solid #ccc; padding:10px; background:#f9f9f9;">Page Contents:' + nestedList.outerHTML + '</div><br />';
   });
 </script>
 
