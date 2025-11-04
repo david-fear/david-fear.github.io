@@ -81,3 +81,36 @@ nav ul li a {
 nav ul li a:hover {
   opacity: 0.7;
 }
+
+/* Make menu fixed on left, full height */
+#menu-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 220px;
+  height: 100vh;
+  background: var(--card-bg);
+  padding: 1rem;
+  box-shadow: 2px 0 6px rgba(0,0,0,0.1);
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+/* Push main content right to avoid overlap */
+body {
+  padding-left: 240px; /* slightly wider than menu */
+  padding-top: 1.25rem; /* keep top padding */
+}
+
+/* Responsive: on small screens, menu becomes top horizontal bar */
+@media (max-width: 767px) {
+  #menu-container {
+    position: relative;
+    width: 100%;
+    height: auto;
+    box-shadow: none;
+  }
+  body {
+    padding-left: 1.25rem; /* reset left padding */
+  }
+}
