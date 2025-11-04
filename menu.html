@@ -1,7 +1,40 @@
-<nav>
+<div id="menu-toggle" tabindex="0" aria-label="Toggle menu" role="button" aria-expanded="false">
+  <span class="hamburger">
+    <span></span>
+    <span></span>
+    <span></span>
+  </span>
+  MENU
+</div>
+
+<nav id="menu-nav" hidden>
   <ul>
     <li><a href="index.html">Home</a></li>
     <li><a href="zendesk-toc-builder.html">Zendesk - Table of Contents Builder</a></li>
     <li><a href="template.html">Template</a></li>
+    <!-- Add more links here -->
   </ul>
 </nav>
+
+<script>
+  const toggle = document.getElementById('menu-toggle');
+  const menu = document.getElementById('menu-nav');
+
+  toggle.addEventListener('click', () => {
+    const expanded = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', String(!expanded));
+    if (menu.hasAttribute('hidden')) {
+      menu.removeAttribute('hidden');
+    } else {
+      menu.setAttribute('hidden', '');
+    }
+  });
+
+  // Optional: Allow toggle with Enter or Space keys for accessibility
+  toggle.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      toggle.click();
+    }
+  });
+</script>
