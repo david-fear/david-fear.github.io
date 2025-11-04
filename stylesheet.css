@@ -63,3 +63,21 @@ a.button:hover {
     margin: auto;
   }
 }
+
+nav ul {
+  list-style: none;
+  padding: 0;
+}
+
+nav ul li {
+  margin-bottom: 0.5rem;
+}
+
+nav ul li a {
+  text-decoration: none;
+  color: var(--primary);
+  font-weight: 600;
+}
+nav ul li a:hover {
+  opacity: 0.7;
+}
