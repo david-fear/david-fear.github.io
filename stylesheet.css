@@ -1,4 +1,4 @@
-/* Mobile-first clean layout */
+/* Variables */
 :root {
   --primary: #0196d7;       /* bright blue */
   --text: #222;
@@ -6,6 +6,7 @@
   --card-bg: #f6f8fa;
 }
 
+/* Reset & base */
 * {
   margin: 0;
   padding: 0;
@@ -17,9 +18,24 @@ body {
   background: var(--bg);
   color: var(--text);
   line-height: 1.6;
-  padding: 1.25rem;
+  padding: 1.25rem 1.25rem 1.25rem 240px; /* left padding for sidebar */
 }
 
+/* Sidebar menu container */
+#menu-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 220px;
+  height: 100vh;
+  background: var(--card-bg);
+  padding: 1rem;
+  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+/* Header */
 header {
   text-align: center;
   padding: 2rem 1rem;
@@ -30,6 +46,7 @@ header h1 {
   color: var(--primary);
 }
 
+/* Sections */
 section {
   background: var(--card-bg);
   padding: 1.5rem;
@@ -37,6 +54,7 @@ section {
   margin: 1rem 0;
 }
 
+/* Buttons */
 a.button {
   display: inline-block;
   background: var(--primary);
@@ -52,65 +70,119 @@ a.button:hover {
   opacity: 0.8;
 }
 
-/* Desktop */
-@media (min-width: 768px) {
-  header h1 {
-    font-size: 2.5rem;
-  }
-  body {
-    padding: 2rem;
-    max-width: 900px;
-    margin: auto;
-  }
-}
-
-nav ul {
+/* Navigation lists */
+nav ul,
+#menu-nav ul {
   list-style: none;
-  padding: 0;
+  padding-left: 0;
+  margin: 0;
 }
 
-nav ul li {
+nav ul li,
+#menu-nav ul li {
   margin-bottom: 0.5rem;
 }
 
-nav ul li a {
+nav ul li a,
+#menu-nav ul li a {
   text-decoration: none;
   color: var(--primary);
   font-weight: 600;
+  font-size: 1rem;
 }
-nav ul li a:hover {
+
+nav ul li a:hover,
+#menu-nav ul li a:hover {
   opacity: 0.7;
 }
 
-/* Make menu fixed on left, full height */
-#menu-container {
-  position: fixed;
-  top: 0;
+/* Menu toggle button */
+#menu-toggle {
+  display: none; /* hidden by default on desktop */
+  align-items: center;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--primary);
+  user-select: none;
+  margin-bottom: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+#menu-toggle:hover,
+#menu-toggle:focus {
+  background-color: rgba(1, 150, 215, 0.1);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(1, 150, 215, 0.3);
+}
+
+/* Hamburger icon */
+#menu-toggle .hamburger {
+  display: inline-block;
+  margin-right: 0.5rem;
+  width: 24px;
+  height: 18px;
+  position: relative;
+}
+
+#menu-toggle .hamburger span {
+  background: var(--primary);
+  display: block;
+  position: absolute;
+  height: 3px;
+  width: 100%;
+  border-radius: 2px;
   left: 0;
-  width: 220px;
-  height: 100vh;
-  background: var(--card-bg);
-  padding: 1rem;
-  box-shadow: 2px 0 6px rgba(0,0,0,0.1);
-  overflow-y: auto;
-  z-index: 1000;
 }
 
-/* Push main content right to avoid overlap */
-body {
-  padding-left: 240px; /* slightly wider than menu */
-  padding-top: 1.25rem; /* keep top padding */
+#menu-toggle .hamburger span:nth-child(1) { top: 0; }
+#menu-toggle .hamburger span:nth-child(2) { top: 7.5px; }
+#menu-toggle .hamburger span:nth-child(3) { top: 15px; }
+
+/* Show/hide menu instantly */
+#menu-nav[hidden] {
+  display: none;
 }
 
-/* Responsive: on small screens, menu becomes top horizontal bar */
+/* Responsive adjustments */
 @media (max-width: 767px) {
+  body {
+    padding-left: 1.25rem; /* remove sidebar padding */
+  }
+
   #menu-container {
     position: relative;
     width: 100%;
     height: auto;
     box-shadow: none;
+    padding: 0.5rem 1rem;
   }
+
+  /* Show toggle button on mobile */
+  #menu-toggle {
+    display: flex;
+  }
+}
+
+@media (min-width: 768px) {
+  header h1 {
+    font-size: 2.5rem;
+  }
+
   body {
-    padding-left: 1.25rem; /* reset left padding */
+    padding: 2rem 2rem 2rem 240px;
+    max-width: 900px;
+    margin: auto;
+  }
+
+  #menu-nav {
+    display: block !important;
+    position: static;
+    height: auto !important;
+  }
+
+  #menu-toggle {
+    display: none;
   }
 }
