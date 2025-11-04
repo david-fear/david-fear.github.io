@@ -1,0 +1,161 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>TOC Builder - Nested Lists</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      gap: 20px;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    textarea {
+      width: 45%;
+      height: 90vh;
+      font-family: monospace;
+      font-size: 14px;
+      white-space: pre-wrap;
+      overflow: auto;
+    }
+
+    #generateBtn {
+      align-self: center;
+      height: 40px;
+      padding: 5px 15px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .output-container {
+      display: flex;
+      flex-direction: column;
+      width: 45%;
+      gap: 20px;
+    }
+
+    .box {
+      border: 1px solid #ccc;
+      padding: 10px;
+      height: 44vh;
+      overflow: auto;
+      background-color: #fafafa;
+      font-family: monospace;
+    }
+
+    .preview {
+      font-family: sans-serif;
+    }
+
+    /* Optional: style the preview's links nicely */
+    .preview a {
+      text-decoration: none;
+      color: #1a0dab;
+    }
+
+    .preview a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <textarea id="inputBox" placeholder="Paste your &lt;body&gt; HTML here..."></textarea>
+
+  <button id="generateBtn">Make&nbsp;TOC&nbsp;&rarr;</button>
+
+  <div class="output-container">
+    <div class="box preview" id="previewBox">
+      <strong>TOC Preview</strong><br /><em>Click the button to generate.</em>
+    </div>
+    <div class="box" id="outputBox" contenteditable="true" spellcheck="false" aria-label="Raw HTML output">
+      <!-- Raw HTML TOC output will appear here -->
+    </div>
+  </div>
+
+  <script>
+    // Function to build nested UL from flat headings list
+    function buildNestedList(headings) {
+      const rootUl = document.createElement('ul');
+      const stack = [{ level: 0, ul: rootUl }];
+
+      headings.forEach(({ level, id, text }) => {
+        // Pop stack to find correct parent
+        while (stack.length > 0 && level <= stack[stack.length - 1].level) {
+          stack.pop();
+        }
+
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = `#${id}`;
+        a.textContent = text;
+        li.appendChild(a);
+
+        // Append li to current ul
+        stack[stack.length - 1].ul.appendChild(li);
+
+        // Prepare for possible nested items
+        const newUl = document.createElement('ul');
+        li.appendChild(newUl);
+        stack.push({ level, ul: newUl });
+      });
+
+      // Clean empty <ul> at end of each <li>
+      function cleanEmptyUl(ul) {
+        const children = Array.from(ul.children);
+        children.forEach(li => {
+          if (li.lastElementChild && li.lastElementChild.tagName === 'UL') {
+            if (li.lastElementChild.children.length === 0) {
+              li.removeChild(li.lastElementChild);
+            } else {
+              cleanEmptyUl(li.lastElementChild);
+            }
+          }
+        });
+      }
+      cleanEmptyUl(rootUl);
+
+      return rootUl;
+    }
+
+    document.getElementById('generateBtn').addEventListener('click', function () {
+      const inputHTML = document.getElementById('inputBox').value;
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(inputHTML, 'text/html');
+      const headingNodes = doc.querySelectorAll('h1, h2, h3, h4, h5, h6');
+
+      // Prepare array of heading info
+      const headings = [];
+      headingNodes.forEach(heading => {
+        const level = parseInt(heading.tagName.substring(1), 10);
+        const id = heading.getAttribute('id');
+        const text = heading.textContent.trim();
+        if (id) {
+          headings.push({ level, id, text });
+        }
+      });
+
+      const previewBox = document.getElementById('previewBox');
+      const outputBox = document.getElementById('outputBox');
+
+      if (headings.length === 0) {
+        previewBox.innerHTML = '<em>No valid headings with IDs found.</em>';
+        outputBox.textContent = '';
+        return;
+      }
+
+      // Build nested UL for preview
+      const nestedList = buildNestedList(headings);
+
+      // Clear preview and append nested list
+      previewBox.innerHTML = '<strong>TOC Preview</strong><br />';
+      previewBox.appendChild(nestedList);
+
+      // Serialize nestedList outerHTML for outputBox
+outputBox.textContent = '<div style="border:1px solid #ccc; padding:10px; background:#f9f9f9;">Page Contents:' + nestedList.outerHTML + '</div><br />';
+    });
+  </script>
+</body>
+</html>
