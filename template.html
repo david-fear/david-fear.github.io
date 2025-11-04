@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>My GitHub Static Site Template</title>
+
+<link rel="stylesheet" href="stylesheet.css" />
+
+</head>
+
+<body>
+
+  <!-- Dynamic sidebar menu -->
+  <div id="menu-container"></div>
+
+  <script>
+    fetch('menu.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('menu-container').innerHTML = data;
+      })
+      .catch(e => console.error('Failed to load menu:', e));
+  </script>
+
+  <header>
+    <h1>Header Heading</h1>
+    <p>Header Paragraph.</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>Main Section Heading</h2>
+      <p>Main Section Paragraph.</p>
+    </section>
+
+    <section>
+      <h2>Main Section Heading</h2>
+      <a href="#" class="button">Example Button</a>
+    </section>
+  </main>
+
+</body>
+</html>
