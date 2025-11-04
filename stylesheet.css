@@ -1,0 +1,65 @@
+/* Mobile-first clean layout */
+:root {
+  --primary: #0196d7;       /* bright blue */
+  --text: #222;
+  --bg: #ffffff;
+  --card-bg: #f6f8fa;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  padding: 1.25rem;
+}
+
+header {
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+header h1 {
+  font-size: 2rem;
+  color: var(--primary);
+}
+
+section {
+  background: var(--card-bg);
+  padding: 1.5rem;
+  border-radius: 10px;
+  margin: 1rem 0;
+}
+
+a.button {
+  display: inline-block;
+  background: var(--primary);
+  color: white;
+  padding: 0.75rem 1.2rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: opacity 0.2s;
+}
+
+a.button:hover {
+  opacity: 0.8;
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  header h1 {
+    font-size: 2.5rem;
+  }
+  body {
+    padding: 2rem;
+    max-width: 900px;
+    margin: auto;
+  }
+}
