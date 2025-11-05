@@ -54,6 +54,19 @@ section {
   margin: 1rem 0;
 }
 
+/* Global hyperlink color */
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover,
+a:focus {
+  color: darken(var(--primary), 15%);
+  text-decoration: underline;
+}
+
 /* Buttons */
 a.button {
   display: inline-block;
@@ -143,6 +156,38 @@ nav ul li a:hover,
 /* Show/hide menu instantly */
 #menu-nav[hidden] {
   display: none;
+}
+
+/* Footer styles */
+footer {
+  margin-top: 40px;
+  padding: 1rem 1rem 1rem 1rem;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text);
+  opacity: 0.85;
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.1);
+}
+
+/* Footer links */
+footer a {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+footer a:hover,
+footer a:focus {
+  color: darken(var(--primary), 20%);
+  text-decoration: underline;
+}
+
+/* Footer image (license badge) */
+footer img {
+  vertical-align: middle;
+  height: 25px;
+  border: 0;
 }
 
 /* Responsive adjustments */
