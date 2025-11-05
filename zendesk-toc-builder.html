@@ -157,5 +157,20 @@
 outputBox.textContent = '<div style="border:1px solid #ccc; padding:10px; background:#f9f9f9;">Page Contents:' + nestedList.outerHTML + '</div><br />';
     });
   </script>
+
+<!-- Footer placeholder -->
+<div id="footer-container"></div>
+
+<script>
+  fetch('footer.html')
+    .then(response => response.text())
+    .then(data => {
+      document.getElementById('footer-container').innerHTML = data;
+    })
+    .catch(error => {
+      console.error('Failed to load footer:', error);
+    });
+</script>
+  
 </body>
 </html>
