@@ -202,7 +202,10 @@ hr {
   margin: 0.5em 0;
 }
 
-
+/* Center text */
+.mid {
+  text-align: center;
+}
 
 /* Responsive adjustments */
 @media (max-width: 767px) {
