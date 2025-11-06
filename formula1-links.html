@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>My GitHub Static Site Template</title>
+
+<link rel="stylesheet" href="https://david-fear.github.io/stylesheet.css" />
+
+</head>
+
+<body>
+
+  <!-- Dynamic sidebar menu -->
+<div id="menu-container"></div>
+
+<script>
+  fetch('menu.html')
+    .then(response => response.text())
+    .then(data => {
+      const container = document.getElementById('menu-container');
+      container.innerHTML = data;
+
+      // Now attach event listeners because the elements exist
+      const toggle = document.getElementById('menu-toggle');
+      const menu = document.getElementById('menu-nav');
+
+      toggle.addEventListener('click', () => {
+        const expanded = toggle.getAttribute('aria-expanded') === 'true';
+        toggle.setAttribute('aria-expanded', String(!expanded));
+        if (menu.hasAttribute('hidden')) {
+          menu.removeAttribute('hidden');
+        } else {
+          menu.setAttribute('hidden', '');
+        }
+      });
+
+      toggle.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggle.click();
+        }
+      });
+    })
+    .catch(e => console.error('Failed to load menu:', e));
+</script>
+
+  <header>
+    <h1>Formula One - Links</h1>
+    <p>The Best 2025 Links - centered around Liam Lawson</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>Performance - Racing Bulls</h2>
+      <p style="white-space:pre">Head-to-Head (Quali):&#9;<a href="https://www.f1teammatequali.com/quali_season?season-quali=2025&constructor-id-quali=211&driver-1-id-season-quali=347&driver-2-id-season-quali=460">Isack Hadjar vs Liam Lawson</a></p>
+      <p style="white-space:pre">Head to Head (Race):&#9;<a href="https://www.f1teammatequali.com/race_season?season-race=2025&constructor-id-race=211&driver-1-id-season-race=347&driver-2-id-season-race=460">Isack Hadjar vs Liam Lawson</a></p>
+    </section>
+  </main>
+
+  <!-- Footer placeholder -->
+<div id="footer-container"></div>
+
+<script>
+  fetch('footer.html')
+    .then(response => response.text())
+    .then(data => {
+      document.getElementById('footer-container').innerHTML = data;
+    })
+    .catch(error => {
+      console.error('Failed to load footer:', error);
+    });
+</script>
+  
+</body>
+</html>
