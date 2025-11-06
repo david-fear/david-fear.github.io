@@ -202,12 +202,10 @@ hr {
   margin: 0.5em 0;
 }
 
-/* Center text */
 .mid {
-  text-align: center;
-}
-.midtable {
-  margin: 0 auto;
+  text-align: center;   /* text (but not in table unless explicitly defined) */
+  margin: 0 auto;       /* table pos */
+  display: block;       /* helps centering block-level/table elements consistently */
 }
 
 /* Responsive adjustments */
