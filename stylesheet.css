@@ -202,9 +202,12 @@ hr {
   margin: 0.5em 0;
 }
 
+/* center text, and table */
 .mid {
-  text-align: center;   /* text (but not in table unless explicitly defined) */
-  margin: 0 auto;       /* table pos */
+  text-align: center;
+}
+.midtable {
+  margin: 0 auto;
 }
 
 /* Responsive adjustments */
