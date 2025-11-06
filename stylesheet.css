@@ -206,6 +206,9 @@ hr {
 .mid {
   text-align: center;
 }
+.midtable {
+  margin: 0 auto;
+}
 
 /* Responsive adjustments */
 @media (max-width: 767px) {
