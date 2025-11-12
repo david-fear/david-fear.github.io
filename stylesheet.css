@@ -88,7 +88,7 @@ a .small-part {
   display: block; /* forces the line break */
   margin-top: -0.5em;
   line-height: 1;
-
+  color: darken(var(--primary), 15%);
 }
 
 /* Navigation lists */
