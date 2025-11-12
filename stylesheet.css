@@ -84,7 +84,7 @@ a.button:hover {
 }
 
 a .small-part {
-  font-size: 60%;
+  font-size: 0.5rem;
   display: block; /* forces the line break */
   margin-top: -0.5em;
   line-height: 1;
