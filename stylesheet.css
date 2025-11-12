@@ -1,6 +1,7 @@
 /* Variables */
 :root {
   --primary: #0196d7;       /* bright blue */
+  --primary-dark-15: color-mix(in srgb, var(--primary), black 15%);
   --text: #222;
   --bg: #ffffff;
   --card-bg: #f6f8fa;
@@ -83,14 +84,6 @@ a.button:hover {
   opacity: 0.8;
 }
 
-a .small-part {
-  font-size: 0.5rem;
-  display: block; /* forces the line break */
-  margin-top: -0.3em;
-  line-height: 0.5em;
-  color: #0176a8;
-}
-
 /* Navigation lists */
 nav ul,
 #menu-nav ul {
@@ -115,6 +108,15 @@ nav ul li a,
 nav ul li a:hover,
 #menu-nav ul li a:hover {
   opacity: 0.7;
+}
+
+nav ul li a .small-part,
+#menu-nav ul li a .small-part {
+  font-size: 0.5rem;
+  display: block; /* forces the line break */
+  margin-top: -0.3em;
+  line-height: 0.5em;
+  color: var(--primary-dark-15) !important;
 }
 
 /* Menu toggle button */
