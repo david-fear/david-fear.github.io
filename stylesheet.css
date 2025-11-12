@@ -115,8 +115,9 @@ nav ul li a .small-part,
   font-size: 0.65rem;
   display: block; /* forces the line break */
   margin-top: -0.2em;
-  line-height: 0.5em;
-  color: var(--primary-light) !important;
+  line-height: 1em;
+  opacity: 0.7;
+  margin-left: 2em;
 }
 
 /* Menu toggle button */
