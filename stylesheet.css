@@ -1,7 +1,7 @@
 /* Variables */
 :root {
   --primary: #0196d7;       /* bright blue */
-  --primary-dark-15: color-mix(in srgb, var(--primary), black 15%);
+  --primary-light: #0176a8;
   --text: #222;
   --bg: #ffffff;
   --card-bg: #f6f8fa;
@@ -112,11 +112,11 @@ nav ul li a:hover,
 
 nav ul li a .small-part,
 #menu-nav ul li a .small-part {
-  font-size: 0.6rem;
+  font-size: 0.65rem;
   display: block; /* forces the line break */
-  margin-top: -0.3em;
+  margin-top: -0.2em;
   line-height: 0.5em;
-  color: var(--primary-dark-15) !important;
+  color: var(--primary-light) !important;
 }
 
 /* Menu toggle button */
