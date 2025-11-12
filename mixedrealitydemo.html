@@ -3,16 +3,31 @@
   <head>
     <meta charset="UTF-8" />
     <title>Cool Mixed Reality Demo</title>
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
+    https://aframe.io/releases/1.4.0/aframe.min.js</script>
+    https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js</script>
     <style>
       body, html { margin: 0; height: 100%; overflow: hidden; }
+      #enterVRButton {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        padding: 10px 20px;
+        background: #333;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        z-index: 999;
+      }
     </style>
   </head>
   <body>
+    <!-- Custom Enter VR Button -->
+    <button id="enterVRButton">Enter VR</button>
+
     <a-scene
       background="color: #222"
-      vr-mode-ui="enterVRButton: true"
+      vr-mode-ui="enterVRButton: #enterVRButton"
       renderer="antialias: true"
       embedded
       teleport-controls="button: trigger; collisionEntities: #floor"
