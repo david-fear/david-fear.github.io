@@ -84,10 +84,11 @@ a.button:hover {
 }
 
 a .small-part {
-  font-size: 40%;
+  font-size: 60%;
   display: block; /* forces the line break */
-  margin-top: - 0.1em; /* remove spacing */
-  color: #555; /* softer color for contrast */
+  margin-top: -0.5em;
+  line-height: 1;
+
 }
 
 /* Navigation lists */
