@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>My GitHub Static Site Template</title>
+    <link rel="stylesheet" href="https://david-fear.github.io/stylesheet.css" />
+  </head>
+  <body>
+    <!-- Dynamic sidebar menu -->
+    <div id="menu-container"></div>
+    <script>
+      fetch('menu.html')
+        .then(response => response.text())
+        .then(data => {
+          const container = document.getElementById('menu-container');
+          container.innerHTML = data;
+      
+          // Now attach event listeners because the elements exist
+          const toggle = document.getElementById('menu-toggle');
+          const menu = document.getElementById('menu-nav');
+      
+          toggle.addEventListener('click', () => {
+            const expanded = toggle.getAttribute('aria-expanded') === 'true';
+            toggle.setAttribute('aria-expanded', String(!expanded));
+            if (menu.hasAttribute('hidden')) {
+              menu.removeAttribute('hidden');
+            } else {
+              menu.setAttribute('hidden', '');
+            }
+          });
+      
+          toggle.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              toggle.click();
+            }
+          });
+        })
+        .catch(e => console.error('Failed to load menu:', e));
+    </script>
+    <header>
+      <h1>Header Heading</h1>
+      <p>Header Paragraph.</p>
+    </header>
+    <main>
+      <section>
+        <h2>Main Section Heading</h2>
+        <style>
+          .collapsible { cursor: pointer; font-weight: bold; user-select: none; margin: 6px 0; display: flex; align-items: center; }
+          .collapsible span { font-size: 0.9em; margin-right: 6px; transition: transform 0.2s ease; }
+          .collapsible.active span { transform: rotate(180deg); }
+          .collapsible-content { display: none; margin: 6px 0 10px 20px; }
+          .collapsible-content ol { margin: 0; padding-left: 20px; }
+        </style>
+        </head>
+        <body>
+          <p class="collapsible"><span>[ » » ] </span>Enterprise</p>
+          <div class="collapsible-content">
+            <ol>
+              <li>do this</li>
+              <li>then this</li>
+              <li>then that</li>
+            </ol>
+          </div>
+          <p class="collapsible"><span>[ » » ]</span>Performance</p>
+          <div class="collapsible-content">
+            <ol>
+              <li>do this and this and this and this and this and this and this and this and this and this and this and this </li>
+              <li>then this</li>
+              <li>then that</li>
+            </ol>
+          </div>
+          <center>
+            <table border=1 width=100%>
+              <tr>
+                <td width=50% valign=top>
+                  <p class="collapsible"><span>[ » » ] </span>Enterprise</p>
+                  <div class="collapsible-content">
+                    <ol>
+                      <li>do this</li>
+                      <li>then this</li>
+                      <li>then that</li>
+                    </ol>
+                  </div>
+                </td>
+                <td valign=top>
+                  <p class="collapsible"> <span>[ » » ]</span>Performance</p>
+                  <div class="collapsible-content">
+                    <ol>
+                      <li>do this and this and this and this and this and this and this and this and this and this and this and this </li>
+                      <li>then this</li>
+                      <li>then that</li>
+                    </ol>
+                  </div>
+              </tr>
+              </td>
+            </table>
+          </center>
+          <script>
+            document.querySelectorAll('.collapsible').forEach(btn => {
+              btn.addEventListener('click', () => {
+                btn.classList.toggle('active');
+                const content = btn.nextElementSibling;
+                content.style.display = content.style.display === 'block' ? 'none' : 'block';
+              });
+            });
+          </script>
+      </section>
+      <section>
+      <h2>Main Section Heading</h2>
+      <a href="#" class="button">Example Button</a>
+      </section>
+    </main>
+    <!-- Footer placeholder -->
+    <div id="footer-container"></div>
+    <script>
+      fetch('footer.html')
+        .then(response => response.text())
+        .then(data => {
+          document.getElementById('footer-container').innerHTML = data;
+        })
+        .catch(error => {
+          console.error('Failed to load footer:', error);
+        });
+    </script>
+  </body>
+</html>
