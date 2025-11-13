@@ -31,16 +31,17 @@
 
     <a-scene background="color: #111" vr-mode-ui="enterVRButton: #enterVRButton" renderer="antialias: true">
       <!-- LIGHTS -->
-<!-- Dimmed ambient and directional lights -->
-<a-entity light="type: ambient; intensity: 0.15"></a-entity>
+<!-- Ambient light: medium brightness -->
+<a-entity light="type: ambient; intensity: 0.4"></a-entity>
 
+<!-- Directional light: brighter with stronger shimmer -->
 <a-entity
-  light="type: directional; intensity: 0.3; castShadow: true"
+  light="type: directional; intensity: 0.8; castShadow: true"
   position="2 4 3"
-  animation="property: intensity; dir: alternate; dur: 3000; loop: true; from: 0.25; to: 0.35"
-  animation__pos="property: position; dir: alternate; dur: 4000; loop: true; from: 1.8 3.8 3; to: 2.2 4.2 3.2"
+  animation="property: intensity; dir: alternate; dur: 2000; loop: true; from: 0.7; to: 0.9"
+  animation__pos="property: position; dir: alternate; dur: 3000; loop: true; from: 1.8 4 3; to: 2.2 4.3 3.2"
 ></a-entity>
-
+      
       <!-- CARD IMAGE DIRECTLY IN MATERIAL -->
       <a-plane
         id="card"
