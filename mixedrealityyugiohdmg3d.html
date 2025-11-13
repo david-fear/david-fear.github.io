@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Dark Magician Girl 3D Model Viewer</title>
+    <title>Dark Magician Girl 3D Model Viewer with Right-Click Drag</title>
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <style>
       body, html {
@@ -22,6 +22,13 @@
         cursor: pointer;
         font-size: 16px;
         z-index: 999;
+      }
+      /* Disable context menu on right click so we can use it */
+      body {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
       }
     </style>
   </head>
@@ -47,10 +54,55 @@
         rotation="0 180 0"
       ></a-entity>
 
-      <!-- Camera -->
+      <!-- Camera rig -->
       <a-entity id="rig" position="0 1.6 0">
         <a-entity id="camera" camera look-controls wasd-controls position="0 0 0"></a-entity>
       </a-entity>
     </a-scene>
+
+    <script>
+      const rig = document.getElementById('rig');
+
+      let isRightMouseDown = false;
+      let lastMouseX = 0;
+      let lastMouseY = 0;
+
+      window.addEventListener('contextmenu', (e) => e.preventDefault()); // Disable right-click menu
+
+      window.addEventListener('mousedown', (e) => {
+        if (e.button === 2) { // Right button
+          isRightMouseDown = true;
+          lastMouseX = e.clientX;
+          lastMouseY = e.clientY;
+        }
+      });
+
+      window.addEventListener('mouseup', (e) => {
+        if (e.button === 2) {
+          isRightMouseDown = false;
+        }
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!isRightMouseDown) return;
+
+        const deltaX = e.clientX - lastMouseX;
+        const deltaY = e.clientY - lastMouseY;
+
+        lastMouseX = e.clientX;
+        lastMouseY = e.clientY;
+
+        const sensitivity = 0.01; // Adjust movement speed here
+
+        const pos = rig.getAttribute('position');
+
+        // Update position: X and Z for horizontal pan, Y for vertical
+        rig.setAttribute('position', {
+          x: pos.x - deltaX * sensitivity,
+          y: Math.min(Math.max(pos.y + deltaY * sensitivity, 0.5), 5), // Clamp Y between 0.5 and 5
+          z: pos.z
+        });
+      });
+    </script>
   </body>
 </html>
