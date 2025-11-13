@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Dark Magician Girl 3D Model Viewer</title>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <style>
+      body, html {
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+        background: #000;
+      }
+      #enterVRButton {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        padding: 10px 20px;
+        background: #333;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        z-index: 999;
+      }
+    </style>
+  </head>
+
+  <body>
+    <button id="enterVRButton">Enter VR</button>
+
+    <a-scene background="color: #111" vr-mode-ui="enterVRButton: #enterVRButton" renderer="antialias: true" embedded>
+      <!-- Lights -->
+      <a-entity light="type: ambient; intensity: 0.6"></a-entity>
+      <a-entity
+        light="type: directional; intensity: 1"
+        position="2 4 3"
+        animation="property: intensity; dir: alternate; dur: 2000; loop: true; from: 0.8; to: 1.2"
+        animation__pos="property: position; dir: alternate; dur: 3000; loop: true; from: 1.8 4 3; to: 2.2 4.3 3.2"
+      ></a-entity>
+
+      <!-- Dark Magician Girl 3D model -->
+      <a-entity
+        gltf-model="https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/DamagedHelmet/glTF/DamagedHelmet.gltf"
+        position="0 0 -3"
+        scale="2 2 2"
+        rotation="0 180 0"
+      ></a-entity>
+
+      <!-- Camera -->
+      <a-entity id="rig" position="0 1.6 0">
+        <a-entity id="camera" camera look-controls wasd-controls position="0 0 0"></a-entity>
+      </a-entity>
+    </a-scene>
+  </body>
+</html>
