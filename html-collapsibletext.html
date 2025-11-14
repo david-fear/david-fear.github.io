@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -54,13 +55,13 @@
         <!-- REQUIRES STYLE --> 
         <style>
           .collapsible { cursor: pointer; font-weight: bold; user-select: none; margin: 6px 0; display: flex; align-items: center; }
-          .collapsible span { font-size: 0.9em; margin-right: 6px; transition: transform 0.2s ease; }
-          .collapsible.active span { transform: rotate(180deg); }
+          .collapsible span { font-size: 1em; margin-right: 6px; transition: transform 0.4s ease; color: var(--primary)}
+          .collapsible.active span { transform: rotate(-135deg); }
           .collapsible-content { display: none; margin: 6px 0 10px 20px; }
           .collapsible-content ol { margin: 0; padding-left: 20px; }
         </style>
           <!-- EXAMPLE LISTS --> 
-          <p class="collapsible"><span>[ » » ] </span>Enterprise</p>
+          <p class="collapsible"><span>[ »»» ] </span>Enterprise</p>
           <div class="collapsible-content">
             <ol>
               <li>do this</li>
@@ -68,7 +69,7 @@
               <li>then that</li>
             </ol>
           </div>
-          <p class="collapsible"><span>[ » » ]</span>Performance</p>
+          <p class="collapsible"><span> ---» </span>Performance</p>
           <div class="collapsible-content">
             <ol>
               <li>do this and this and this and this and this and this and this and this and this and this and this and this </li>
@@ -81,7 +82,7 @@
             <table border=1 width=100%>
               <tr>
                 <td width=50% valign=top>
-                  <p class="collapsible"><span>[ » » ] </span>Enterprise</p>
+                  <p class="collapsible"><span> ─▶ </span>Enterprise</p>
                   <div class="collapsible-content">
                     <ol>
                       <li>do this</li>
@@ -91,7 +92,7 @@
                   </div>
                 </td>
                 <td valign=top>
-                  <p class="collapsible"> <span>[ » » ]</span>Performance</p>
+                  <p class="collapsible"> <span>···»</span>Performance</p>
                   <div class="collapsible-content">
                     <ol>
                       <li>do this and this and this and this and this and this and this and this and this and this and this and this </li>
