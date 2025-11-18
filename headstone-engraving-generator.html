@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -7,12 +8,6 @@
 
 <style>
   /* --- compact layout overrides --- */
-  body {
-    padding: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
   .grid {
     display: grid;
     grid-template-columns: 380px 1fr;
@@ -67,6 +62,12 @@
     display: block;
     margin: 4px 0;
   }
+  .engraving.quote {
+    text-shadow: 0 1px 0 rgba(0,0,0,0.9), 0 -1px 0 rgba(255,255,255,0.05);
+    font-style: italic;
+    display: block;
+    margin: 4px 0;
+  }
 
   .flower {
     position: absolute;
@@ -91,7 +92,7 @@
 <div id="menu-container"></div>
 
 <script>
-  fetch('menu.html')
+  fetch('https://david-fear.github.io/menu.html')
     .then(response => response.text())
     .then(data => {
       const container = document.getElementById('menu-container');
@@ -120,9 +121,13 @@
     })
     .catch(e => console.error('Failed to load menu:', e));
 </script>
-  
-<h1>Headstone Engraving Generator</h1>
+<header>
+<h1>Headstone/Plaque</h1>
+<p>Engraving Generator</p>
+</header>
 
+<main>
+<section>
 <div class="grid">
 
   <!-- LEFT: compact input form -->
@@ -139,8 +144,10 @@
       <input id="dates" type="text" value="6/10/1953 - 7/7/2023">
 
       <label>Inscription:</label>
-      <textarea id="inscription">Dearly Loved Mother, Nanu, and Wife
-" quote "</textarea> 
+      <textarea id="inscription">Dearly Loved Mother, Nanu, and Wife</textarea> 
+
+      <label>Quote:</label>
+      <textarea id="quote">" quote "</textarea>  
 
       <label>Flower (L/R):</label>
       <div style="display:flex; gap:8px;">
@@ -182,6 +189,8 @@
     </div>
   </div>
 
+</section>
+
   <!-- RIGHT: preview -->
   <div>
     <div id="preview" class="preview-box">
@@ -192,13 +201,13 @@
         <span id="p1" class="engraving" style="font-size:18px;">In Loving Memory of</span>
         <span id="pName" class="engraving" style="font-size:34px; font-weight:bold;">Katrina (Lu) Raewyn Fear</span>
         <span id="pDates" class="engraving" style="font-size:18px;">6/10/1953 - 7/7/2023</span>
-        <span id="pInsc" class="engraving" style="font-size:16px; white-space:pre-wrap;">Dearly Loved Mother, Nanu, and Wife
-" quote "</span>
+        <span id="pInsc" class="engraving" style="font-size:16px; white-space:pre-wrap;">Dearly Loved Mother, Nanu, and Wife</span>
+        <span id="pQuot" class="engraving quote" style="font-size:16px; white-space:pre-wrap;">" Have you got your sunblock on? "</span>        
       </div>
     </div>
   </div>
 
-</div>
+</main>
 
 <script>
 // Explicit element lookups to fix event triggers
@@ -206,6 +215,7 @@ const line1       = document.getElementById("line1");
 const nameEl      = document.getElementById("name");
 const dates       = document.getElementById("dates");
 const inscription = document.getElementById("inscription");
+const quote       = document.getElementById("quote");
 const flowerL     = document.getElementById("flowerL");
 const flowerR     = document.getElementById("flowerR");
 const fontSel     = document.getElementById("font");
@@ -217,6 +227,7 @@ const p1    = document.getElementById("p1");
 const pName = document.getElementById("pName");
 const pDates = document.getElementById("pDates");
 const pInsc = document.getElementById("pInsc");
+const pQuot = document.getElementById("pQuot");
 const fL = document.getElementById("fL");
 const fR = document.getElementById("fR");
 const stone = document.getElementById("stone");
@@ -230,6 +241,7 @@ function refresh(){
   pName.textContent = nameEl.value;
   pDates.textContent = dates.value;
   pInsc.textContent = inscription.value;
+  pQuot.textContent = quote.value;
 
   fL.textContent = flowerL.value;
   fR.textContent = flowerR.value;
@@ -245,7 +257,7 @@ function refresh(){
 
 // Attach listeners
 [
- line1, nameEl, dates, inscription,
+ line1, nameEl, dates, inscription, quote,
  flowerL, flowerR, fontSel,
  sizeName, sizeDates, alignSel
 ].forEach(el => el.addEventListener("input", refresh));
@@ -262,7 +274,8 @@ document.getElementById("resetBtn").addEventListener("click", ()=>{
   line1.value = "In Loving Memory of";
   nameEl.value = "Katrina (Lu) Raewyn Fear";
   dates.value = "6/10/1953 - 7/7/2023";
-  inscription.value = 'Dearly Loved Mother, Nanu, and Wife\n" quote "';
+  inscription.value = 'Dearly Loved Mother, Nanu, and Wife';
+  quote.value = '" Have you got your sunblock on? "';
   flowerL.value = "🌸";
   flowerR.value = "🌸";
   sizeName.value = 34;
