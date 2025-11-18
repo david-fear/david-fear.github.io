@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Headstone Engraving</title>
+<link rel="stylesheet" href="https://david-fear.github.io/stylesheet.css">
+
+<style>
+  /* --- compact layout overrides --- */
+  body {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 20px;
+  }
+
+  @media(max-width: 900px){
+    .grid { grid-template-columns: 1fr; }
+  }
+
+  .form-table {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    row-gap: 8px;
+    column-gap: 10px;
+    align-items: center;
+  }
+
+  .form-table label {
+    font-weight: bold;
+  }
+
+  input[type=text], textarea, select, input[type=number] {
+    width: 100%;
+  }
+
+  textarea { min-height: 60px; }
+
+  .preview-box {
+    background: #2b2b2b;
+    border-radius: 10px;
+    width: 100%;
+    height: 460px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 25px;
+    position: relative;
+    color: #eee;
+    overflow: hidden;
+  }
+
+  .stone-face {
+    text-align: center;
+    width: 100%;
+    max-width: 80%;
+    margin: 0 auto;
+  }
+
+  .engraving {
+    text-shadow: 0 1px 0 rgba(0,0,0,0.9), 0 -1px 0 rgba(255,255,255,0.05);
+    display: block;
+    margin: 4px 0;
+  }
+
+  .flower {
+    position: absolute;
+    top: 10px;
+    font-size: 28px;
+    opacity: 0.9;
+  }
+  .flower.left { left: 10px; }
+  .flower.right { right: 10px; }
+
+  .buttons {
+    margin-top: 15px;
+  }
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+
+<body>
+
+    <!-- Dynamic sidebar menu -->
+<div id="menu-container"></div>
+
+<script>
+  fetch('menu.html')
+    .then(response => response.text())
+    .then(data => {
+      const container = document.getElementById('menu-container');
+      container.innerHTML = data;
+
+      // Now attach event listeners because the elements exist
+      const toggle = document.getElementById('menu-toggle');
+      const menu = document.getElementById('menu-nav');
+
+      toggle.addEventListener('click', () => {
+        const expanded = toggle.getAttribute('aria-expanded') === 'true';
+        toggle.setAttribute('aria-expanded', String(!expanded));
+        if (menu.hasAttribute('hidden')) {
+          menu.removeAttribute('hidden');
+        } else {
+          menu.setAttribute('hidden', '');
+        }
+      });
+
+      toggle.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggle.click();
+        }
+      });
+    })
+    .catch(e => console.error('Failed to load menu:', e));
+</script>
+  
+<h1>Headstone Engraving Generator</h1>
+
+<div class="grid">
+
+  <!-- LEFT: compact input form -->
+  <div>
+    <div class="form-table">
+
+      <label>Top Line:</label>
+      <input id="line1" type="text" value="In Loving Memory of">
+
+      <label>Name:</label>
+      <input id="name" type="text" value="Katrina (Lu) Raewyn Fear">
+
+      <label>Dates:</label>
+      <input id="dates" type="text" value="6/10/1953 - 7/7/2023">
+
+      <label>Inscription:</label>
+      <textarea id="inscription">Dearly Loved Mother, Nanu, and Wife
+" quote "</textarea> 
+
+      <label>Flower (L/R):</label>
+      <div style="display:flex; gap:8px;">
+        <input id="flowerL" type="text" value="🌸">
+        <input id="flowerR" type="text" value="🌸">
+      </div>
+
+    <label>Font:</label>
+    <select id="font">
+      <option value="'Palatino Linotype', Palatino, serif">Palatino Linotype</option>
+      <option value="Cambria, serif">Cambria</option>
+      <option value="Constantia, serif">Constantia</option>
+      <option value="'Times New Roman', Times, serif">Times New Roman</option>
+      <option value="'Baskerville Old Face', serif">Baskerville Old Face</option>
+      <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+      <option value="'Segoe UI', sans-serif">Segoe UI</option>
+      <option value="Georgia, serif">Georgia</option>
+      <option value="serif">Generic Serif</option>
+    </select>
+
+      <label>Sizes:</label>
+      <div style="display:flex; gap:8px;">
+        <input id="sizeName" type="number" value="34">
+        <input id="sizeDates" type="number" value="18">
+      </div>
+
+      <label>Alignment:</label>
+      <select id="align">
+        <option value="center">Centre</option>
+        <option value="left">Left</option>
+        <option value="right">Right</option> 
+      </select>
+
+    </div>
+
+    <div class="buttons">
+      <button id="downloadBtn">Download PNG</button>
+      <button id="resetBtn">Reset</button>
+    </div>
+  </div>
+
+  <!-- RIGHT: preview -->
+  <div>
+    <div id="preview" class="preview-box">
+      <span id="fL" class="flower left">🌸</span>
+      <span id="fR" class="flower right">🌸</span>
+
+      <div id="stone" class="stone-face">
+        <span id="p1" class="engraving" style="font-size:18px;">In Loving Memory of</span>
+        <span id="pName" class="engraving" style="font-size:34px; font-weight:bold;">Katrina (Lu) Raewyn Fear</span>
+        <span id="pDates" class="engraving" style="font-size:18px;">6/10/1953 - 7/7/2023</span>
+        <span id="pInsc" class="engraving" style="font-size:16px; white-space:pre-wrap;">Dearly Loved Mother, Nanu, and Wife
+" quote "</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Explicit element lookups to fix event triggers
+const line1       = document.getElementById("line1");
+const nameEl      = document.getElementById("name");
+const dates       = document.getElementById("dates");
+const inscription = document.getElementById("inscription");
+const flowerL     = document.getElementById("flowerL");
+const flowerR     = document.getElementById("flowerR");
+const fontSel     = document.getElementById("font");
+const sizeName    = document.getElementById("sizeName");
+const sizeDates   = document.getElementById("sizeDates");
+const alignSel    = document.getElementById("align");
+
+const p1    = document.getElementById("p1");
+const pName = document.getElementById("pName");
+const pDates = document.getElementById("pDates");
+const pInsc = document.getElementById("pInsc");
+const fL = document.getElementById("fL");
+const fR = document.getElementById("fR");
+const stone = document.getElementById("stone");
+const preview = document.getElementById("preview");
+
+// Prevent Times New Roman by setting a default font in CSS
+stone.style.fontFamily = "Georgia, serif";
+
+function refresh(){
+  p1.textContent = line1.value;
+  pName.textContent = nameEl.value;
+  pDates.textContent = dates.value;
+  pInsc.textContent = inscription.value;
+
+  fL.textContent = flowerL.value;
+  fR.textContent = flowerR.value;
+
+  // only change font if user actually changes selector
+  stone.style.fontFamily = fontSel.value;
+
+  pName.style.fontSize = sizeName.value + "px";
+  pDates.style.fontSize = sizeDates.value + "px";
+
+  stone.style.textAlign = alignSel.value;
+}
+
+// Attach listeners
+[
+ line1, nameEl, dates, inscription,
+ flowerL, flowerR, fontSel,
+ sizeName, sizeDates, alignSel
+].forEach(el => el.addEventListener("input", refresh));
+
+document.getElementById("downloadBtn").addEventListener("click", async ()=>{
+  const canvas = await html2canvas(preview, { scale: 2 });
+  const a = document.createElement("a");
+  a.download = (nameEl.value || "headstone") + ".png";
+  a.href = canvas.toDataURL();
+  a.click();
+});
+
+document.getElementById("resetBtn").addEventListener("click", ()=>{
+  line1.value = "In Loving Memory of";
+  nameEl.value = "Katrina (Lu) Raewyn Fear";
+  dates.value = "6/10/1953 - 7/7/2023";
+  inscription.value = 'Dearly Loved Mother, Nanu, and Wife\n" quote "';
+  flowerL.value = "🌸";
+  flowerR.value = "🌸";
+  sizeName.value = 34;
+  sizeDates.value = 18;
+  fontSel.value = "'Palatino Linotype', Palatino, Cambria, Constantia, 'Times New Roman', 'Baskerville Old Face', 'Trebuchet MS', 'Segoe UI', serif";
+  alignSel.value = "center";
+  refresh();
+});
+
+refresh();
+</script>
+
+</body>
+</html>
