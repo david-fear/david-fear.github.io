@@ -223,7 +223,7 @@ hr {
 
 .wide {
   max-width: none !important;
-  width: 90%;
+  width: 100%;
 }
 
 /* Responsive adjustments */
