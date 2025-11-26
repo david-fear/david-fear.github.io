@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>HAR File Analyzer</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+  <style>
+    pre { white-space: pre-wrap; word-wrap: break-word; }
+    .dropzone { border: 2px dashed #9CA3AF; border-radius: .5rem; padding: 1.5rem; text-align:center }
+    .small-muted { font-size: .85rem; color: #6B7280 }
+    .chip { display:inline-block; padding:.25rem .5rem; border-radius:999px; background:#E5E7EB; margin:.125rem }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+  <div class="max-w-6xl mx-auto p-6">
+    <h1 class="text-2xl font-semibold mb-2">HAR File Analyzer</h1>
+    <p class="small-muted mb-4">Drop a .har file or choose one. This single HTML file parses the HAR and shows summaries, charts and exports.</p>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div class="lg:col-span-1">
+        <div id="drop" class="dropzone bg-white cursor-pointer" tabindex="0">
+          <p id="dropText">Drop HAR here or click to choose a file</p>
+          <input id="fileInput" type="file" accept="application/json,.har" class="hidden" />
+        </div>
+        <div class="mt-4 bg-white p-4 rounded shadow-sm">
+          <div class="mb-2"><strong>Summary</strong></div>
+          <div id="summary" class="text-sm space-y-1 small-muted">No file loaded.</div>
+
+          <div class="mt-3">
+            <button id="exportCSV" class="mt-2 px-3 py-1 bg-blue-600 text-white rounded">Export requests CSV</button>
+            <button id="downloadReport" class="mt-2 ml-2 px-3 py-1 bg-green-600 text-white rounded">Download JSON report</button>
+          </div>
+        </div>
+
+        <div class="mt-4 bg-white p-4 rounded shadow-sm">
+          <div><strong>Filters</strong></div>
+          <div class="mt-2">
+            <label class="small-muted">Status codes (comma separated)</label>
+            <input id="statusFilter" class="w-full mt-1 p-2 border rounded" placeholder="e.g. 200,301,404" />
+            <label class="small-muted mt-2">Domain filter (regex)</label>
+            <input id="domainFilter" class="w-full mt-1 p-2 border rounded" placeholder="e.g. \\bexample\\.com$" />
+            <button id="applyFilters" class="mt-3 px-3 py-1 bg-indigo-600 text-white rounded">Apply</button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="lg:col-span-2">
+        <div class="bg-white p-4 rounded shadow-sm">
+          <div class="mb-3 flex items-center justify-between">
+            <div><strong>Requests</strong> <span id="reqCount" class="small-muted"></span></div>
+            <div class="small-muted">Top domains: <span id="topDomains"></span></div>
+          </div>
+
+          <div class="overflow-auto" style="max-height:300px">
+            <table id="requestsTable" class="w-full text-sm table-auto">
+              <thead class="bg-gray-100 sticky top-0">
+                <tr class="text-left"><th class="p-2">#</th><th>Method</th><th>URL</th><th>Domain</th><th>Status</th><th>Size (B)</th><th>Time (ms)</th><th>Type</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+
+          <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-white p-3 rounded border">
+              <canvas id="sizeChart" height="200"></canvas>
+            </div>
+            <div class="bg-white p-3 rounded border">
+              <canvas id="countChart" height="200"></canvas>
+            </div>
+          </div>
+
+          <div class="mt-4 bg-white p-3 rounded border">
+            <strong>Largest resources</strong>
+            <ol id="largestList" class="list-decimal pl-5 mt-2 small-muted"></ol>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <div class="mt-6 bg-white p-4 rounded shadow-sm">
+      <details>
+        <summary><strong>Raw HAR JSON (excerpt)</strong></summary>
+        <pre id="rawJson" class="p-2"></pre>
+      </details>
+    </div>
+
+    <footer class="mt-6 small-muted">Made with ❤️ — open the file in a modern browser. No data leaves your computer.</footer>
+  </div>
+
+<script>
+(function(){
+  const drop = document.getElementById('drop');
+  const fileInput = document.getElementById('fileInput');
+  const dropText = document.getElementById('dropText');
+  const summary = document.getElementById('summary');
+  const requestsTableBody = document.querySelector('#requestsTable tbody');
+  const reqCount = document.getElementById('reqCount');
+  const topDomainsEl = document.getElementById('topDomains');
+  const largestList = document.getElementById('largestList');
+  const rawJson = document.getElementById('rawJson');
+  const exportCSV = document.getElementById('exportCSV');
+  const downloadReport = document.getElementById('downloadReport');
+  const applyFilters = document.getElementById('applyFilters');
+  const statusFilter = document.getElementById('statusFilter');
+  const domainFilter = document.getElementById('domainFilter');
+
+  let har = null;
+  let entries = [];
+  let sizeChart = null;
+  let countChart = null;
+
+  function resetUI(){
+    requestsTableBody.innerHTML='';
+    largestList.innerHTML='';
+    rawJson.textContent='';
+    reqCount.textContent='';
+    topDomainsEl.textContent='';
+    if(sizeChart) sizeChart.destroy();
+    if(countChart) countChart.destroy();
+  }
+
+  function parseHAR(obj){
+    const log = obj.log;
+    if(!log || !log.entries) throw new Error('Not a HAR log with entries');
+    entries = log.entries.map((e,i)=>{
+      const url = new URL(e.request.url);
+      const domain = url.hostname;
+      const method = e.request.method;
+      const status = e.response.status;
+      const mime = (e.response.content && e.response.content.mimeType) || '';
+      const size = (e.response.bodySize>=0? e.response.bodySize : (e.response.content && e.response.content.size) || 0);
+      const time = e.time || ( (e.timings && Object.values(e.timings).reduce((a,b)=>a+(b>0?b:0),0)) || 0);
+      const started = new Date(e.startedDateTime).getTime();
+      const type = mime.split(';')[0];
+      return {i, url: e.request.url, domain, method, status, mime, size, time, started, type};
+    });
+  }
+
+  function summarize(){
+    const totalRequests = entries.length;
+    const totalBytes = entries.reduce((s,e)=>s+ (Number(e.size)||0),0);
+    const totalTime = entries.reduce((s,e)=>s+ (Number(e.time)||0),0);
+    const byStatus = {}; const byDomain={}; const byType={};
+    entries.forEach(e=>{
+      byStatus[e.status] = (byStatus[e.status]||0)+1;
+      byDomain[e.domain] = (byDomain[e.domain]||0)+1;
+      byType[e.type] = (byType[e.type]||0)+1;
+    });
+    const topDomains = Object.entries(byDomain).sort((a,b)=>b[1]-a[1]).slice(0,5).map(x=>x[0]+'('+x[1]+')');
+
+    summary.innerHTML = `
+      <div>Total requests: <strong>${totalRequests}</strong></div>
+      <div>Total transferred: <strong>${totalBytes.toLocaleString()} B</strong></div>
+      <div>Sum of request times: <strong>${Math.round(totalTime)} ms</strong></div>
+      <div class="mt-2"><strong>Status breakdown:</strong> ${Object.entries(byStatus).map(s=>`<span class="chip">${s[0]}: ${s[1]}</span>`).join(' ')}</div>
+      <div class="mt-2"><strong>Type breakdown:</strong> ${Object.entries(byType).slice(0,10).map(s=>`<span class="chip">${s[0]}: ${s[1]}</span>`).join(' ')}</div>
+    `;
+
+    reqCount.textContent = `${totalRequests} requests`;
+    topDomainsEl.textContent = topDomains.join(', ');
+
+    // fill table
+    requestsTableBody.innerHTML = entries.map(e=>`
+      <tr class="border-t"><td class="p-2">${e.i+1}</td><td class="p-2">${e.method}</td><td class="p-2"><a href="${e.url}" target="_blank" rel="noreferrer noopener">${truncate(e.url,80)}</a></td><td class="p-2">${e.domain}</td><td class="p-2">${e.status}</td><td class="p-2">${e.size}</td><td class="p-2">${Math.round(e.time)}</td><td class="p-2">${e.type}</td></tr>
+    `).join('');
+
+    // largest
+    const largest = entries.slice().sort((a,b)=>b.size-a.size).slice(0,10);
+    largestList.innerHTML = largest.map(x=>`<li>${x.domain} — ${truncate(x.url,80)} — ${x.size.toLocaleString()} B</li>`).join('');
+
+    // charts
+    drawCharts(byDomain);
+
+    // raw
+    rawJson.textContent = JSON.stringify({log: {version: obj.log && obj.log.version, creator: obj.log && obj.log.creator}, summary: {totalRequests, totalBytes, totalTime}}, null, 2);
+  }
+
+  function truncate(s,n){ return s.length>n? s.slice(0,n-1)+'…': s }
+
+  function drawCharts(byDomain){
+    const domainLabels = Object.entries(byDomain).sort((a,b)=>b[1]-a[1]).slice(0,10);
+    const labels = domainLabels.map(a=>a[0]);
+    const counts = domainLabels.map(a=>a[1]);
+    const sizesByDomain = labels.map(d=> entries.filter(e=>e.domain===d).reduce((s,e)=>s+(e.size||0),0));
+
+    const ctx1 = document.getElementById('sizeChart').getContext('2d');
+    sizeChart = new Chart(ctx1, {
+      type: 'bar', data: { labels, datasets: [{ label: 'Transferred bytes', data: sizesByDomain, } ] }, options: { responsive:true, plugins:{ legend:{display:false}}, scales:{ y:{beginAtZero:true}} }
+    });
+
+    const ctx2 = document.getElementById('countChart').getContext('2d');
+    countChart = new Chart(ctx2, {
+      type: 'bar', data: { labels, datasets: [{ label: 'Request count', data: counts }] }, options: { responsive:true, plugins:{ legend:{display:false}}, scales:{ y:{beginAtZero:true, precision:0}} }
+    });
+  }
+
+  function applyFilterAndRefresh(){
+    const statusText = statusFilter.value.trim();
+    const domainText = domainFilter.value.trim();
+    let statusSet = null;
+    if(statusText) {
+      statusSet = new Set(statusText.split(',').map(s=>s.trim()).filter(Boolean).map(Number));
+    }
+    let domainRe = null;
+    if(domainText){ try{ domainRe = new RegExp(domainText); } catch(e){ alert('Domain regex invalid: '+e.message); return; } }
+
+    const filtered = entries.filter(e=>{
+      if(statusSet && !statusSet.has(Number(e.status))) return false;
+      if(domainRe && !domainRe.test(e.domain)) return false;
+      return true;
+    });
+
+    // temporarily replace entries for summarize, but keep master copy
+    const old = entries;
+    entries = filtered;
+    summarize();
+    entries = old;
+  }
+
+  applyFilters.addEventListener('click', applyFilterAndRefresh);
+
+  function handleFile(file){
+    const reader = new FileReader();
+    reader.onload = function(ev){
+      try{
+        const obj = JSON.parse(ev.target.result);
+        resetUI();
+        parseHAR(obj);
+        window._harEntries = entries; // for console debugging
+        summarize();
+      } catch(err){
+        alert('Failed to parse HAR: '+err.message);
+      }
+    };
+    reader.onerror = () => alert('Failed reading file');
+    reader.readAsText(file);
+  }
+
+  drop.addEventListener('click', ()=>fileInput.click());
+  drop.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') fileInput.click(); });
+  drop.addEventListener('dragover', (e)=>{ e.preventDefault(); drop.classList.add('ring-2','ring-indigo-300'); });
+  drop.addEventListener('dragleave', ()=>{ drop.classList.remove('ring-2','ring-indigo-300'); });
+  drop.addEventListener('drop', (e)=>{ e.preventDefault(); drop.classList.remove('ring-2','ring-indigo-300'); if(e.dataTransfer.files && e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]); });
+  fileInput.addEventListener('change', (e)=>{ if(e.target.files && e.target.files[0]) handleFile(e.target.files[0]); });
+
+  exportCSV.addEventListener('click', ()=>{
+    if(!entries || !entries.length){ alert('No entries to export'); return; }
+    const rows = [['index','method','url','domain','status','size','time','mime']];
+    entries.forEach(e=> rows.push([e.i+1,e.method,e.url,e.domain,e.status,e.size,Math.round(e.time),e.mime||'']));
+    const csv = rows.map(r=> r.map(c=> '"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'har-requests.csv'; a.click(); URL.revokeObjectURL(url);
+  });
+
+  downloadReport.addEventListener('click', ()=>{
+    if(!entries || !entries.length){ alert('No data'); return; }
+    const report = {generatedAt: new Date().toISOString(), requests: entries};
+    const blob = new Blob([JSON.stringify(report,null,2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'har-report.json'; a.click(); URL.revokeObjectURL(url);
+  });
+
+})();
+</script>
+</body>
+</html>
