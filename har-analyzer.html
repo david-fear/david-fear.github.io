@@ -8,11 +8,39 @@
   body { font-family: Arial, sans-serif; margin: 20px; }
   h1 { font-size: 24px; margin-bottom: 10px; }
   #dropzone { border: 2px dashed #999; padding: 20px; text-align: center; cursor: pointer; margin-bottom: 20px; }
-  table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-  th, td { border: 1px solid #ccc; padding: 6px; font-size: 12px; vertical-align: top; }
-  th { background: #f4f4f4; }
-  #summary { margin-top: 20px; font-size: 14px; }
-  pre { background: #f5f5f5; padding: 10px; overflow: auto; font-size: 12px; white-space: pre-wrap; word-break: break-word; }
+  #results {
+    overflow-x: auto;
+    max-width: 100%;
+    border: 1px solid #ccc;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    table-layout: auto; /* allow flexible column widths */
+    white-space: nowrap; /* prevent wrapping inside cells */
+  }
+  th, td {
+    border: 1px solid #ccc;
+    padding: 6px;
+    font-size: 12px;
+    vertical-align: top;
+  }
+  th {
+    background: #f4f4f4;
+  }
+  #summary {
+    margin-top: 20px;
+    font-size: 14px;
+  }
+  pre {
+    background: #f5f5f5;
+    padding: 10px;
+    overflow: auto;
+    font-size: 12px;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
   button {
     cursor: pointer;
     background-color: #007acc;
@@ -66,7 +94,10 @@
 </script>
 <!-- Dynamic sidebar menu END -->
 
-<h1>HAR Analyzer</h1>
+  <header>
+    <h1>HAR Analyzer</h1>
+  </header>
+
 <div id="dropzone">Drop HAR file here or click to select</div>
 <input type="file" id="fileInput" accept=".har" style="display:none;" />
 
@@ -174,7 +205,7 @@ function renderTable(obj) {
         html += `
         <tr>
             <td>${escapeHtml(req?.method || '')}</td>
-            <td title="${escapeHtml(req?.url || '')}">${escapeHtml(truncateUrl(req?.url || '', 80))}</td>
+            <td>${escapeHtml(req?.url || '')}</td>
             <td>${res?.status || ''}</td>
             <td>${res?.content?.size || 0}</td>
             <td>${e.time || 0}</td>
@@ -222,12 +253,6 @@ function tryParseJson(text) {
     } catch {
         return null;
     }
-}
-
-function truncateUrl(url, maxLen) {
-    if (!url) return "";
-    if (url.length <= maxLen) return url;
-    return url.substring(0, maxLen - 3) + "...";
 }
 </script>
 
