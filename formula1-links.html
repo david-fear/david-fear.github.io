@@ -83,6 +83,10 @@
           <td><a href="https://formulacountdown.com/">https://formulacountdown.com/</a></td>
         </tr>
         <tr>
+          <td width="200px;"><p>F1 Pace</p></td>
+          <td><a href="https://f1pace.com/">https://f1pace.com/</a></td>
+        </tr>
+        <tr>
           <td><p>Youtube - TacticalRab</p></td>
           <td><p><a href="https://www.youtube.com/@F1NewsTR/videos">https://www.youtube.com/@F1NewsTR</a></p></td>
         </tr>
@@ -92,7 +96,54 @@
         </tr>
       </table>
     </section>
-  
+
+    <section>
+      <h2 class="mid">Next Race</h2>
+        <div id="race-info">
+    Loading next race details...
+  </div>
+
+<script>
+  async function fetchNextRace() {
+    try {
+      const proxyUrl = 'https://api.allorigins.win/raw?url=';
+      const apiUrl = 'https://ergast.com/api/f1/current/next.json';
+
+      const res = await fetch(proxyUrl + encodeURIComponent(apiUrl));
+      const data = await res.json();
+
+      const race = data.MRData.RaceTable.Races[0];
+      if (!race) {
+        document.getElementById('race-info').textContent = "No upcoming races found.";
+        return;
+      }
+
+      const raceName = race.raceName;
+      const circuit = race.Circuit.circuitName;
+      const location = race.Circuit.Location.locality + ", " + race.Circuit.Location.country;
+      const raceDateTimeUTC = race.date + "T" + race.time;
+      const raceDate = new Date(raceDateTimeUTC);
+
+      const optionsDate = { year: 'numeric', month: 'long', day: 'numeric' };
+      const optionsTime = { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' };
+      const localDate = raceDate.toLocaleDateString(undefined, optionsDate);
+      const localTime = raceDate.toLocaleTimeString(undefined, optionsTime);
+
+      document.getElementById('race-info').innerHTML = `
+        <strong>${raceName}</strong><br/>
+        Circuit: ${circuit} (${location})<br/>
+        Date: ${localDate}<br/>
+        Time: ${localTime}
+      `;
+    } catch (error) {
+      document.getElementById('race-info').textContent = "Failed to load race data.";
+      console.error(error);
+    }
+  }
+
+  fetchNextRace();
+</script>
+    </section>
   </main>
 
   <!-- Footer placeholder -->
