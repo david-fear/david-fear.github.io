@@ -21,7 +21,8 @@
     border: 1px solid #ccc;
     padding: 4px;
     font-size: 10px;
-    vertical-align: top;
+    vertical-align: top
+    word-break: break-all;
   }
   th {
     background: #f4f4f4;
@@ -182,6 +183,8 @@ function renderTable(obj) {
             <th>Status</th>
             <th>Size</th>
             <th>Time (ms)</th>
+            <th>Origin</th>
+            <th>Content-Type</th>
             <th>Payload</th>
         </tr>
     `;
@@ -189,6 +192,14 @@ function renderTable(obj) {
     entries.forEach((e, idx) => {
         const req = e.request;
         const res = e.response;
+
+        // Extract Origin from request headers (case-insensitive)
+        const originHeader = (req.headers || []).find(h => h.name.toLowerCase() === 'origin');
+        const origin = originHeader ? originHeader.value : '';
+
+        // Extract Content-Type from response headers (case-insensitive)
+        const contentTypeHeader = (res.headers || []).find(h => h.name.toLowerCase() === 'content-type');
+        const contentType = contentTypeHeader ? contentTypeHeader.value : '';
 
         const hasJSON = req?.postData?.text ? true : false;
         const hasParams = req?.postData?.params?.length > 0;
@@ -207,6 +218,8 @@ function renderTable(obj) {
             <td>${res?.status || ''}</td>
             <td>${res?.content?.size || 0}</td>
             <td>${Math.round(e.time) || 0}</td>
+            <td>${escapeHtml(origin)}</td>
+            <td>${escapeHtml(contentType)}</td>
             <td>
                 ${(hasJSON || hasParams)
                     ? `<button onclick="togglePayload(${idx})">View</button>`
@@ -215,7 +228,7 @@ function renderTable(obj) {
             </td>
         </tr>
         <tr id="payload-${idx}" class="payload-row" style="display:none;">
-            <td colspan="6">
+            <td colspan="8">
                 <pre>${payloadDisplay}</pre>
             </td>
         </tr>
