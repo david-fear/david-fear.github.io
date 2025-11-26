@@ -11,9 +11,8 @@
 
 <body>
 
-  <!-- Dynamic sidebar menu -->
+<!-- Dynamic sidebar menu START - right after BODY tag -->
 <div id="menu-container"></div>
-
 <script>
   fetch('menu.html')
     .then(response => response.text())
@@ -44,6 +43,8 @@
     })
     .catch(e => console.error('Failed to load menu:', e));
 </script>
+<!-- Dynamic sidebar menu END -->
+
 
   <header>
     <h1>Header Heading</h1>
