@@ -5,8 +5,6 @@
 <link rel="stylesheet" href="https://david-fear.github.io/stylesheet.css" />
 <title>HAR Analyzer</title>
 <style>
-  body { font-family: Arial, sans-serif; margin: 20px; }
-  h1 { font-size: 24px; margin-bottom: 10px; }
   #dropzone { border: 2px dashed #999; padding: 20px; text-align: center; cursor: pointer; margin-bottom: 20px; }
   #results {
     overflow-x: auto;
@@ -18,12 +16,11 @@
     border-collapse: collapse;
     margin-top: 20px;
     table-layout: auto; /* allow flexible column widths */
-    white-space: nowrap; /* prevent wrapping inside cells */
   }
   th, td {
     border: 1px solid #ccc;
-    padding: 6px;
-    font-size: 12px;
+    padding: 4px;
+    font-size: 10px;
     vertical-align: top;
   }
   th {
@@ -98,6 +95,7 @@
     <h1>HAR Analyzer</h1>
   </header>
 
+<main>
 <div id="dropzone">Drop HAR file here or click to select</div>
 <input type="file" id="fileInput" accept=".har" style="display:none;" />
 
@@ -208,7 +206,7 @@ function renderTable(obj) {
             <td>${escapeHtml(req?.url || '')}</td>
             <td>${res?.status || ''}</td>
             <td>${res?.content?.size || 0}</td>
-            <td>${e.time || 0}</td>
+            <td>${Math.round(e.time) || 0}</td>
             <td>
                 ${(hasJSON || hasParams)
                     ? `<button onclick="togglePayload(${idx})">View</button>`
