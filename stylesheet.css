@@ -221,6 +221,11 @@ hr {
   margin: 0 auto;
 }
 
+.wide {
+  max-width: none !important;
+  width: 90%;
+}
+
 /* Responsive adjustments */
 @media (max-width: 767px) {
   body {
