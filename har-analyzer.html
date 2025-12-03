@@ -123,6 +123,12 @@ dropzone.addEventListener("drop", e => {
 });
 fileInput.addEventListener("change", e => handleFile(e.target.files[0]));
 
+function timeColor(ms) {
+    if (ms < 100) return "background-color:#c6f6c6";        // green
+    if (ms < 1000) return "background-color:#ffe9b3";       // orange
+    return "background-color:#ffb3b3";                      // red
+}
+
 function handleFile(file) {
     const reader = new FileReader();
     reader.onload = evt => {
@@ -217,7 +223,7 @@ function renderTable(obj) {
             <td>${escapeHtml(req?.url || '')}</td>
             <td>${res?.status || ''}</td>
             <td>${res?.content?.size || 0}</td>
-            <td>${Math.round(e.time) || 0}</td>
+            <td style="${timeColor(Math.round(e.time))}">${Math.round(e.time) || 0}</td>
             <td>${escapeHtml(origin)}</td>
             <td>${escapeHtml(contentType)}</td>
             <td>
