@@ -128,7 +128,12 @@ function timeColor(ms) {
     if (ms < 1000) return "background-color:#ffe9b3";       // orange
     return "background-color:#ffb3b3";                      // red
 }
-
+  
+function statusColor(status) {
+    if (status >= 200 && status < 300) return "background-color:#c6f6c6";  // green
+    return "background-color:#ffb3b3";                                    // red
+}
+  
 function handleFile(file) {
     const reader = new FileReader();
     reader.onload = evt => {
@@ -221,7 +226,7 @@ function renderTable(obj) {
         <tr>
             <td>${escapeHtml(req?.method || '')}</td>
             <td>${escapeHtml(req?.url || '')}</td>
-            <td>${res?.status || ''}</td>
+            <td style="${statusColor(res?.status)}">${res?.status || ''}</td>
             <td>${res?.content?.size || 0}</td>
             <td style="${timeColor(Math.round(e.time))}">${Math.round(e.time) || 0}</td>
             <td>${escapeHtml(origin)}</td>
