@@ -14,7 +14,7 @@
 <div id="menu-container"></div>
 
 <script>
-  fetch('menu.html')
+  fetch('https://david-fear.github.io/menu.html')
     .then(response => response.text())
     .then(data => {
       const container = document.getElementById('menu-container');
@@ -50,6 +50,13 @@
   </header>
 
   <main>
+      
+    <section align="center">
+      <h2>Next Race</h2>
+      <script type="text/javascript" src="https://www.f1widget.com/javascript/remote.js" async></script>
+      <script type="text/javascript">(window.f1widgets ||= []).push({width: 400, height: 70, lang: "en"});</script>
+    </section>
+
     <section>
       <h2 class="mid">Racing Bulls Performance</h2>
       <p class="mid"><b>Isack Hadjar</b> vs <b>Liam Lawson</b> (H2H)</p>
@@ -97,53 +104,6 @@
       </table>
     </section>
 
-    <section>
-      <h2 class="mid">Next Race</h2>
-        <div id="race-info">
-    Loading next race details...
-  </div>
-
-<script>
-  async function fetchNextRace() {
-    try {
-      const proxyUrl = 'https://api.allorigins.win/raw?url=';
-      const apiUrl = 'https://ergast.com/api/f1/current/next.json';
-
-      const res = await fetch(proxyUrl + encodeURIComponent(apiUrl));
-      const data = await res.json();
-
-      const race = data.MRData.RaceTable.Races[0];
-      if (!race) {
-        document.getElementById('race-info').textContent = "No upcoming races found.";
-        return;
-      }
-
-      const raceName = race.raceName;
-      const circuit = race.Circuit.circuitName;
-      const location = race.Circuit.Location.locality + ", " + race.Circuit.Location.country;
-      const raceDateTimeUTC = race.date + "T" + race.time;
-      const raceDate = new Date(raceDateTimeUTC);
-
-      const optionsDate = { year: 'numeric', month: 'long', day: 'numeric' };
-      const optionsTime = { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' };
-      const localDate = raceDate.toLocaleDateString(undefined, optionsDate);
-      const localTime = raceDate.toLocaleTimeString(undefined, optionsTime);
-
-      document.getElementById('race-info').innerHTML = `
-        <strong>${raceName}</strong><br/>
-        Circuit: ${circuit} (${location})<br/>
-        Date: ${localDate}<br/>
-        Time: ${localTime}
-      `;
-    } catch (error) {
-      document.getElementById('race-info').textContent = "Failed to load race data.";
-      console.error(error);
-    }
-  }
-
-  fetchNextRace();
-</script>
-    </section>
   </main>
 
   <!-- Footer placeholder -->
