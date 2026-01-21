@@ -6,6 +6,23 @@
 <title>My GitHub Static Site Template</title>
 
 <link rel="stylesheet" href="https://david-fear.github.io/stylesheet.css" />
+<style>
+.iframe-wrapper {
+  width: 550px;
+  height: 260px;
+  margin: 0 auto;
+  overflow: hidden;
+  position: relative;
+}
+
+.iframe-wrapper iframe {
+  width: 1100px;
+  height: 520px;
+  transform: scale(0.5);
+  transform-origin: top left;
+  border: 0;
+}
+</style>
 </head>
 
 <body>
@@ -51,11 +68,19 @@
 
   <main>
       
-    <section align="center">
-      <h2>Next Race</h2>
-      <script type="text/javascript" src="https://www.f1widget.com/javascript/remote.js" async></script>
-      <script type="text/javascript">(window.f1widgets ||= []).push({width: 400, height: 70, lang: "en"});</script>
-    </section>
+<section>
+  <h2 class="mid">Next Race</h2>
+  <div id="race-info" class="iframe-wrapper">
+    <iframe
+      src="https://www.f1timer.com/"
+      width="600"
+      height="300"
+      frameborder="0"
+      scrolling="no"
+      loading="lazy">
+    </iframe>
+  </div>
+</section>
 
     <section>
       <h2 class="mid">Racing Bulls Performance</h2>
