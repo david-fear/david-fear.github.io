@@ -62,6 +62,25 @@
   border-radius: 6px;
 }
 
+#previewBox ul, #outputBox ul {
+  list-style-type: disc;
+  margin-left: 1.2em;
+  padding-left: 1.2em;
+}
+
+#previewBox ul ul, #outputBox ul ul {
+  list-style-type: circle;
+  margin-left: 1.2em;
+}
+
+#previewBox ul ul ul, #outputBox ul ul ul {
+  list-style-type: square;
+}
+
+#previewBox li, #outputBox li {
+  margin: 2px 0;
+}
+
 #outputBox {
   grid-column: 3 / 4;  /* moved to right column */
   grid-row: 2 / 3;     /* at bottom */
