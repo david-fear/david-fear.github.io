@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<link rel="stylesheet" href="../stylesheet.css" />
+<title>TCPDUMP Analyzer</title>
+
+<style>
+  #dropzone {
+    border: 2px dashed #999;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    margin-bottom: 20px;
+  }
+
+  #results {
+    overflow-x: auto;
+    max-width: 100%;
+    border: 1px solid #ccc;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    table-layout: auto;
+  }
+
+  th, td {
+    border: 1px solid #ccc;
+    padding: 4px;
+    font-size: 10px;
+    vertical-align: top;
+    word-break: break-all;
+  }
+
+  th {
+    background: #f4f4f4;
+  }
+
+  #summary {
+    margin-top: 20px;
+    font-size: 14px;
+  }
+
+  pre {
+    background: #f5f5f5;
+    padding: 10px;
+    overflow: auto;
+    font-size: 11px;
+    white-space: pre-wrap;
+  }
+
+  button {
+    cursor: pointer;
+    background-color: #007acc;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+  }
+
+  button:hover {
+    background-color: #005fa3;
+  }
+
+  tr.payload-row td {
+    background-color: #fafafa;
+    font-family: monospace;
+  }
+</style>
+</head>
+
+<body>
+
+<!-- Dynamic sidebar menu START -->
+<div id="menu-container"></div>
+<script>
+fetch('../components/menu.html')
+  .then(r => r.text())
+  .then(html => {
+    document.getElementById('menu-container').innerHTML = html;
+
+    const toggle = document.getElementById('menu-toggle');
+    const menu = document.getElementById('menu-nav');
+
+    toggle.addEventListener('click', () => {
+      const expanded = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', String(!expanded));
+      menu.hasAttribute('hidden') ? menu.removeAttribute('hidden') : menu.setAttribute('hidden', '');
+    });
+  })
+  .catch(e => console.error('Menu load failed', e));
+</script>
+<!-- Dynamic sidebar menu END -->
+
+<header>
+  <h1>TCPDUMP Analyzer</h1>
+</header>
+
+<main>
+<div id="dropzone">Drop tcpdump text file here or click to select</div>
+<input type="file" id="fileInput" accept=".txt,.log" style="display:none;" />
+
+<div id="summary"></div>
+<div id="results" class="wide"></div>
+
+<script>
+const dropzone = document.getElementById("dropzone");
+const fileInput = document.getElementById("fileInput");
+const summaryDiv = document.getElementById("summary");
+const resultsDiv = document.getElementById("results");
+
+let packets = [];
+
+dropzone.addEventListener("click", () => fileInput.click());
+dropzone.addEventListener("dragover", e => {
+  e.preventDefault();
+  dropzone.style.background = "#eee";
+});
+dropzone.addEventListener("dragleave", () => dropzone.style.background = "");
+dropzone.addEventListener("drop", e => {
+  e.preventDefault();
+  dropzone.style.background = "";
+  if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener("change", e => handleFile(e.target.files[0]));
+
+function handleFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => parseTcpdump(e.target.result);
+  reader.readAsText(file);
+}
+
+function parseTcpdump(text) {
+  packets = [];
+
+  const lines = text.split(/\r?\n/).filter(l => l.trim().length);
+
+  lines.forEach((line, idx) => {
+    const pkt = {
+      idx,
+      raw: line,
+      timestamp: "",
+      proto: "",
+      src: "",
+      dst: "",
+      flags: "",
+      length: "",
+      note: ""
+    };
+
+    // Example tcpdump line:
+    // 2025-01-01 12:00:00.123456 IP 10.0.0.1.443 > 10.0.0.2.53123: Flags [P.], length 517
+
+    const tsMatch = line.match(/^(\S+\s+\S+)/);
+    if (tsMatch) pkt.timestamp = tsMatch[1];
+
+    const protoMatch = line.match(/\s(IP6?|ARP)\s/);
+    if (protoMatch) pkt.proto = protoMatch[1];
+
+    const addrMatch = line.match(/([\d.:]+)\s*>\s*([\d.:]+)/);
+    if (addrMatch) {
+      pkt.src = addrMatch[1];
+      pkt.dst = addrMatch[2];
+    }
+
+    const flagsMatch = line.match(/Flags\s+\[([^\]]+)\]/);
+    if (flagsMatch) {
+      pkt.flags = flagsMatch[1];
+      pkt.note = interpretFlags(flagsMatch[1]);
+    }
+
+    const lenMatch = line.match(/length\s+(\d+)/);
+    if (lenMatch) pkt.length = lenMatch[1];
+
+    packets.push(pkt);
+  });
+
+  renderSummary();
+  renderTable();
+}
+
+function interpretFlags(flags) {
+  // Interpret common TCP flags to user-friendly notes
+  // Flags string example: "S", "F.", "P.", "R", "S.", etc.
+  const notes = [];
+
+  if (flags.includes('S')) notes.push("SYN (Connection start)");
+  if (flags.includes('F')) notes.push("FIN (Connection finish)");
+  if (flags.includes('P')) notes.push("PUSH (Data push)");
+  if (flags.includes('R')) notes.push("RST (Connection reset)");
+  if (flags.includes('.')) notes.push("ACK (Acknowledgement)");
+
+  // If no recognized flags, just return the raw flags
+  if(notes.length === 0) return flags;
+
+  return notes.join(", ");
+}
+
+function renderSummary() {
+  const total = packets.length;
+  const totalBytes = packets.reduce((s, p) => s + (parseInt(p.length) || 0), 0);
+
+  const protoCounts = {};
+  packets.forEach(p => {
+    protoCounts[p.proto || "UNKNOWN"] = (protoCounts[p.proto || "UNKNOWN"] || 0) + 1;
+  });
+
+  summaryDiv.innerHTML = `
+    <strong>Total packets:</strong> ${total}<br>
+    <strong>Total bytes:</strong> ${totalBytes.toLocaleString()}<br>
+    <strong>Protocols:</strong>
+    ${Object.entries(protoCounts).map(([k,v]) => `${k}: ${v}`).join(", ")}
+  `;
+}
+
+function renderTable() {
+  let html = `
+  <table class="wide">
+    <tr>
+      <th>#</th>
+      <th>Timestamp</th>
+      <th>Protocol</th>
+      <th>Source</th>
+      <th>Destination</th>
+      <th>Flags</th>
+      <th>Length</th>
+      <th>Note</th>
+      <th>Raw</th>
+    </tr>
+  `;
+
+  packets.forEach(p => {
+    html += `
+      <tr>
+        <td>${p.idx}</td>
+        <td>${escapeHtml(p.timestamp)}</td>
+        <td>${escapeHtml(p.proto)}</td>
+        <td>${escapeHtml(p.src)}</td>
+        <td>${escapeHtml(p.dst)}</td>
+        <td>${escapeHtml(p.flags)}</td>
+        <td>${p.length}</td>
+        <td>${escapeHtml(p.note)}</td>
+        <td><button onclick="toggleRaw(${p.idx})">View</button></td>
+      </tr>
+      <tr id="raw-${p.idx}" class="payload-row" style="display:none;">
+        <td colspan="9">
+          <pre>${escapeHtml(p.raw)}</pre>
+        </td>
+      </tr>
+    `;
+  });
+
+  html += "</table>";
+  resultsDiv.innerHTML = html;
+}
+
+function toggleRaw(i) {
+  const row = document.getElementById(`raw-${i}`);
+  row.style.display = row.style.display === "none" ? "table-row" : "none";
+}
+
+function escapeHtml(str) {
+  if (!str) return "";
+  return str.replace(/[&<>"']/g, m => ({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;'
+  })[m]);
+}
+</script>
+</main>
+
+</body>
+</html>

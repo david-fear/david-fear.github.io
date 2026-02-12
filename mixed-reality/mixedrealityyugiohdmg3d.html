@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>3D Model Viewer with Right-Click Drag</title>
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <style>
+      body, html {
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+        background: #000;
+      }
+      #enterVRButton {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        padding: 10px 20px;
+        background: #333;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        z-index: 999;
+      }
+      /* Disable context menu on right click so we can use it */
+      body {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <button id="enterVRButton">Enter VR</button>
+
+    <a-scene background="color: #111" vr-mode-ui="enterVRButton: #enterVRButton" renderer="antialias: true" embedded>
+      <!-- Lights -->
+      <a-entity light="type: ambient; intensity: 0.6"></a-entity>
+      <a-entity
+        light="type: directional; intensity: 1"
+        position="2 4 3"
+        animation="property: intensity; dir: alternate; dur: 2000; loop: true; from: 0.8; to: 1.2"
+        animation__pos="property: position; dir: alternate; dur: 3000; loop: true; from: 1.8 4 3; to: 2.2 4.3 3.2"
+      ></a-entity>
+
+      <!-- 3D model -->
+      <!-- source of some - > "https://github.com/KhronosGroup/glTF-Sample-Models/blob/main/2.0/Duck/glTF/Duck.gltf" --> 
+      <!-- HELMET gltf-model="https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/DamagedHelmet/glTF/DamagedHelmet.gltf" -->
+      <a-entity
+        gltf-model="https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/Duck/glTF/Duck.gltf"
+        position="0 0 -3"
+        scale="2 2 2"
+        rotation="0 180 0"
+      ></a-entity>
+
+      <!-- Camera rig -->
+      <a-entity id="rig" position="0 1.6 0">
+        <a-entity id="camera" camera look-controls wasd-controls position="0 0 0"></a-entity>
+      </a-entity>
+    </a-scene>
+
+    <script>
+      const rig = document.getElementById('rig');
+
+      let isRightMouseDown = false;
+      let lastMouseX = 0;
+      let lastMouseY = 0;
+
+      window.addEventListener('contextmenu', (e) => e.preventDefault()); // Disable right-click menu
+
+      window.addEventListener('mousedown', (e) => {
+        if (e.button === 2) { // Right button
+          isRightMouseDown = true;
+          lastMouseX = e.clientX;
+          lastMouseY = e.clientY;
+        }
+      });
+
+      window.addEventListener('mouseup', (e) => {
+        if (e.button === 2) {
+          isRightMouseDown = false;
+        }
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!isRightMouseDown) return;
+
+        const deltaX = e.clientX - lastMouseX;
+        const deltaY = e.clientY - lastMouseY;
+
+        lastMouseX = e.clientX;
+        lastMouseY = e.clientY;
+
+        const sensitivity = 0.01; // Adjust movement speed here
+
+        const pos = rig.getAttribute('position');
+        // Update position: X and Z for horizontal pan, Y for vertical
+        rig.setAttribute('position', {
+          x: pos.x - deltaX * sensitivity,
+          y: Math.min(Math.max(pos.y + deltaY * sensitivity, 0.5), 5), // Clamp Y between 0.5 and 5
+          z: pos.z
+        });
+      });
+    </script>
+  </body>
+</html>
