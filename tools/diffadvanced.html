@@ -173,6 +173,40 @@ button:hover { opacity: 0.9; }
 
 <body>
 
+<!-- Menu will load here -->
+<div id="menu-container"></div>
+
+<script>
+  fetch('../components/menu.html')
+    .then(response => response.text())
+    .then(data => {
+      const container = document.getElementById('menu-container');
+      container.innerHTML = data;
+
+      // Now attach event listeners because the elements exist
+      const toggle = document.getElementById('menu-toggle');
+      const menu = document.getElementById('menu-nav');
+
+      toggle.addEventListener('click', () => {
+        const expanded = toggle.getAttribute('aria-expanded') === 'true';
+        toggle.setAttribute('aria-expanded', String(!expanded));
+        if (menu.hasAttribute('hidden')) {
+          menu.removeAttribute('hidden');
+        } else {
+          menu.setAttribute('hidden', '');
+        }
+      });
+
+      toggle.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggle.click();
+        }
+      });
+    })
+    .catch(e => console.error('Failed to load menu:', e));
+</script>
+
 <header>
   <h1>DIFF</h1>
   <p>Paste two text blobs, define ignore rules if needed, then choose a diff mode.</p>
