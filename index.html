@@ -11,11 +11,10 @@
 
 <body>
 
-<!-- Menu will load here -->
+<!-- Dynamic sidebar menu START - right after BODY tag -->
 <div id="menu-container"></div>
-
 <script>
-  fetch('components/menu.html')
+  fetch('../components/menu.html')
     .then(response => response.text())
     .then(data => {
       const container = document.getElementById('menu-container');
@@ -44,6 +43,7 @@
     })
     .catch(e => console.error('Failed to load menu:', e));
 </script>
+<!-- Dynamic sidebar menu END -->
 
 <header>
   <h1>Welcome to My Site</h1>
@@ -60,7 +60,7 @@
 <div id="footer-container"></div>
 
 <script>
-  fetch('footer.html')
+  fetch('footer/footer.html')
     .then(response => response.text())
     .then(data => {
       document.getElementById('footer-container').innerHTML = data;
