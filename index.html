@@ -14,7 +14,7 @@
 <!-- Dynamic sidebar menu START - right after BODY tag -->
 <div id="menu-container"></div>
 <script>
-  fetch('../components/menu.html')
+  fetch('components/menu.html')
     .then(response => response.text())
     .then(data => {
       const container = document.getElementById('menu-container');
