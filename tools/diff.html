@@ -4,6 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Text Diff Tool</title>
+  <script>
+  (function () {
+    const theme = localStorage.getItem("theme");
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark-mode");
+    }
+  })();
+  </script>
 
   <link rel="stylesheet" href="../stylesheet.css" />
 
@@ -371,6 +379,8 @@ sideChangedBtn.onclick = () => {
   outputBox.innerHTML = sideBySide(buildDiffMap(d.left,d.right,d.ignore), true) || "No differences.";
 };
 </script>
+
+<script src="https://david-fear.github.io/components/darkmode.js"></script>
 
 </body>
 </html>

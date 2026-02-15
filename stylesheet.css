@@ -7,6 +7,15 @@
   --card-bg: #f6f8fa;
 }
 
+/* Dark mode overrides */
+html.dark-mode {
+  --primary: #4db8ff;
+  --primary-light: #2a9fd6;
+  --text: #e6e6e6;
+  --bg: #121212;
+  --card-bg: #1e1e1e;
+}
+
 /* Reset & base */
 * {
   margin: 0;
