@@ -4,19 +4,54 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ruby Hash → JSON → HTML Tables</title>
+<link rel="stylesheet" href="https://david-fear.github.io/stylesheet.css" />
 <style>
-  body { font-family: monospace; margin: 20px; }
   textarea { width: 100%; box-sizing: border-box; font-family: monospace; margin-bottom: 10px; }
-  #inputBox { height: 200px; }
-  #outputBox { height: 200px; }
-  #tableBox { height: 400px; overflow: auto; border: 1px solid #ccc; padding: 10px; }
+  #inputBox { height: 100px; font-family: monospace; }
+  #outputBox { height: 250px; font-family: monospace; }
+  #tableBox { height: 10000px; overflow: auto; border: 1px solid #ccc; padding: 2px; font-family: monospace; }
   button { padding: 10px 20px; font-size: 16px; margin-bottom: 10px; }
-  table { border-collapse: collapse; margin: 5px 0; }
+  table { border-collapse: collapse; margin: 3px 0; }
   table, th, td { border: 1px solid #999; }
-  th, td { padding: 5px; text-align: left; vertical-align: top; }
+  th, td { padding: 2px; text-align: left; vertical-align: top; }
 </style>
 </head>
+
 <body>
+<!-- Dynamic sidebar menu START - right after BODY tag -->
+<div id="menu-container"></div>
+<script>
+  fetch('https://david-fear.github.io/components/menu.html')
+    .then(response => response.text())
+    .then(data => {
+      const container = document.getElementById('menu-container');
+      container.innerHTML = data;
+
+      // Now attach event listeners because the elements exist
+      const toggle = document.getElementById('menu-toggle');
+      const menu = document.getElementById('menu-nav');
+
+      toggle.addEventListener('click', () => {
+        const expanded = toggle.getAttribute('aria-expanded') === 'true';
+        toggle.setAttribute('aria-expanded', String(!expanded));
+        if (menu.hasAttribute('hidden')) {
+          menu.removeAttribute('hidden');
+        } else {
+          menu.setAttribute('hidden', '');
+        }
+      });
+
+      toggle.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggle.click();
+        }
+      });
+    })
+    .catch(e => console.error('Failed to load menu:', e));
+</script>
+<!-- Dynamic sidebar menu END -->
+  
 <h2>Ruby Hash → JSON → HTML Tables</h2>
 
 <textarea id="inputBox" placeholder="Paste your Ruby hash here..."></textarea>
