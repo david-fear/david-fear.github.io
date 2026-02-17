@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ruby Hash → JSON → HTML Tables</title>
+<style>
+  body { font-family: monospace; margin: 20px; }
+  textarea { width: 100%; box-sizing: border-box; font-family: monospace; margin-bottom: 10px; }
+  #inputBox { height: 200px; }
+  #outputBox { height: 200px; }
+  #tableBox { height: 400px; overflow: auto; border: 1px solid #ccc; padding: 10px; }
+  button { padding: 10px 20px; font-size: 16px; margin-bottom: 10px; }
+  table { border-collapse: collapse; margin: 5px 0; }
+  table, th, td { border: 1px solid #999; }
+  th, td { padding: 5px; text-align: left; vertical-align: top; }
+</style>
+</head>
+<body>
+<h2>Ruby Hash → JSON → HTML Tables</h2>
+
+<textarea id="inputBox" placeholder="Paste your Ruby hash here..."></textarea>
+<br>
+<button onclick="convertRubyHash()">Convert to JSON</button>
+<textarea id="outputBox" placeholder="Converted JSON will appear here..." readonly></textarea>
+<br>
+<button onclick="convertJSONtoTables()">Convert JSON → HTML Tables</button>
+<div id="tableBox" placeholder="HTML tables will appear here..."></div>
+
+<script>
+// 1️⃣ Convert Ruby Hash → JSON
+function convertRubyHash() {
+  let rubyStr = document.getElementById('inputBox').value;
+
+  try {
+    let jsonStr = rubyStr.replace(/=>/g, ':');       // hash rockets
+    jsonStr = jsonStr.replace(/\bnil\b/g, 'null');  // nil → null
+    jsonStr = jsonStr.replace(/'((?:\\'|[^'])*)'/g, function(match, p1){
+      return `"${p1.replace(/"/g, '\\"')}"`;
+    });
+    jsonStr = jsonStr.replace(/,(\s*[}\]])/g, '$1'); // trailing commas
+
+    let parsed = JSON.parse(jsonStr);
+    document.getElementById('outputBox').value = JSON.stringify(parsed, null, 2);
+  } catch (err) {
+    document.getElementById('outputBox').value = 'ERROR: Invalid Ruby hash or parsing issue:\n' + err;
+  }
+}
+
+// 2️⃣ Convert JSON → HTML Tables
+function convertJSONtoTables() {
+  let jsonText = document.getElementById('outputBox').value;
+  if (!jsonText) return alert('No JSON to convert!');
+
+  try {
+    let obj = JSON.parse(jsonText);
+    let html = jsonToTable(obj);
+    document.getElementById('tableBox').innerHTML = html;
+  } catch (err) {
+    document.getElementById('tableBox').innerHTML = 'ERROR: Invalid JSON:\n' + err;
+  }
+}
+
+// Recursive function to convert any JSON to HTML table
+function jsonToTable(obj) {
+  if (Array.isArray(obj)) {
+    let rows = obj.map(item => `<tr><td>${jsonToTable(item)}</td></tr>`).join('');
+    return `<table>${rows}</table>`;
+  } else if (obj !== null && typeof obj === 'object') {
+    let rows = '';
+    for (let key in obj) {
+      rows += `<tr><th>${key}</th><td>${jsonToTable(obj[key])}</td></tr>`;
+    }
+    return `<table>${rows}</table>`;
+  } else {
+    // primitive value
+    return obj === null ? 'null' : obj.toString();
+  }
+}
+</script>
+</body>
+</html>
