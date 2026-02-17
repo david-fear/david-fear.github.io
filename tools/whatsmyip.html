@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>What's My IP</title>
 
-<link rel="stylesheet" href="../stylesheet.css" />
+<link rel="stylesheet" href="https://david-fear.github.io/stylesheet.css" />
 
 <style>
   #ip { font-size: 2em; text-align: center; }
@@ -17,7 +17,7 @@
 <!-- Dynamic sidebar menu START - right after BODY tag -->
 <div id="menu-container"></div>
 <script>
-  fetch('../components/menu.html')
+  fetch('https://david-fear.github.io/components/menu.html')
     .then(response => response.text())
     .then(data => {
       const container = document.getElementById('menu-container');
@@ -69,7 +69,7 @@
                 console.error(error);
             }
         }
-        fetchIP();
+      fetchIP();
     </script>
    </section>
   </main>
@@ -78,7 +78,7 @@
 <div id="footer-container"></div>
 
 <script>
-  fetch('../components/footer.html')
+  fetch('https://david-fear.github.io/components/footer.html')
     .then(response => response.text())
     .then(data => {
       document.getElementById('footer-container').innerHTML = data;

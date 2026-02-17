@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Take Charge of your Cancer</title>
 
-<link rel="stylesheet" href="../stylesheet.css" />
+<link rel="stylesheet" href="https://david-fear.github.io/stylesheet.css" />
 
 </head>
 
@@ -14,7 +14,7 @@
 <!-- Dynamic sidebar menu START - right after BODY tag -->
 <div id="menu-container"></div>
 <script>
-  fetch('../components/menu.html')
+  fetch('https://david-fear.github.io/components/menu.html')
     .then(response => response.text())
     .then(data => {
       const container = document.getElementById('menu-container');
@@ -70,7 +70,7 @@
 <div id="footer-container"></div>
 
 <script>
-  fetch('../components/footer.html')
+  fetch('https://david-fear.github.io/components/footer.html')
     .then(response => response.text())
     .then(data => {
       document.getElementById('footer-container').innerHTML = data;
