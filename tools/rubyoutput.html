@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Nested Table Converter</title>
+    <link rel="stylesheet" href="https://david-fear.github.io/stylesheet.css" />
+
+    <style>
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 20px;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            width: 100%;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre;
+            overflow: auto;
+            resize: none;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        #inputBox {
+            height: 240px;
+        }
+
+        #outputBox {
+            height: 60vh;
+            border: 1px solid #ccc;
+            background: #fafafa;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            overflow: auto;
+            white-space: pre;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Dynamic sidebar menu -->
+    <div id="menu-container"></div>
+    <script>
+        fetch('https://david-fear.github.io/components/menu.html')
+            .then(response => response.text())
+            .then(data => {
+                const container = document.getElementById('menu-container');
+                container.innerHTML = data;
+
+                // Now attach event listeners because the elements exist
+                const toggle = document.getElementById('menu-toggle');
+                const menu = document.getElementById('menu-nav');
+
+                toggle.addEventListener('click', () => {
+                    const expanded = toggle.getAttribute('aria-expanded') === 'true';
+                    toggle.setAttribute('aria-expanded', String(!expanded));
+                    if (menu.hasAttribute('hidden')) {
+                        menu.removeAttribute('hidden');
+                    } else {
+                        menu.setAttribute('hidden', '');
+                    }
+                });
+
+                toggle.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggle.click();
+                    }
+                });
+            })
+            .catch(e => console.error('Failed to load menu:', e));
+    </script>
+
+    <header>
+        <h1>Ruby to Table</h1>
+        <p>Paste your JSON/object below (first 20 lines show)</p>
+    </header>
+
+    <div class="container">
+        <textarea id="inputBox" placeholder="Paste your data here..."></textarea>
+        <button>Convert to Nested Table => Format</button>
+        <h2 class="mid">Converted Output</h2>
+        <textarea id="outputBox" readonly placeholder="Your formatted table will appear here..."></textarea>
+    </div>
+
+    <script>
+        function isObject(val) {
+            return val && typeof val === 'object' && !Array.isArray(val);
+        }
+
+        function formatNested(obj, indent = '') {
+            let lines = [];
+            if (Array.isArray(obj)) {
+                obj.forEach((item, idx) => {
+                    if (isObject(item) || Array.isArray(item)) {
+                        lines.push(indent + '[' + idx + '] =>');
+                        lines.push(formatNested(item, indent + '  '));
+                    } else {
+                        lines.push(indent + '[' + idx + '] => ' + String(item));
+                    }
+                });
+            } else if (isObject(obj)) {
+                Object.keys(obj).forEach(key => {
+                    const val = obj[key];
+                    if (isObject(val) || Array.isArray(val)) {
+                        lines.push(indent + key + ' =>');
+                        lines.push(formatNested(val, indent + '  '));
+                    } else {
+                        lines.push(indent + key + ' => ' + String(val));
+                    }
+                });
+            } else {
+                lines.push(indent + String(obj));
+            }
+            return lines.join('\n');
+        }
+
+        document.getElementById('convertBtn').onclick = () => {
+            const inputText = document.getElementById('inputBox').value;
+            let parsed;
+            try {
+                parsed = eval('(' + inputText + ')'); // safe-ish for pasted JSON-like objects
+            } catch (e) {
+                document.getElementById('outputBox').value = 'Error parsing input: ' + e;
+                return;
+            }
+            const output = formatNested(parsed);
+            document.getElementById('outputBox').value = output;
+        };
+    </script>
+
+</body>
+
+</html>
