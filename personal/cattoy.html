@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>My GitHub Static Site Template</title>
+
+<link rel="stylesheet" href="https://david-fear.github.io/stylesheet.css" />
+
+<style>
+  #catGameCanvas {
+    background: #111;
+    touch-action: manipulation;
+    display: block;
+    margin: 0 auto;
+  }
+</style>
+
+</head>
+
+<body>
+
+<!-- Dynamic sidebar menu START -->
+<div id="menu-container"></div>
+<script>
+  fetch('https://david-fear.github.io/components/menu.html')
+    .then(response => response.text())
+    .then(data => {
+      const container = document.getElementById('menu-container');
+      container.innerHTML = data;
+
+      const toggle = document.getElementById('menu-toggle');
+      const menu = document.getElementById('menu-nav');
+
+      toggle.addEventListener('click', () => {
+        const expanded = toggle.getAttribute('aria-expanded') === 'true';
+        toggle.setAttribute('aria-expanded', String(!expanded));
+        if (menu.hasAttribute('hidden')) {
+          menu.removeAttribute('hidden');
+        } else {
+          menu.setAttribute('hidden', '');
+        }
+      });
+
+      toggle.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggle.click();
+        }
+      });
+    })
+    .catch(e => console.error('Failed to load menu:', e));
+</script>
+<!-- Dynamic sidebar menu END -->
+
+<main>
+
+  <!-- === CAT GAME SECTION === -->
+  <section>
+    <center>
+      <button id="modeButton" class="button">Switch to STRING</button>
+      <br><br>
+      <canvas id="catGameCanvas" width="600" height="400"></canvas>
+    </center>
+  </section>
+
+  <script>
+    const canvas = document.getElementById("catGameCanvas");
+    const ctx = canvas.getContext("2d");
+    const modeButton = document.getElementById("modeButton");
+
+    let mode = "dot";
+    let dotSize = 14;
+    let stringLength = 140;
+
+    let target = { x: 300, y: 200, vx: 2, vy: 1.7 };
+    let speedMultiplier = 1;
+
+    function randomSpeedChange() {
+      speedMultiplier = 0.3 + Math.random() * 2.5;
+    }
+
+    setInterval(randomSpeedChange, 1800);
+
+    function update() {
+      target.x += target.vx * speedMultiplier;
+      target.y += target.vy * speedMultiplier;
+
+      if (target.x < 20 || target.x > canvas.width - 20) {
+        target.vx *= -1;
+        target.vx += (Math.random() - 0.5) * 2;
+      }
+
+      if (target.y < 20 || target.y > canvas.height - 20) {
+        target.vy *= -1;
+        target.vy += (Math.random() - 0.5) * 2;
+      }
+    }
+
+    function drawDot() {
+      ctx.fillStyle = "red";
+      ctx.beginPath();
+      ctx.arc(target.x, target.y, dotSize, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function drawString() {
+      ctx.strokeStyle = "white";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+
+      let baseX = target.x;
+      let baseY = target.y;
+      let jitter = 0;
+
+      for (let i = 0; i < stringLength; i++) {
+        jitter += (Math.random() - 0.5) * 4;
+
+        let x = baseX - i;
+        let y = baseY + jitter;
+
+        if (i === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+      }
+
+      ctx.stroke();
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (mode === "dot") {
+        drawDot();
+      } else {
+        drawString();
+      }
+    }
+
+    function loop() {
+      update();
+      draw();
+      requestAnimationFrame(loop);
+    }
+
+    canvas.addEventListener("click", (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+
+      if (mode === "dot" && x < canvas.width / 2) {
+        dotSize += 5;
+        if (dotSize > 50) dotSize = 8;
+      }
+
+      if (mode === "string" && x >= canvas.width / 2) {
+        stringLength += 30;
+        if (stringLength > 350) stringLength = 60;
+      }
+    });
+
+    modeButton.addEventListener("click", () => {
+      if (mode === "dot") {
+        mode = "string";
+        modeButton.textContent = "Switch to DOT";
+      } else {
+        mode = "dot";
+        modeButton.textContent = "Switch to STRING";
+      }
+    });
+
+    loop();
+  </script>
+
+</main>
+
+<div id="footer-container"></div>
+
+<script>
+  fetch('https://david-fear.github.io/components/footer.html')
+    .then(response => response.text())
+    .then(data => {
+      document.getElementById('footer-container').innerHTML = data;
+    })
+    .catch(error => {
+      console.error('Failed to load footer:', error);
+    });
+</script>
+
+</body>
+</html>
