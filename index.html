@@ -1,74 +1,106 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>David Fear's Static GitHub Site</title>
 
-<!-- Link to external stylesheet -->
-<link rel="stylesheet" href="https://david-fear.github.io/stylesheet.css" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>David Fear's Site - TV Stuff</title>
+
+  <!-- Link to external stylesheet -->
+  <link rel="stylesheet" href="https://david-fear.github.io/stylesheet.css" />
+  <style>
+    button {
+      width: 200px;
+    }
+  </style>
 </head>
 
 <body>
 
-<!-- Dynamic sidebar menu START - right after BODY tag -->
-<div id="menu-container"></div>
-<script>
-  fetch('https://david-fear.github.io/components/menu.html')
-    .then(response => response.text())
-    .then(data => {
-      const container = document.getElementById('menu-container');
-      container.innerHTML = data;
+  <!-- Dynamic sidebar menu START - right after BODY tag -->
+  <div id="menu-container"></div>
+  <script>
+    fetch('https://david-fear.github.io/components/menu.html')
+      .then(response => response.text())
+      .then(data => {
+        const container = document.getElementById('menu-container');
+        container.innerHTML = data;
 
-      // Now attach event listeners because the elements exist
-      const toggle = document.getElementById('menu-toggle');
-      const menu = document.getElementById('menu-nav');
+        // Now attach event listeners because the elements exist
+        const toggle = document.getElementById('menu-toggle');
+        const menu = document.getElementById('menu-nav');
 
-      toggle.addEventListener('click', () => {
-        const expanded = toggle.getAttribute('aria-expanded') === 'true';
-        toggle.setAttribute('aria-expanded', String(!expanded));
-        if (menu.hasAttribute('hidden')) {
-          menu.removeAttribute('hidden');
-        } else {
-          menu.setAttribute('hidden', '');
-        }
+        toggle.addEventListener('click', () => {
+          const expanded = toggle.getAttribute('aria-expanded') === 'true';
+          toggle.setAttribute('aria-expanded', String(!expanded));
+          if (menu.hasAttribute('hidden')) {
+            menu.removeAttribute('hidden');
+          } else {
+            menu.setAttribute('hidden', '');
+          }
+        });
+
+        toggle.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggle.click();
+          }
+        });
+      })
+      .catch(e => console.error('Failed to load menu:', e));
+  </script>
+  <!-- Dynamic sidebar menu END -->
+
+  <header>
+    <h1>Welcome to My Site</h1>
+  </header>
+
+  <section>
+    <center>
+      <h2>TV Family Games</h2>
+      <table>
+        <tr>
+          <td><button onclick="window.location.href='https://swellgarfo.com/scattergories/'">Scattergories</button>
+          </td>
+          <td>
+            <button onclick="window.location.href='https://wordleunlimited.org/'">Wordle</button>
+          </td>
+        </tr>
+        <tr>
+          <td><button onclick="window.location.href='https://www.jetpunk.com/daily-trivia'">Quiz - JetPunk
+              Daily</button></td>
+          <td>
+            <button onclick="window.location.href='https://world-geography-games.com/en/flags_world.html'">Quiz - World
+              Flags</button>
+          </td>
+        </tr>
+      </table>
+    </center>
+  </section>
+
+  <section>
+    <center>
+      <h2>TV Family Watch</h2>
+      <p>
+        <button onclick="window.location.href='https://swellgarfo.com/scattergories/'">Scattergories</button>
+      </p>
+    </center>
+  </section>
+
+  <!-- Footer placeholder -->
+  <div id="footer-container"></div>
+
+  <script>
+    fetch('https://david-fear.github.io/components/footer.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('footer-container').innerHTML = data;
+      })
+      .catch(error => {
+        console.error('Failed to load footer:', error);
       });
-
-      toggle.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          toggle.click();
-        }
-      });
-    })
-    .catch(e => console.error('Failed to load menu:', e));
-</script>
-<!-- Dynamic sidebar menu END -->
-
-<header>
-  <h1>Welcome to My Site</h1>
-  <p>A clean, simple, fast homepage.</p>
-</header>
-
-<section>
-  <h2>About</h2>
-  <p>This page is hosted for free on GitHub Pages. No ads. No tracking.</p>
-  <p>This site will contain handy things I've built and would like to share for all interested.</p>
-</section>
-
-<!-- Footer placeholder -->
-<div id="footer-container"></div>
-
-<script>
-  fetch('https://david-fear.github.io/components/footer.html')
-    .then(response => response.text())
-    .then(data => {
-      document.getElementById('footer-container').innerHTML = data;
-    })
-    .catch(error => {
-      console.error('Failed to load footer:', error);
-    });
-</script>
+  </script>
 
 </body>
+
 </html>
