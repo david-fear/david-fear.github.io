@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Times Table Trainer</title>
+
+  <link rel="stylesheet" href="https://david-fear.github.io/stylesheet.css" />
+
+  <style>
+    /* Trainer-specific styling */
+
+    .trainer-controls {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .trainer-controls input {
+      width: 70px;
+      font-size: 1rem;
+      padding: 0.4rem;
+      margin: 0 0.4rem;
+    }
+
+    .question {
+      font-size: 3.5rem;
+      text-align: center;
+      margin-top: 2rem;
+      font-weight: 600;
+    }
+
+    .answer-highlight {
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .timer-container {
+      width: 100%;
+      max-width: 500px;
+      height: 20px;
+      background-color: var(--card-bg);
+      margin: 2rem auto;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    .timer-bar {
+      height: 100%;
+      width: 100%;
+      background-color: var(--primary);
+      transition: width linear;
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <!-- Dynamic sidebar menu START -->
+  <div id="menu-container"></div>
+  <script>
+    fetch('https://david-fear.github.io/components/menu.html')
+      .then(response => response.text())
+      .then(data => {
+        const container = document.getElementById('menu-container');
+        container.innerHTML = data;
+
+        const toggle = document.getElementById('menu-toggle');
+        const menu = document.getElementById('menu-nav');
+
+        toggle.addEventListener('click', () => {
+          const expanded = toggle.getAttribute('aria-expanded') === 'true';
+          toggle.setAttribute('aria-expanded', String(!expanded));
+          if (menu.hasAttribute('hidden')) {
+            menu.removeAttribute('hidden');
+          } else {
+            menu.setAttribute('hidden', '');
+          }
+        });
+
+        toggle.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggle.click();
+          }
+        });
+      })
+      .catch(e => console.error('Failed to load menu:', e));
+  </script>
+  <!-- Dynamic sidebar menu END -->
+
+  <header>
+    <h1>Times Table Trainer</h1>
+    <p>Rapid-fire multiplication practice</p>
+  </header>
+
+  <main>
+
+    <section>
+      <div class="trainer-controls">
+        Min:
+        <input type="number" id="min" value="1">
+        Max:
+        <input type="number" id="max" value="10">
+        <button onclick="startQuiz()">Start</button>
+      </div>
+
+      <div class="question" id="question">Press Start</div>
+
+      <div class="timer-container">
+        <div class="timer-bar" id="timerBar"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer placeholder -->
+  <div id="footer-container"></div>
+
+  <script>
+    fetch('https://david-fear.github.io/components/footer.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('footer-container').innerHTML = data;
+      })
+      .catch(error => {
+        console.error('Failed to load footer:', error);
+      });
+  </script>
+
+  <script>
+    let count = 0;
+    const maxRounds = 10;
+    const questionTime = 5000;
+    const answerTime = 3000;
+
+    function randomBetween(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function startQuiz() {
+      count = 0;
+      nextQuestion();
+    }
+
+    function nextQuestion() {
+      if (count >= maxRounds) {
+        document.getElementById("question").innerText = "Finished!";
+        document.getElementById("timerBar").style.width = "0%";
+        return;
+      }
+
+      const min = parseInt(document.getElementById("min").value);
+      const max = parseInt(document.getElementById("max").value);
+
+      if (isNaN(min) || isNaN(max) || min > max) {
+        document.getElementById("question").innerText = "Invalid range";
+        return;
+      }
+
+      const x = randomBetween(min, max);
+      const y = randomBetween(min, max);
+      const answer = x * y;
+
+      const questionDiv = document.getElementById("question");
+      const timerBar = document.getElementById("timerBar");
+
+      questionDiv.innerHTML = x + " × " + y + " = <span class='answer-highlight'>?</span>";
+
+      timerBar.style.transition = "none";
+      timerBar.style.width = "100%";
+      void timerBar.offsetWidth;
+
+      timerBar.style.transition = "width " + (questionTime / 1000) + "s linear";
+      timerBar.style.width = "0%";
+
+      setTimeout(function () {
+
+        questionDiv.innerHTML = x + " × " + y + " = <span class='answer-highlight'>" + answer + "</span>";
+
+        timerBar.style.transition = "none";
+        timerBar.style.width = "0%";
+
+        setTimeout(function () {
+          count++;
+          nextQuestion();
+        }, answerTime);
+
+      }, questionTime);
+    }
+  </script>
+
+</body>
+
+</html>
