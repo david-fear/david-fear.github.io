@@ -1,14 +1,26 @@
 /* Variables */
+
+/* Light Mode
 :root {
-  --primary: #0196d7;       /* bright blue */
+  --primary: #0196d7;
   --primary-light: #0176a8;
   --text: #222;
   --bg: #ffffff;
   --card-bg: #f6f8fa;
 }
+*/
 
-/* Dark mode overrides */
+/* Dark Mode
 html.dark-mode {
+  --primary: #4db8ff;
+  --primary-light: #2a9fd6;
+  --text: #e6e6e6;
+  --bg: #121212;
+  --card-bg: #1e1e1e;
+}
+*/
+
+:root {
   --primary: #4db8ff;
   --primary-light: #2a9fd6;
   --text: #e6e6e6;
