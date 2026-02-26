@@ -25,7 +25,7 @@ html.dark-mode {
   --primary-light: #2a9fd6;
   --text: #e6e6e6;
   --bg: #121212;
-  --card-bg: #1e1e1e;
+  --card-bg: #2b2b2b;
 }
 
 /* Reset & base */
@@ -80,7 +80,7 @@ section {
 a {
   color: var(--primary);
   text-decoration: none;
-  transition: color 0.2s ease;
+  transition: color 0.25s ease;
 }
 
 a:hover,
@@ -115,7 +115,7 @@ nav ul,
 
 nav ul li,
 #menu-nav ul li {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.2rem;
 }
 
 nav ul li a,
@@ -128,7 +128,7 @@ nav ul li a,
 
 nav ul li a:hover,
 #menu-nav ul li a:hover {
-  opacity: 0.7;
+  opacity: 0.8;
 }
 
 nav ul li a .small-part,
@@ -136,8 +136,9 @@ nav ul li a .small-part,
   font-size: 0.65rem;
   display: block; /* forces the line break */
   margin-top: -0.2em;
+  margin-bottom: -0.2em;  
   line-height: 1em;
-  opacity: 0.7;
+  opacity: 0.8;
   margin-left: 1em;
 }
 
