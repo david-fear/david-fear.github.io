@@ -1,92 +1,207 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>What's My IP</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>What's My IP</title>
 
-<link rel="stylesheet" href="https://david-fear.github.io/stylesheet.css" />
+  <link rel="stylesheet" href="https://david-fear.github.io/stylesheet.css" />
 
-<style>
-  #ip { font-size: 2em; text-align: center; }
-</style>
+  <style>
+    #ip {
+      font-size: 2em;
+      text-align: center;
+    }
+  </style>
 </head>
 
 <body>
 
-<!-- Dynamic sidebar menu START - right after BODY tag -->
-<div id="menu-container"></div>
-<script>
-  fetch('https://david-fear.github.io/components/menu.html')
-    .then(response => response.text())
-    .then(data => {
-      const container = document.getElementById('menu-container');
-      container.innerHTML = data;
+  <!-- Dynamic sidebar menu START - right after BODY tag -->
+  <div id="menu-container"></div>
+  <script>
+    fetch('https://david-fear.github.io/components/menu.html')
+      .then(response => response.text())
+      .then(data => {
+        const container = document.getElementById('menu-container');
+        container.innerHTML = data;
 
-      // Now attach event listeners because the elements exist
-      const toggle = document.getElementById('menu-toggle');
-      const menu = document.getElementById('menu-nav');
+        // Now attach event listeners because the elements exist
+        const toggle = document.getElementById('menu-toggle');
+        const menu = document.getElementById('menu-nav');
 
-      toggle.addEventListener('click', () => {
-        const expanded = toggle.getAttribute('aria-expanded') === 'true';
-        toggle.setAttribute('aria-expanded', String(!expanded));
-        if (menu.hasAttribute('hidden')) {
-          menu.removeAttribute('hidden');
-        } else {
-          menu.setAttribute('hidden', '');
-        }
-      });
+        toggle.addEventListener('click', () => {
+          const expanded = toggle.getAttribute('aria-expanded') === 'true';
+          toggle.setAttribute('aria-expanded', String(!expanded));
+          if (menu.hasAttribute('hidden')) {
+            menu.removeAttribute('hidden');
+          } else {
+            menu.setAttribute('hidden', '');
+          }
+        });
 
-      toggle.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          toggle.click();
-        }
-      });
-    })
-    .catch(e => console.error('Failed to load menu:', e));
-</script>
-<!-- Dynamic sidebar menu END -->
+        toggle.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggle.click();
+          }
+        });
+      })
+      .catch(e => console.error('Failed to load menu:', e));
+  </script>
+  <!-- Dynamic sidebar menu END -->
 
 
   <header>
-    <h1>IP Address</h1>
-    <p>Your IP Address is:</p>
+    <h1>IP Addresses</h1>
   </header>
 
   <main>
     <section>
-    <div id="ip">Loading...</div>
-    <script>
-        async function fetchIP() {
+      <center>
+        <p>Your IP Address is:</p>
+        <div id="ip">Loading...</div>
+        <script>
+          async function fetchIP() {
             try {
-                // Use a public IP API
-                let response = await fetch('https://api.ipify.org?format=json');
-                let data = await response.json();
-                document.getElementById('ip').textContent = data.ip;
+              // Use a public IP API
+              let response = await fetch('https://api.ipify.org?format=json');
+              let data = await response.json();
+              document.getElementById('ip').textContent = data.ip;
             } catch (error) {
-                document.getElementById('ip').textContent = 'Unable to fetch IP';
-                console.error(error);
+              document.getElementById('ip').textContent = 'Unable to fetch IP';
+              console.error(error);
             }
-        }
-      fetchIP();
-    </script>
-   </section>
+          }
+          fetchIP();
+        </script>
+      </center>
+    </section>
+
+    <section>
+      <center>
+        <h2>DNS Lookup Tool</h2>
+        <p>Enter a domain name:</p>
+
+        <input type="text" id="domainInput" placeholder="example.com" />
+        <button onclick="lookupDomain()">Lookup</button>
+
+        <div id="domainResult" style="margin-top:20px;text-align:left;"></div>
+
+        <script>
+          async function lookupDomain() {
+            const domain = document.getElementById('domainInput').value.trim();
+            const resultDiv = document.getElementById('domainResult');
+
+            if (!domain) {
+              resultDiv.innerHTML = 'Please enter a domain.';
+              return;
+            }
+
+            resultDiv.innerHTML = 'Querying DNS...';
+
+            try {
+              const response = await fetch(
+                'https://dns.google/resolve?name=' + encodeURIComponent(domain) + '&type=ANY'
+              );
+              const data = await response.json();
+
+              let output = '';
+
+              // Status
+              output += '<strong>Status:</strong> ' + getStatusText(data.Status) + '<br><br>';
+
+              if (data.Answer) {
+                const records = {
+                  'IPv4 Address': [],
+                  'IPv6 Address': [],
+                  'Alias / Canonical Name': [],
+                  'Mail Server': [],
+                  'Text / Verification': [],
+                  'Name Server': []
+                };
+
+                data.Answer.forEach(record => {
+                  switch (record.type) {
+                    case 1: records['IPv4 Address'].push(record); break;    // A
+                    case 28: records['IPv6 Address'].push(record); break;   // AAAA
+                    case 5: records['Alias / Canonical Name'].push(record); break; // CNAME
+                    case 15: records['Mail Server'].push(record); break;    // MX
+                    case 16: records['Text / Verification'].push(record); break; // TXT
+                    case 2: records['Name Server'].push(record); break;    // NS
+                  }
+                });
+
+                for (const label in records) {
+                  if (records[label].length) {
+                    output += `<h3>${label}:</h3>`;
+                    records[label].forEach(r => {
+                      let text = r.data;
+                      if (r.preference !== undefined) text = r.preference + ' ' + text; // MX
+                      output += text + ' (TTL ' + r.TTL + ')<br>';
+                    });
+                    output += '<br>';
+                  }
+                }
+
+                if (!Object.values(records).some(arr => arr.length)) {
+                  output += 'No DNS records found.<br><br>';
+                }
+
+              } else {
+                output += 'No DNS answer section returned.<br><br>';
+              }
+
+              // Collapsible raw JSON
+              output += `
+      <details>
+        <summary>Raw DNS Response (like dig output)</summary>
+        <pre style="background:#111;color:#0f0;padding:10px;overflow:auto;">
+${JSON.stringify(data, null, 2)}
+        </pre>
+      </details>
+    `;
+
+              resultDiv.innerHTML = output;
+
+            } catch (err) {
+              resultDiv.innerHTML = 'Lookup failed.';
+              console.error(err);
+            }
+          }
+
+          function getStatusText(code) {
+            const map = {
+              0: 'No Error',
+              1: 'Format Error',
+              2: 'Server Failure',
+              3: 'Non-Existent Domain',
+              4: 'Not Implemented',
+              5: 'Query Refused'
+            };
+            return map[code] || code;
+          }
+        </script>
+      </center>
+    </section>
+
   </main>
 
   <!-- Footer placeholder -->
-<div id="footer-container"></div>
+  <div id="footer-container"></div>
 
-<script>
-  fetch('https://david-fear.github.io/components/footer.html')
-    .then(response => response.text())
-    .then(data => {
-      document.getElementById('footer-container').innerHTML = data;
-    })
-    .catch(error => {
-      console.error('Failed to load footer:', error);
-    });
-</script>
-  
+  <script>
+    fetch('https://david-fear.github.io/components/footer.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('footer-container').innerHTML = data;
+      })
+      .catch(error => {
+        console.error('Failed to load footer:', error);
+      });
+  </script>
+
 </body>
+
 </html>
