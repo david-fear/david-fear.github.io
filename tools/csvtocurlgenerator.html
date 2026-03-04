@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CSV to Debtor CURL Generator</title>
+
+  <link rel="stylesheet" href="https://david-fear.github.io/stylesheet.css" />
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    textarea {
+      width: 100%;
+      font-family: monospace;
+      font-size: 8pt;
+    }
+
+    #csvInput {
+      min-height: 150px;
+    }
+
+    #cookieInput,
+    #serverInput {
+      width: 100%;
+      font-family: monospace;
+      font-size: 8pt;
+      margin-top: 5px;
+    }
+
+    button {
+      margin-top: 5px;
+    }
+
+    .output-area {
+      margin-top: 20px;
+    }
+
+    pre {
+      background: #1e1e1e;
+      padding: 10px;
+      overflow-x: auto;
+      white-space: pre;
+      word-wrap: break-word;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>CSV to Debtor CURL Generator</h1>
+    <p>Paste CSV, paste your session-uhcc cookie, generate Windows CMD curl commands, copy with Ctrl+C.</p>
+  </header>
+
+  <main>
+
+    <section>
+      <h2>1. Paste CSV (with headers)</h2>
+      <textarea id="csvInput">cust_id,title,first_name,surname,initials,contact,address_1,address_2,address_3,address_4,postcode,phone,mobile_number,email_address
+108478,,David,Davidson,,,"58 Duck Street","Napier North",Napier,"New Zealand",4110,"06 835 1111",027441111,my@email.com
+</textarea>
+    </section>
+
+    <section>
+      <h2>2. Base Server Name</h2>
+      <input type="text" id="serverInput" placeholder="e.g. https://training.uhcc.servername.com" />
+    </section>
+
+    <section>
+      <h2>3. Paste Cookie Header Value</h2>
+      <textarea id="cookieInput">session-uhcc=xxxxx</textarea>
+    </section>
+
+    <section>
+      <p><button onclick="generateCurls()" class="button">Generate CURL Commands</button></p>
+    </section>
+
+    <section class="output-area">
+      <h2>4. Generated CURL Commands</h2>
+      <pre id="output"></pre>
+    </section>
+
+    <section>
+      <h2>Sample CSV</h2>
+      <textarea readonly>
+cust_id,title,first_name,surname,initials,contact,address_1,address_2,address_3,address_4,postcode,phone,mobile_number,email_address
+108478,,David,Davidson,,,"58 Duck Street","Napier North",Napier,"New Zealand",4110,"06 835 1111",027441111,my@email.com
+</textarea>
+    </section>
+
+    <script>
+
+      // Improved CSV parser (handles empty fields correctly)
+      function parseCSV(text) {
+        const lines = text.trim().split(/\r?\n/);
+        if (lines.length < 2) return [];
+
+        const headers = lines[0].split(',').map(h => h.trim());
+        const rows = [];
+
+        for (let i = 1; i < lines.length; i++) {
+          const values = [];
+          const regex = /(?:^|,)(?:"([^"]*)"|([^",]*))/g;
+          let match;
+
+          while ((match = regex.exec(lines[i])) !== null) {
+            values.push(match[1] !== undefined ? match[1] : match[2]);
+          }
+
+          if (values.length === 0) continue;
+
+          const obj = {};
+          headers.forEach((h, j) => {
+            obj[h] = values[j] !== undefined ? values[j] : '';
+          });
+
+          rows.push(obj);
+        }
+
+        return rows;
+      }
+
+      // Generate Windows CMD curl commands
+      function generateCurls() {
+        const csvText = document.getElementById('csvInput').value;
+        const cookieValue = document.getElementById('cookieInput').value.trim();
+        const serverName = document.getElementById('serverInput').value.trim();
+
+        if (!serverName) return alert("Please enter the server name (e.g. https://training.uhcc.magiqcloud.com)");
+        if (!cookieValue) return alert("Please paste your session-uhcc=xxxxx cookie!");
+
+        const output = document.getElementById('output');
+        output.textContent = '';
+
+        const rows = parseCSV(csvText);
+        if (rows.length === 0) {
+          output.textContent = "No valid rows found in CSV.";
+          return;
+        }
+
+        const curlLines = rows.map(row => {
+
+          const payload = {
+            dr_key: "auto",
+            cust_id: row.cust_id || "",
+            title: row.title || "",
+            first_name: row.first_name || "",
+            surname: row.surname || "",
+            initials: row.initials || "",
+            contact: row.contact || "",
+            address_1: row.address_1 || "",
+            address_2: row.address_2 || "",
+            address_3: row.address_3 || "",
+            address_4: row.address_4 || "",
+            postcode: row.postcode || "",
+            phone: row.phone || "",
+            name_source: "T",
+            address_source: "T",
+            mobile_number: row.mobile_number || "",
+            email_address: row.email_address || ""
+          };
+
+          const jsonString = JSON.stringify(payload).replace(/"/g, '\\"');
+
+          return `curl -L -X POST "${serverName}/api/debtors/DR/debtors" -H "Content-Type: application/json" -H "Cookie: ${cookieValue}" -d "${jsonString}"`;
+        });
+
+        output.textContent = curlLines.join('\n');
+      }
+
+    </script>
+
+</body>
+
+</html>
