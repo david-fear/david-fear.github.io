@@ -32,10 +32,6 @@
       margin-top: 5px;
     }
 
-    button {
-      margin-top: 5px;
-    }
-
     .output-area {
       margin-top: 20px;
     }
@@ -52,9 +48,43 @@
 
 <body>
 
+  <!-- Dynamic sidebar menu START - right after BODY tag -->
+  <div id="menu-container"></div>
+  <script>
+    fetch('https://david-fear.github.io/components/menu.html')
+      .then(response => response.text())
+      .then(data => {
+        const container = document.getElementById('menu-container');
+        container.innerHTML = data;
+
+        // Now attach event listeners because the elements exist
+        const toggle = document.getElementById('menu-toggle');
+        const menu = document.getElementById('menu-nav');
+
+        toggle.addEventListener('click', () => {
+          const expanded = toggle.getAttribute('aria-expanded') === 'true';
+          toggle.setAttribute('aria-expanded', String(!expanded));
+          if (menu.hasAttribute('hidden')) {
+            menu.removeAttribute('hidden');
+          } else {
+            menu.setAttribute('hidden', '');
+          }
+        });
+
+        toggle.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggle.click();
+          }
+        });
+      })
+      .catch(e => console.error('Failed to load menu:', e));
+  </script>
+  <!-- Dynamic sidebar menu END -->
+
   <header>
     <h1>CSV to Debtor CURL Generator</h1>
-    <p>Paste CSV, paste your session-uhcc cookie, generate Windows CMD curl commands, copy with Ctrl+C.</p>
+    <p>Paste CSV, paste your cookie, generate Windows CMD curl commands, copypaste.</p>
   </header>
 
   <main>
@@ -77,7 +107,9 @@
     </section>
 
     <section>
-      <p><button onclick="generateCurls()" class="button">Generate CURL Commands</button></p>
+      <center>
+        <p><button onclick="generateCurls()" class="button">Generate CURL Commands</button></p>
+      </center>
     </section>
 
     <section class="output-area">
@@ -173,6 +205,20 @@ cust_id,title,first_name,surname,initials,contact,address_1,address_2,address_3,
         output.textContent = curlLines.join('\n');
       }
 
+    </script>
+
+    <!-- Footer placeholder -->
+    <div id="footer-container"></div>
+
+    <script>
+      fetch('https://david-fear.github.io/components/footer.html')
+        .then(response => response.text())
+        .then(data => {
+          document.getElementById('footer-container').innerHTML = data;
+        })
+        .catch(error => {
+          console.error('Failed to load footer:', error);
+        });
     </script>
 
 </body>
