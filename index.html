@@ -8,19 +8,33 @@
 
   <!-- Link to external stylesheet -->
   <link rel="stylesheet" href="https://david-fear.github.io/stylesheet.css" />
+
   <style>
+    .button-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 2px;
+      max-width: 900px;
+      margin:  auto;
+    }
+
     button {
-      width: 175px;
+      width: 100%;
       font-size: 1em;
-      padding-left: 2px;
-      padding-right: 2px;
+      padding: 10px;
+      cursor: pointer;
+    }
+
+    section {
+      text-align: center;
+      margin-bottom: 25px;
     }
   </style>
 </head>
 
 <body>
 
-  <!-- Dynamic sidebar menu START - right after BODY tag -->
+  <!-- Dynamic sidebar menu START -->
   <div id="menu-container"></div>
   <script>
     fetch('https://david-fear.github.io/components/menu.html')
@@ -29,7 +43,6 @@
         const container = document.getElementById('menu-container');
         container.innerHTML = data;
 
-        // Now attach event listeners because the elements exist
         const toggle = document.getElementById('menu-toggle');
         const menu = document.getElementById('menu-nav');
 
@@ -54,86 +67,48 @@
   </script>
   <!-- Dynamic sidebar menu END -->
 
-  <header>
-    <h1>Welcome to My Site</h1>
-  </header>
-
   <section>
-    <center>
-      <h2>TV Family Games</h2>
-      <table>
-        <tr>
-          <td><button onclick="window.location.href='https://swellgarfo.com/scattergories/'">Scattergories</button>
-          </td>
-          <td>
-            <button onclick="window.location.href='https://wordleunlimited.org/'">Wordle</button>
-          </td>
-        </tr>
-        <tr>
-          <td><button onclick="window.location.href='https://www.jetpunk.com/daily-trivia'">Quiz - JetPunk</button></td>
-          <td>
-            <button onclick="window.location.href='https://world-geography-games.com/en/flags_world.html'">Quiz - World
-              Flags</button>
-          </td>
-        </tr>
-        <tr>
-          <td><button onclick="window.location.href='/personal/timestables.html'">Times Tables!</button></td>
-          <td><button onclick="window.location.href='https://www.fantasyherd.co.nz/'">Fantasy Herd</button></td>
-        </tr>
-      </table>
-    </center>
+    <h2>TV Family Games</h2>
+    <div class="button-grid">
+      <button onclick="window.location.href='https://swellgarfo.com/scattergories/'">Scattergories</button>
+      <button onclick="window.location.href='https://wordleunlimited.org/'">Wordle</button>
+      <button onclick="window.location.href='https://www.jetpunk.com/daily-trivia'">Quiz - JetPunk</button>
+      <button onclick="window.location.href='https://world-geography-games.com/en/flags_world.html'">Quiz - World Flags</button>
+      <button onclick="window.location.href='/personal/timestables.html'">Times Tables!</button>
+      <button onclick="window.location.href='https://www.fantasyherd.co.nz/'">Fantasy Herd</button>
+    </div>
   </section>
 
   <section>
-    <center>
-      <h2>TV Family Watch</h2>
-      <table>
-        <tr>
-          <td><button onclick="window.location.href='https://famelack.com/'">Famelack.com</button></td>
-          <td><button onclick="window.location.href='https://channelsurfer.tv'">ChannelSurfer.tv</button></td>
-        </tr>
-        <tr>
-          <td><button onclick="window.location.href='https://tubitv.com/'">TubiTV.com</button></td>
-          <td><button onclick="window.location.href='https://channelsurfer.tv'">ChannelSurfer.tv</button></td>
-        </tr>
-        <tr>
-          <td><button onclick="window.location.href='https://worldmonitor.app'">WorldMonitor.app</button></td>
-          <td><button onclick="window.location.href='https://retrocrush.tv'">Classic Anime</button></td>
-        </tr>
-      </table>
-    </center>
+    <h2>TV Family Watch</h2>
+    <div class="button-grid">
+      <button onclick="window.location.href='https://famelack.com/'">Famelack.com</button>
+      <button onclick="window.location.href='https://channelsurfer.tv'">ChannelSurfer.tv</button>
+      <button onclick="window.location.href='https://tubitv.com/'">TubiTV.com</button>
+      <button onclick="window.location.href='https://channelsurfer.tv'">ChannelSurfer.tv</button>
+      <button onclick="window.location.href='https://worldmonitor.app'">WorldMonitor.app</button>
+      <button onclick="window.location.href='https://retrocrush.tv'">Classic Anime</button>
+    </div>
   </section>
 
   <section>
-    <center>
-      <h2>Browser Gaming</h2>
-      <table>
-        <tr>
-          <td><button onclick="window.location.href='https://myemulator.onl/'">myemulator.onl</button></td>
-          <td><button onclick="window.location.href='https://rec0ded88.com'">rec0ded88</button></td>
-        </tr>
-        <tr>
-          <td><button onclick="window.location.href='https://x'">x</button></td>
-          <td><button onclick="window.location.href='https://x'">x</button></td>
-        </tr>
-      </table>
-    </center>
+    <h2>Browser Gaming</h2>
+    <div class="button-grid">
+      <button onclick="window.location.href='https://myemulator.onl/'">myemulator.onl</button>
+      <button onclick="window.location.href='https://rec0ded88.com'">rec0ded88</button>
+      <button onclick="window.location.href='https://x'">x</button>
+      <button onclick="window.location.href='https://x'">x</button>
+    </div>
   </section>
 
   <section>
-    <center>
-      <h2>Education</h2>
-      <table>
-        <tr>
-          <td><button onclick="window.location.href='https://exercism.org/'">Programming</button></td>
-          <td><button onclick="window.location.href='https://x'">x</button></td>
-        </tr>
-        <tr>
-          <td><button onclick="window.location.href='https://x'">x</button></td>
-          <td><button onclick="window.location.href='https://x'">x</button></td>
-        </tr>
-      </table>
-    </center>
+    <h2>Education</h2>
+    <div class="button-grid">
+      <button onclick="window.location.href='https://exercism.org/'">Programming</button>
+      <button onclick="window.location.href='https://x'">x</button>
+      <button onclick="window.location.href='https://x'">x</button>
+      <button onclick="window.location.href='https://x'">x</button>
+    </div>
   </section>
 
   <!-- Footer placeholder -->
@@ -151,5 +126,4 @@
   </script>
 
 </body>
-
 </html>
