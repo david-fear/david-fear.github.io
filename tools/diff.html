@@ -6,11 +6,6 @@
 <title>Smart Diff</title>
 <link rel="stylesheet" href="https://david-fear.github.io/stylesheet.css" />
 <style>
-body {
-  margin:0;
-  padding:20px;
-}
-
 .container {
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -23,20 +18,19 @@ textarea {
   height:100%;
   resize:none;
   font-family: monospace;
+  background-color: #2a2a2a;
+  color: #808080;
 }
 
-button {
-  margin:5px 5px 5px 0;
-  padding:6px 12px;
-}
 
 #output {
-  margin-top:15px;
   border:1px solid #ccc;
   padding:10px;
   height:45vh;
   overflow:auto;
   font-family: monospace;
+  background-color: #2a2a2a;
+  color: #808080;
 }
 
 .same {}
@@ -61,22 +55,24 @@ button {
 </head>
 
 <body>
-
-<h2>Smart Diff (LCS aligned)</h2>
-
+  <main>
+    <section>
+      <h2><center>Smart Diff (LCS aligned)</center></h2>
+    </section>
+<section>
 <div class="container">
-<textarea id="left"></textarea>
-<textarea id="right"></textarea>
+<textarea id="left">Paste ...</textarea>
+<textarea id="right">Paste ...</textarea>
 </div>
 
-<div>
-<button onclick="runUnified()">Unified</button>
+<center><button onclick="runUnified()">Unified</button>
 <button onclick="runUnified(true)">Unified (changes)</button>
 <button onclick="runSide()">Side</button>
 <button onclick="runSide(true)">Side (changes)</button>
-</div>
+</center>
 
-<div id="output"></div>
+
+<div id="output">Differences: ...</div>
 
 <script>
 function escapeHtml(s){
@@ -165,6 +161,7 @@ function runSide(changesOnly=false){
     `</div>`;
 }
 </script>
+</section>
 
 </body>
 </html>
