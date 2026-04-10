@@ -248,7 +248,7 @@
         'Racing Bulls': '#8874D8',
         'Williams':     '#37BEDD',
         'Alpine':       '#FF87BC',
-        'Haas':         '#B6BABD',
+        'Haas':         '#FFFFFF',
         'Audi':         '#4E7C59',
         'Aston Martin': '#006F62',
         'Cadillac':     '#C8AA44'
@@ -307,8 +307,8 @@
         beforeDatasetDraw(chart, args) {
           if (args.index === hoveredDatasetIndex) {
             chart.ctx.save();
-            chart.ctx.shadowColor = 'rgba(255, 255, 255, 0.9)';
-            chart.ctx.shadowBlur = 14;
+            chart.ctx.shadowColor = 'rgba(255, 255, 255, 1)';
+            chart.ctx.shadowBlur = 5;
           }
         },
         afterDatasetDraw(chart, args) {
