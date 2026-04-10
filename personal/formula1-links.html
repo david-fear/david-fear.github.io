@@ -169,14 +169,16 @@
 
     <!-- NEW SECTION: F1 2026 Points Table & Chart -->
     <section>
+      <h2>F1 2026 Cumulative Points Chart</h2>
+      <div style="position:relative; height:500px; min-height:500px; max-height:500px; width:100%;">
+        <canvas id="pointsChart"></canvas>
+      </div>
+
       <h2>F1 2026 Points Table</h2>
       <table id="f1Table" class="f1-points">
         <thead></thead>
         <tbody></tbody>
       </table>
-
-      <h2>F1 2026 Cumulative Points Chart</h2>
-      <canvas id="pointsChart" width="1000" height="1000"></canvas>
     </section>
 
   </main>
@@ -347,6 +349,7 @@
         plugins: [glowPlugin, driverLabelsPlugin],
         options: {
           responsive: true,
+          maintainAspectRatio: false,
           layout: {
             padding: { right: 40 }
           },
@@ -360,6 +363,7 @@
                   original.forEach(label => {
                     const dataset = chart.data.datasets[label.datasetIndex];
                     label.lineDash = dataset.borderDash || [];
+                    label.text = driverAbbr[label.text] || label.text.substring(0, 3).toUpperCase();
                   });
                   return original;
                 }
@@ -374,6 +378,20 @@
               }
             },
             title: { display: true, text: 'F1 2026 Cumulative Points' }
+          },
+          onHover: function(event, elements, chart) {
+            if (elements && elements.length > 0) {
+              const newIndex = elements[0].datasetIndex;
+              if (newIndex !== hoveredDatasetIndex) {
+                hoveredDatasetIndex = newIndex;
+                chart.update('none');
+              }
+            } else {
+              if (hoveredDatasetIndex !== -1) {
+                hoveredDatasetIndex = -1;
+                chart.update('none');
+              }
+            }
           },
           scales: {
             y: { beginAtZero: true }
