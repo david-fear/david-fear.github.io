@@ -240,10 +240,48 @@
     function buildChart(data, races) {
       const ctx = document.getElementById('pointsChart').getContext('2d');
 
+      const teamColors = {
+        'Mercedes':     '#00D2BE',
+        'Ferrari':      '#DC0000',
+        'McLaren':      '#FF8000',
+        'Red Bull':     '#3671C6',
+        'Racing Bulls': '#8874D8',
+        'Williams':     '#37BEDD',
+        'Alpine':       '#FF87BC',
+        'Haas':         '#B6BABD',
+        'Audi':         '#4E7C59',
+        'Aston Martin': '#006F62',
+        'Cadillac':     '#C8AA44'
+      };
+
+      const driverAbbr = {
+        'Antonelli': 'ANT', 'Russell':   'RUS', 'Leclerc':   'LEC', 'Hamilton':  'HAM',
+        'Norris':    'NOR', 'Piastri':   'PIA', 'Bearman':   'BEA', 'Gasly':     'GAS',
+        'Verstappen':'VER', 'Lawson':    'LAW', 'Lindblad':  'LIN', 'Hadjar':    'HAD',
+        'Bortoleto': 'BOR', 'Ocon':      'OCO', 'Sainz':     'SAI', 'Colapinto': 'COL',
+        'Hulkenberg':'HUL', 'Albon':     'ALB', 'Bottas':    'BOT', 'Perez':     'PER',
+        'Alonso':    'ALO', 'Stroll':    'STR'
+      };
+
+      // First pass: determine solid vs dotted by CSV row order within each team
+      const teamCount = {};
+      const driverDash = {};
+      data.forEach(row => {
+        const team = row.constructor;
+        if (!teamCount[team]) teamCount[team] = 0;
+        teamCount[team]++;
+        driverDash[row.driver] = teamCount[team] === 1 ? [] : [2, 4];
+      });
+
       // Sort drivers by total points descending
-      const sortedData = data.slice().sort((a, b) => (b.total || 0) - (a.total || 0));
+      const sortedData = data.slice().sort((a, b) => {
+        const totalA = races.reduce((s, r) => s + (a[r] || 0), 0);
+        const totalB = races.reduce((s, r) => s + (b[r] || 0), 0);
+        return totalB - totalA;
+      });
 
       const datasets = sortedData.map((driver, index) => {
+        const color = teamColors[driver.constructor] || '#888888';
         let cumulative = 0;
         const points = races.map(r => {
           cumulative += driver[r] || 0;
@@ -253,11 +291,52 @@
           label: driver.driver,
           data: points,
           fill: false,
-          borderColor: getRandomColor(),
+          borderColor: color,
+          backgroundColor: color,
+          borderDash: driverDash[driver.driver],
+          borderWidth: 2,
           tension: 0.2,
-          hidden: index >= sortedData.length - 10 // bottom 10 hidden
+          hidden: index >= sortedData.length - 10
         };
       });
+
+      let hoveredDatasetIndex = -1;
+
+      const glowPlugin = {
+        id: 'glowPlugin',
+        beforeDatasetDraw(chart, args) {
+          if (args.index === hoveredDatasetIndex) {
+            chart.ctx.save();
+            chart.ctx.shadowColor = 'rgba(255, 255, 255, 0.9)';
+            chart.ctx.shadowBlur = 14;
+          }
+        },
+        afterDatasetDraw(chart, args) {
+          if (args.index === hoveredDatasetIndex) {
+            chart.ctx.restore();
+          }
+        }
+      };
+
+      const driverLabelsPlugin = {
+        id: 'driverLabelsPlugin',
+        afterDraw(chart) {
+          const c = chart.ctx;
+          chart.data.datasets.forEach((dataset, i) => {
+            const meta = chart.getDatasetMeta(i);
+            if (!meta.visible) return;
+            const lastPoint = meta.data[meta.data.length - 1];
+            if (!lastPoint) return;
+            c.save();
+            c.font = 'bold 8px sans-serif';
+            c.fillStyle = dataset.borderColor;
+            c.textAlign = 'left';
+            c.textBaseline = 'middle';
+            c.fillText(driverAbbr[dataset.label] || dataset.label.substring(0, 3).toUpperCase(), lastPoint.x + 4, lastPoint.y);
+            c.restore();
+          });
+        }
+      };
 
       new Chart(ctx, {
         type: 'line',
@@ -265,12 +344,34 @@
           labels: races,
           datasets: datasets
         },
+        plugins: [glowPlugin, driverLabelsPlugin],
         options: {
           responsive: true,
+          layout: {
+            padding: { right: 40 }
+          },
           plugins: {
             legend: {
               position: 'top',
-              labels: { usePointStyle: true }
+              labels: {
+                usePointStyle: true,
+                generateLabels: function(chart) {
+                  const original = Chart.defaults.plugins.legend.labels.generateLabels(chart);
+                  original.forEach(label => {
+                    const dataset = chart.data.datasets[label.datasetIndex];
+                    label.lineDash = dataset.borderDash || [];
+                  });
+                  return original;
+                }
+              },
+              onHover: function(event, legendItem, legend) {
+                hoveredDatasetIndex = legendItem.datasetIndex;
+                legend.chart.update('none');
+              },
+              onLeave: function(event, legendItem, legend) {
+                hoveredDatasetIndex = -1;
+                legend.chart.update('none');
+              }
             },
             title: { display: true, text: 'F1 2026 Cumulative Points' }
           },
@@ -279,14 +380,6 @@
           }
         }
       });
-    }
-
-    // Utility: fully random RGB colors (not pastels)
-    function getRandomColor() {
-      const r = Math.floor(Math.random() * 256);
-      const g = Math.floor(Math.random() * 256);
-      const b = Math.floor(Math.random() * 256);
-      return `rgb(${r},${g},${b})`;
     }
   </script>
 
