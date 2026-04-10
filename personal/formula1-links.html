@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>My GitHub Static Site Template</title>
+  <title>Formula 1</title>
 
   <link rel="stylesheet" href="https://david-fear.github.io/stylesheet.css" />
   <style>
@@ -23,14 +23,44 @@
       transform-origin: top left;
       border: 0;
     }
+
+    /* F1 Points Table Styles */
+    table.f1-points {
+      border-collapse: collapse;
+      width: 100%;
+      margin-bottom: 30px;
+      font-size: 6.5pt;
+    }
+
+    table.f1-points th,
+    table.f1-points td {
+      border: 1px solid #333;
+      padding: 1pt;
+      text-align: right;
+    }
+
+    table.f1-points th:first-child,
+    table.f1-points td:first-child {
+      text-align: left;
+    }
+
+    table.f1-points th:nth-child(2),
+    table.f1-points td:nth-child(2),
+    table.f1-points th:nth-child(3),
+    table.f1-points td:nth-child(3) {
+      text-align: left;
+    }
   </style>
+
+  <!-- CSV & Chart.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
 
   <!-- Dynamic sidebar menu -->
   <div id="menu-container"></div>
-
   <script>
     fetch('https://david-fear.github.io/components/menu.html')
       .then(response => response.text())
@@ -38,7 +68,6 @@
         const container = document.getElementById('menu-container');
         container.innerHTML = data;
 
-        // Now attach event listeners because the elements exist
         const toggle = document.getElementById('menu-toggle');
         const menu = document.getElementById('menu-nav');
 
@@ -69,6 +98,7 @@
 
   <main>
 
+    <!-- Existing sections -->
     <section>
       <h2 class="mid">Next Race</h2>
       <div id="race-info" class="iframe-wrapper">
@@ -84,17 +114,14 @@
           <tr>
             <td width="50px;">2026</td>
             <td width="90px;"><code>LAW vs LIN</code></td>
-            <td width="90px;"><a href="https://www.f1teammatequali.com/quali_season_teammates/2026/166/440/454">Qualifying</a>
-            </td>
+            <td width="90px;"><a href="https://www.f1teammatequali.com/quali_season_teammates/2026/166/440/454">Qualifying</a></td>
             <td width="90px;"><a href="https://www.f1teammatequali.com/race_season_teammates/2026/166/440/454">Race</a></td>
           </tr>
           <tr>
             <td width="50px;">2025</td>
             <td width="90px;"><code>LAW vs HAD</code></td>
-            <td width="90px;"><a href="https://www.f1teammatequali.com/quali_season_drivers/2025/440/325">Qualifying</a>
-            </td>
-            <td width="90px;"><a href="https://www.f1teammatequali.com/quali_season_teammates/2025/166/440/325">Race</a>
-            </td>
+            <td width="90px;"><a href="https://www.f1teammatequali.com/quali_season_drivers/2025/440/325">Qualifying</a></td>
+            <td width="90px;"><a href="https://www.f1teammatequali.com/quali_season_teammates/2025/166/440/325">Race</a></td>
           </tr>
         </table>
       </center>
@@ -105,18 +132,13 @@
         <h2>x.com (ex-Twitter)</h2>
         <table>
           <tr>
-            <td width="120px;">
-              <p>F1 Troll</p>
-            </td>
+            <td width="120px;">F1 Troll</td>
             <td><a href="https://x.com/f1trollofficial">https://x.com/f1trollofficial</a></td>
           </tr>
           <tr>
-            <td>
-              <p>F1 Visualized</p>
-            </td>
-            <td>
-              <p><a href="https://x.com/f1visualized">https://x.com/f1visualized</a></p>
-            </td>
+            <td>F1 Visualized</td>
+            <td><a href="https://x.com/f1visualized">https://x.com/f1visualized</a></td>
+          </tr>
         </table>
       </center>
     </section>
@@ -126,42 +148,41 @@
         <h2>Other Links</h2>
         <table>
           <tr>
-            <td width="200px;">
-              <p>F1 Countdown</p>
-            </td>
+            <td width="200px;">F1 Countdown</td>
             <td><a href="https://formulacountdown.com/">https://formulacountdown.com/</a></td>
           </tr>
           <tr>
-            <td width="200px;">
-              <p>F1 Pace</p>
-            </td>
+            <td width="200px;">F1 Pace</td>
             <td><a href="https://f1pace.com/">https://f1pace.com/</a></td>
           </tr>
           <tr>
-            <td>
-              <p>Youtube - TacticalRab</p>
-            </td>
-            <td>
-              <p><a href="https://www.youtube.com/@F1NewsTR/videos">https://www.youtube.com/@F1NewsTR</a></p>
-            </td>
+            <td>Youtube - TacticalRab</td>
+            <td><a href="https://www.youtube.com/@F1NewsTR/videos">https://www.youtube.com/@F1NewsTR</a></td>
           </tr>
           <tr>
-            <td>
-              <p>Youtube - LawVS</p>
-            </td>
-            <td>
-              <p><a href="https://www.youtube.com/@LawVS/videos">https://www.youtube.com/@LawVS</a></p>
-            </td>
+            <td>Youtube - LawVS</td>
+            <td><a href="https://www.youtube.com/@LawVS/videos">https://www.youtube.com/@LawVS</a></td>
           </tr>
         </table>
       </center>
+    </section>
+
+    <!-- NEW SECTION: F1 2026 Points Table & Chart -->
+    <section>
+      <h2>F1 2026 Points Table</h2>
+      <table id="f1Table" class="f1-points">
+        <thead></thead>
+        <tbody></tbody>
+      </table>
+
+      <h2>F1 2026 Cumulative Points Chart</h2>
+      <canvas id="pointsChart" width="1000" height="1000"></canvas>
     </section>
 
   </main>
 
   <!-- Footer placeholder -->
   <div id="footer-container"></div>
-
   <script>
     fetch('https://david-fear.github.io/components/footer.html')
       .then(response => response.text())
@@ -173,6 +194,101 @@
       });
   </script>
 
-</body>
+  <!-- F1 Points Table & Chart Script -->
+  <script>
+    const csvURL = 'https://david-fear.github.io/personal/formula1-data.csv';
 
+    Papa.parse(csvURL, {
+      download: true,
+      header: true,
+      dynamicTyping: true,
+      complete: function (results) {
+        const data = results.data;
+        const races = Object.keys(data[0]).filter(k => !['driver', 'constructor', 'total'].includes(k));
+
+        buildTable(data, races);
+        buildChart(data, races);
+      }
+    });
+
+    function buildTable(data, races) {
+      const thead = document.querySelector('#f1Table thead');
+      const tbody = document.querySelector('#f1Table tbody');
+
+      // Build header row
+      let headerHTML = '<tr><th>Driver</th><th>Constructor</th>';
+      races.forEach(r => headerHTML += `<th>${r}</th>`);
+      headerHTML += '<th>Total</th></tr>';
+      thead.innerHTML = headerHTML;
+
+      // Build body rows
+      let bodyHTML = '';
+      data.forEach(row => {
+        let total = 0;
+        let rowHTML = `<tr><td>${row.driver}</td><td>${row.constructor}</td>`;
+        races.forEach(r => {
+          const val = row[r] || 0;
+          total += val;
+          rowHTML += `<td>${val}</td>`;
+        });
+        rowHTML += `<td>${total}</td></tr>`;
+        bodyHTML += rowHTML;
+      });
+      tbody.innerHTML = bodyHTML;
+    }
+
+    function buildChart(data, races) {
+      const ctx = document.getElementById('pointsChart').getContext('2d');
+
+      // Sort drivers by total points descending
+      const sortedData = data.slice().sort((a, b) => (b.total || 0) - (a.total || 0));
+
+      const datasets = sortedData.map((driver, index) => {
+        let cumulative = 0;
+        const points = races.map(r => {
+          cumulative += driver[r] || 0;
+          return cumulative;
+        });
+        return {
+          label: driver.driver,
+          data: points,
+          fill: false,
+          borderColor: getRandomColor(),
+          tension: 0.2,
+          hidden: index >= sortedData.length - 10 // bottom 10 hidden
+        };
+      });
+
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: races,
+          datasets: datasets
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: { usePointStyle: true }
+            },
+            title: { display: true, text: 'F1 2026 Cumulative Points' }
+          },
+          scales: {
+            y: { beginAtZero: true }
+          }
+        }
+      });
+    }
+
+    // Utility: fully random RGB colors (not pastels)
+    function getRandomColor() {
+      const r = Math.floor(Math.random() * 256);
+      const g = Math.floor(Math.random() * 256);
+      const b = Math.floor(Math.random() * 256);
+      return `rgb(${r},${g},${b})`;
+    }
+  </script>
+
+</body>
 </html>
