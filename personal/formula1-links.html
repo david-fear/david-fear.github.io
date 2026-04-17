@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -175,26 +176,16 @@
       </div>
 
       <h2>F1 2026 Points Table</h2>
-      <table id="f1Table" class="f1-points">
-        <thead></thead>
-        <tbody></tbody>
-      </table>
+      <details>
+        <summary>Show / Hide Table</summary>
+        <table id="f1Table" class="f1-points">
+          <thead></thead>
+          <tbody></tbody>
+        </table>
+      </details>
     </section>
 
   </main>
-
-  <!-- Footer placeholder -->
-  <div id="footer-container"></div>
-  <script>
-    fetch('https://david-fear.github.io/components/footer.html')
-      .then(response => response.text())
-      .then(data => {
-        document.getElementById('footer-container').innerHTML = data;
-      })
-      .catch(error => {
-        console.error('Failed to load footer:', error);
-      });
-  </script>
 
   <!-- F1 Points Table & Chart Script -->
   <script>
@@ -399,6 +390,243 @@
         }
       });
     }
+  </script>
+
+
+<!-- NEW SECTION: F1 2026 Constructor Points Chart -->
+<section>
+  <h2>F1 2026 Constructor Cumulative Points Chart</h2>
+  <div style="position:relative; height:500px; min-height:500px; max-height:500px; width:100%;">
+    <canvas id="constructorChart"></canvas>
+  </div>
+
+  <h2>F1 2026 Constructor Points Table</h2>
+  <details>
+    <summary>Show / Hide Table</summary>
+    <table id="constructorTable" class="f1-points">
+      <thead></thead>
+      <tbody></tbody>
+    </table>
+  </details>
+</section>
+
+<!-- Constructor Chart Script -->
+<script>
+(function() {
+  const csvURL = 'https://david-fear.github.io/personal/formula1-data.csv';
+
+  const teamColors = {
+    'Mercedes':     '#00D2BE',
+    'Ferrari':      '#DC0000',
+    'McLaren':      '#FF8000',
+    'Red Bull':     '#3671C6',
+    'Racing Bulls': '#8874D8',
+    'Williams':     '#37BEDD',
+    'Alpine':       '#FF87BC',
+    'Haas':         '#B0B0B0',
+    'Audi':         '#4E7C59',
+    'Aston Martin': '#006F62',
+    'Cadillac':     '#C8AA44'
+  };
+
+  const teamAbbr = {
+    'Mercedes':     'Mercedes',
+    'Ferrari':      'Ferrari',
+    'McLaren':      'McLaren',
+    'Red Bull':     'Red Bull',
+    'Racing Bulls': 'Racing Bulls',
+    'Williams':     'Williams',
+    'Alpine':       'Alpine',
+    'Haas':         'Haas',
+    'Audi':         'Audi',
+    'Aston Martin': 'Autin',
+    'Cadillac':     'Cadillac'
+  };
+
+  Papa.parse(csvURL, {
+    download: true,
+    header: true,
+    dynamicTyping: true,
+    complete: function(results) {
+      const data = results.data.filter(r => r.driver);
+      const races = Object.keys(data[0]).filter(k => !['driver', 'constructor', 'total'].includes(k));
+
+      // Sum points per team per race
+      const teamRacePoints = {};
+      data.forEach(row => {
+        const team = row.constructor;
+        if (!teamRacePoints[team]) teamRacePoints[team] = {};
+        races.forEach(r => {
+          teamRacePoints[team][r] = (teamRacePoints[team][r] || 0) + (row[r] || 0);
+        });
+      });
+
+      // Sort teams by total points descending
+      const teamTotals = {};
+      Object.keys(teamRacePoints).forEach(team => {
+        teamTotals[team] = races.reduce((s, r) => s + teamRacePoints[team][r], 0);
+      });
+      const sortedTeams = Object.keys(teamRacePoints).sort((a, b) => teamTotals[b] - teamTotals[a]);
+
+      buildConstructorTable(sortedTeams, teamRacePoints, teamTotals, races);
+      buildConstructorChart(sortedTeams, teamRacePoints, races);
+    }
+  });
+
+  function buildConstructorTable(sortedTeams, teamRacePoints, teamTotals, races) {
+    const thead = document.querySelector('#constructorTable thead');
+    const tbody = document.querySelector('#constructorTable tbody');
+
+    let headerHTML = '<tr><th>#</th><th>Constructor</th>';
+    races.forEach(r => headerHTML += `<th>${r}</th>`);
+    headerHTML += '<th>Total</th></tr>';
+    thead.innerHTML = headerHTML;
+
+    let bodyHTML = '';
+    sortedTeams.forEach((team, idx) => {
+      let rowHTML = `<tr><td>${idx + 1}</td><td>${team}</td>`;
+      races.forEach(r => {
+        rowHTML += `<td>${teamRacePoints[team][r] || 0}</td>`;
+      });
+      rowHTML += `<td>${teamTotals[team]}</td></tr>`;
+      bodyHTML += rowHTML;
+    });
+    tbody.innerHTML = bodyHTML;
+  }
+
+  function buildConstructorChart(sortedTeams, teamRacePoints, races) {
+    const ctx = document.getElementById('constructorChart').getContext('2d');
+
+    const datasets = sortedTeams.map(team => {
+      let cumulative = 0;
+      const points = races.map(r => {
+        cumulative += teamRacePoints[team][r] || 0;
+        return cumulative;
+      });
+      const totalPoints = races.reduce((s, r) => s + (teamRacePoints[team][r] || 0), 0);
+      return {
+        label: team,
+        data: points,
+        fill: false,
+        borderColor: teamColors[team] || '#888888',
+        backgroundColor: teamColors[team] || '#888888',
+        borderWidth: 2.5,
+        tension: 0.2,
+        pointRadius: 3,
+        pointHoverRadius: 5,
+        hidden: totalPoints === 0
+      };
+    });
+
+    let hoveredDatasetIndex = -1;
+
+    const glowPlugin = {
+      id: 'glowPlugin',
+      beforeDatasetDraw(chart, args) {
+        if (args.index === hoveredDatasetIndex) {
+          chart.ctx.save();
+          chart.ctx.shadowColor = 'rgba(255,255,255,1)';
+          chart.ctx.shadowBlur = 5;
+        }
+      },
+      afterDatasetDraw(chart, args) {
+        if (args.index === hoveredDatasetIndex) {
+          chart.ctx.restore();
+        }
+      }
+    };
+
+    const endLabelsPlugin = {
+      id: 'endLabelsPlugin',
+      afterDraw(chart) {
+        const c = chart.ctx;
+        chart.data.datasets.forEach((dataset, i) => {
+          const meta = chart.getDatasetMeta(i);
+          if (!meta.visible) return;
+          const lastPoint = meta.data[meta.data.length - 1];
+          if (!lastPoint) return;
+          c.save();
+          c.font = 'bold 8px sans-serif';
+          c.fillStyle = dataset.borderColor;
+          c.textAlign = 'left';
+          c.textBaseline = 'middle';
+          c.fillText(teamAbbr[dataset.label] || dataset.label.substring(0, 3).toUpperCase(), lastPoint.x + 4, lastPoint.y);
+          c.restore();
+        });
+      }
+    };
+
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: races,
+        datasets: datasets
+      },
+      plugins: [glowPlugin, endLabelsPlugin],
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: {
+          padding: { right: 44 }
+        },
+        onHover: function(event, elements, chart) {
+          const idx = elements && elements.length ? elements[0].datasetIndex : -1;
+          if (idx !== hoveredDatasetIndex) {
+            hoveredDatasetIndex = idx;
+            chart.update('none');
+          }
+        },
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: {
+              usePointStyle: true,
+              generateLabels: function(chart) {
+                const original = Chart.defaults.plugins.legend.labels.generateLabels(chart);
+                original.forEach(label => {
+                  label.text = teamAbbr[label.text] || label.text.substring(0, 3).toUpperCase();
+                });
+                return original;
+              }
+            },
+            onHover: function(event, legendItem, legend) {
+              hoveredDatasetIndex = legendItem.datasetIndex;
+              legend.chart.update('none');
+            },
+            onLeave: function(event, legendItem, legend) {
+              hoveredDatasetIndex = -1;
+              legend.chart.update('none');
+            }
+          },
+          title: { display: true, text: 'F1 2026 Cumulative Constructor Points' },
+          tooltip: {
+            callbacks: {
+              title: items => items[0].dataset.label,
+              label: item => `After ${item.label}: ${item.raw} pts`
+            }
+          }
+        },
+        scales: {
+          y: { beginAtZero: true },
+          x: { ticks: { maxRotation: 45 } }
+        }
+      }
+    });
+  }
+})();
+</script>
+
+  <!-- Footer placeholder -->
+  <div id="footer-container"></div>
+  <script>
+    fetch('https://david-fear.github.io/components/footer.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('footer-container').innerHTML = data;
+      })
+      .catch(error => {
+        console.error('Failed to load footer:', error);
+      });
   </script>
 
 </body>
