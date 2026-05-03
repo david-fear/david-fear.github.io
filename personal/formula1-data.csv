@@ -1,23 +1,23 @@
-driver,constructor,AUS,CHN-S,CHN,JPN,MIA-S
-Antonelli,Mercedes,18,4,25,25,3
-Russell,Mercedes,25,8,18,12,5
-Leclerc,Ferrari,15,7,12,15,6
-Hamilton,Ferrari,12,6,15,8,2
-Norris,McLaren,10,5,0,10,8
-Piastri,McLaren,0,3,0,18,7
-Bearman,Haas,6,1,10,0,0
-Gasly,Alpine,1,0,8,6,1
-Verstappen,Red Bull,8,0,0,4,4
-Lawson,Racing Bulls,0,2,6,2,0
-Lindblad,Racing Bulls,4,0,0,0,0
-Hadjar,Red Bull,0,0,4,0,0
-Bortoleto,Audi,2,0,2,0,0
-Ocon,Haas,0,0,0,1,0
-Sainz,Williams,0,0,0,0,0
-Colapinto,Alpine,0,0,1,0,0
-Hulkenberg,Audi,0,0,0,0,0
-Albon,Williams,0,0,0,0,0
-Bottas,Cadillac,0,0,0,0,0
-Perez,Cadillac,0,0,0,0,0
-Alonso,Aston Martin,0,0,0,0,0
-Stroll,Aston Martin,0,0,0,0,0
+driver,constructor,AUS,CHN-S,CHN,JPN,MIA-S,MIA
+Antonelli,Mercedes,18,4,25,25,3,25
+Russell,Mercedes,25,8,18,12,5,12
+Leclerc,Ferrari,15,7,12,15,6,8
+Hamilton,Ferrari,12,6,15,8,2,6
+Norris,McLaren,10,5,0,10,8,18
+Piastri,McLaren,0,3,0,18,7,15
+Bearman,Haas,6,1,10,0,0,0
+Gasly,Alpine,1,0,8,6,1,0
+Verstappen,Red Bull,8,0,0,4,4,10
+Lawson,Racing Bulls,0,2,6,2,0,0
+Lindblad,Racing Bulls,4,0,0,0,0,0
+Hadjar,Red Bull,0,0,4,0,0,0
+Bortoleto,Audi,2,0,2,0,0,0
+Ocon,Haas,0,0,0,1,0,0
+Sainz,Williams,0,0,0,0,0,2
+Colapinto,Alpine,0,0,1,0,0,4
+Hulkenberg,Audi,0,0,0,0,0,0
+Albon,Williams,0,0,0,0,0,1
+Bottas,Cadillac,0,0,0,0,0,0
+Perez,Cadillac,0,0,0,0,0,0
+Alonso,Aston Martin,0,0,0,0,0,0
+Stroll,Aston Martin,0,0,0,0,0,0
