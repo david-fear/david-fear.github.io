@@ -278,12 +278,12 @@
     function buildDriverChart(data, races) {
       const ctx = document.getElementById('driverChart').getContext('2d');
 
-      /* Work out dash pattern: first occurrence solid, later dotted */
-      const seen = {};
+      /* Work out dash pattern: solid = 1st driver listed per team, dotted = 2nd */
+      const teamCount = {};
       const driverDash = data.map(row => {
-        const key = row.driver;
-        seen[key] = (seen[key] || 0) + 1;
-        return seen[key] === 1 ? [] : [4, 4];
+        const team = row.constructor;
+        teamCount[team] = (teamCount[team] || 0) + 1;
+        return teamCount[team] === 1 ? [] : [2, 4];
       });
 
       /* Sort by total descending */
@@ -354,10 +354,26 @@
       const thead = document.querySelector('#driverTable thead');
       const tbody = document.querySelector('#driverTable tbody');
 
-      /* Max per race for gold highlight */
+      /* Merge rows with the same driver name (e.g. Lawson, Tsunoda mid-season swaps) */
+      const mergedMap = {};
+      const mergedOrder = [];
+      data.forEach(row => {
+        if (!mergedMap[row.driver]) {
+          mergedMap[row.driver] = Object.assign({}, row, { _constructors: [row.constructor] });
+          mergedOrder.push(row.driver);
+        } else {
+          races.forEach(r => {
+            mergedMap[row.driver][r] = (mergedMap[row.driver][r] || 0) + (row[r] || 0);
+          });
+          mergedMap[row.driver]._constructors.push(row.constructor);
+        }
+      });
+      const tableData = mergedOrder.map(name => mergedMap[name]);
+
+      /* Max per race for gold highlight (use merged totals) */
       const maxPerRace = {};
       races.forEach(r => {
-        maxPerRace[r] = Math.max(...data.map(row => row[r] || 0));
+        maxPerRace[r] = Math.max(...tableData.map(row => row[r] || 0));
       });
 
       /* Header */
@@ -366,11 +382,12 @@
       headerHTML += '<th>Total</th></tr>';
       thead.innerHTML = headerHTML;
 
-      /* Body — keep original CSV order */
+      /* Body — merged, original order */
       let bodyHTML = '';
-      data.forEach(row => {
+      tableData.forEach(row => {
         let total = 0;
-        let rowHTML = `<tr><td>${row.driver}</td><td>${row.constructor}</td>`;
+        const constructorLabel = row._constructors.join(' / ');
+        let rowHTML = `<tr><td>${row.driver}</td><td>${constructorLabel}</td>`;
         races.forEach(r => {
           const val   = row[r] || 0;
           total      += val;
