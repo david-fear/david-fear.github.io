@@ -30,6 +30,7 @@
 <h2>NZ YGO Card Search</h2>
 
 <input id="q" placeholder="Card name or code, e.g. DUPO-EN017" value="DUPO-EN017" />
+<input id="limit" type="number" min="1" max="20" value="10" style="width:50px;" title="Results per site" />
 <button onclick="search()">Search</button>
 
 <div id="query"></div>
@@ -97,11 +98,11 @@ function fetchJSON(url) {
 }
 
 /* Query one Shopify store via suggest.json */
-async function searchStore(store, query) {
+async function searchStore(store, query, limit) {
   const domain = store.d;
   const fallback = `https://${domain}/search?q=${encodeURIComponent(query)}`;
   const url = `https://${domain}/search/suggest.json?q=${encodeURIComponent(query)}`
-            + `&resources[type]=product&resources[limit]=8`;
+            + `&resources[type]=product&resources[limit]=${limit}`;
   try {
     const data = await fetchJSON(url);
     const products = data?.resources?.results?.products;
@@ -129,7 +130,7 @@ function renderStore(store, result, query) {
   if (result.ok) {
     inner = result.items.map(r => {
       const badge = r.soldOut
-        ? `<span class="sold-out">SOLD OUT</span>`
+        ? `<span class="sold-out">SOLD OUT${r.price ? ' ' + r.price : ''}</span>`
         : r.price
           ? `<span class="price">${esc(r.price)}</span>`
           : `<span class="no-price">—</span>`;
@@ -149,6 +150,7 @@ async function search() {
   if (!q) return;
 
   const shopifyStores = STORES.filter(s => !s.link);
+  const limit = Math.max(1, Math.min(20, parseInt(document.getElementById('limit').value) || 10));
   document.getElementById('query').textContent = 'Searching: ' + q;
   document.getElementById('status').textContent = `Querying ${shopifyStores.length} Shopify stores + ${STORES.length - shopifyStores.length} link-only…`;
 
@@ -172,7 +174,7 @@ async function search() {
   let done = 0;
   const promises = STORES.map((store, i) => {
     if (store.link) return Promise.resolve();
-    return searchStore(store, q).then(result => {
+    return searchStore(store, q, limit).then(result => {
       const fresh = document.createElement('div');
       fresh.className = 'store';
       fresh.innerHTML = renderStore(store, result, q)
@@ -188,9 +190,8 @@ async function search() {
   document.getElementById('status').textContent = `Done — ${STORES.length} stores searched`;
 }
 
-document.getElementById('q').addEventListener('keydown', e => {
-  if (e.key === 'Enter') search();
-});
+document.getElementById('q').addEventListener('keydown', e => { if (e.key === 'Enter') search(); });
+document.getElementById('limit').addEventListener('keydown', e => { if (e.key === 'Enter') search(); });
 
 </script>
 
