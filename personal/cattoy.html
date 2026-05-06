@@ -58,7 +58,7 @@
   <!-- === CAT GAME SECTION === -->
   <section>
     <center>
-      <button id="modeButton" class="button">Switch to STRING</button>
+      <button id="modeButton" class="button">Switch to FEATHER WAND</button>
       <br><br>
       <canvas id="catGameCanvas" width="600" height="400"></canvas>
     </center>
@@ -69,73 +69,149 @@
     const ctx = canvas.getContext("2d");
     const modeButton = document.getElementById("modeButton");
 
-    let mode = "dot";
-    let dotSize = 14;
-    let stringLength = 140;
+    let mode = "laser"; // "laser" or "wand"
+    let dotRadius = 10;
+    let target = { x: 300, y: 200, vx: 2.5, vy: 2 };
+    let speedMult = 1;
+    let hitFlash = 0;
 
-    let target = { x: 300, y: 200, vx: 2, vy: 1.7 };
-    let speedMultiplier = 1;
+    // Wand handle drifts slowly across the top edge
+    let handleX = 300;
+    let handleDirX = 0.4;
 
-    function randomSpeedChange() {
-      speedMultiplier = 0.3 + Math.random() * 2.5;
+    function randomBehavior() {
+      if (Math.random() < 0.25) {
+        // Pause, then dart
+        speedMult = 0;
+        setTimeout(() => {
+          speedMult = 1.5 + Math.random() * 2;
+          target.vx = (Math.random() - 0.5) * 7;
+          target.vy = (Math.random() - 0.5) * 7;
+        }, 300 + Math.random() * 700);
+      } else {
+        speedMult = 0.4 + Math.random() * 2.2;
+      }
     }
-
-    setInterval(randomSpeedChange, 1800);
+    setInterval(randomBehavior, 1800);
 
     function update() {
-      target.x += target.vx * speedMultiplier;
-      target.y += target.vy * speedMultiplier;
+      target.x += target.vx * speedMult;
+      target.y += target.vy * speedMult;
 
-      if (target.x < 20 || target.x > canvas.width - 20) {
-        target.vx *= -1;
-        target.vx += (Math.random() - 0.5) * 2;
+      const pad = 25;
+      if (target.x < pad) {
+        target.x = pad;
+        target.vx = Math.abs(target.vx) + (Math.random() - 0.5);
+      }
+      if (target.x > canvas.width - pad) {
+        target.x = canvas.width - pad;
+        target.vx = -Math.abs(target.vx) + (Math.random() - 0.5);
+      }
+      if (target.y < pad) {
+        target.y = pad;
+        target.vy = Math.abs(target.vy) + (Math.random() - 0.5);
+      }
+      if (target.y > canvas.height - pad) {
+        target.y = canvas.height - pad;
+        target.vy = -Math.abs(target.vy) + (Math.random() - 0.5);
       }
 
-      if (target.y < 20 || target.y > canvas.height - 20) {
-        target.vy *= -1;
-        target.vy += (Math.random() - 0.5) * 2;
+      handleX += handleDirX;
+      if (handleX < 80 || handleX > canvas.width - 80) handleDirX *= -1;
+
+      if (hitFlash > 0) hitFlash--;
+    }
+
+    function drawBackground() {
+      ctx.fillStyle = "#1a1410";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      if (hitFlash > 0) {
+        ctx.fillStyle = `rgba(255, 255, 150, ${(hitFlash / 15) * 0.3})`;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
     }
 
-    function drawDot() {
-      ctx.fillStyle = "red";
+    function drawLaser() {
+      const x = target.x, y = target.y;
+      // Soft outer glow
+      const glow = ctx.createRadialGradient(x, y, 0, x, y, dotRadius * 5);
+      glow.addColorStop(0, "rgba(255, 60, 60, 0.75)");
+      glow.addColorStop(0.4, "rgba(220, 20, 20, 0.3)");
+      glow.addColorStop(1, "rgba(200, 0, 0, 0)");
+      ctx.fillStyle = glow;
       ctx.beginPath();
-      ctx.arc(target.x, target.y, dotSize, 0, Math.PI * 2);
+      ctx.arc(x, y, dotRadius * 5, 0, Math.PI * 2);
+      ctx.fill();
+      // Main dot with bright white centre
+      const dot = ctx.createRadialGradient(x, y, 0, x, y, dotRadius);
+      dot.addColorStop(0, "#ffffff");
+      dot.addColorStop(0.25, "#ff5555");
+      dot.addColorStop(1, "#cc0000");
+      ctx.fillStyle = dot;
+      ctx.beginPath();
+      ctx.arc(x, y, dotRadius, 0, Math.PI * 2);
       ctx.fill();
     }
 
-    function drawString() {
-      ctx.strokeStyle = "white";
-      ctx.lineWidth = 3;
+    function drawSingleFeather(x, y, angle, len, color) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(angle);
+      // Feather vane shape
       ctx.beginPath();
-
-      let baseX = target.x;
-      let baseY = target.y;
-      let jitter = 0;
-
-      for (let i = 0; i < stringLength; i++) {
-        jitter += (Math.random() - 0.5) * 4;
-
-        let x = baseX - i;
-        let y = baseY + jitter;
-
-        if (i === 0) {
-          ctx.moveTo(x, y);
-        } else {
-          ctx.lineTo(x, y);
-        }
-      }
-
+      ctx.moveTo(0, 0);
+      ctx.bezierCurveTo(len * 0.25, len * 0.2, len * 0.3, len * 0.65, 0, len);
+      ctx.bezierCurveTo(-len * 0.3, len * 0.65, -len * 0.25, len * 0.2, 0, 0);
+      ctx.fillStyle = color;
+      ctx.fill();
+      // Spine
+      ctx.strokeStyle = "rgba(255,255,255,0.3)";
+      ctx.lineWidth = 0.8;
+      ctx.beginPath();
+      ctx.moveTo(0, 2);
+      ctx.lineTo(0, len * 0.9);
       ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawFeatherWand() {
+      const tx = target.x, ty = target.y;
+      const hy = 5; // string anchors at top edge
+      // Natural-sag bezier string
+      const cpX = (handleX + tx) / 2;
+      const sag = 35 + Math.abs(tx - handleX) * 0.22;
+      const cpY = (hy + ty) / 2 + sag;
+      ctx.strokeStyle = "#b8904a";
+      ctx.lineWidth = 1.5;
+      ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(handleX, hy);
+      ctx.quadraticCurveTo(cpX, cpY, tx, ty);
+      ctx.stroke();
+      // Knot where feathers attach
+      ctx.fillStyle = "#6a4a2a";
+      ctx.beginPath();
+      ctx.arc(tx, ty, 4, 0, Math.PI * 2);
+      ctx.fill();
+      // Fan of feathers drooping from knot
+      const feathers = [
+        { angle: -0.55, len: 38, color: "#d03010" },
+        { angle: -0.20, len: 43, color: "#f09020" },
+        { angle:  0.00, len: 46, color: "#f8f8f0" },
+        { angle:  0.20, len: 43, color: "#e8c030" },
+        { angle:  0.55, len: 38, color: "#c02010" },
+      ];
+      for (const f of feathers) {
+        drawSingleFeather(tx, ty, f.angle, f.len, f.color);
+      }
     }
 
     function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      if (mode === "dot") {
-        drawDot();
+      drawBackground();
+      if (mode === "laser") {
+        drawLaser();
       } else {
-        drawString();
+        drawFeatherWand();
       }
     }
 
@@ -145,29 +221,39 @@
       requestAnimationFrame(loop);
     }
 
+    function handleHit(mx, my) {
+      const dist = Math.hypot(mx - target.x, my - target.y);
+      if (mode === "laser") {
+        if (dist < dotRadius * 2.5) {
+          hitFlash = 15;
+          dotRadius = dotRadius >= 35 ? 8 : dotRadius + 5;
+        }
+      } else {
+        if (dist < 40) {
+          hitFlash = 15;
+        }
+      }
+    }
+
     canvas.addEventListener("click", (e) => {
       const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-
-      if (mode === "dot" && x < canvas.width / 2) {
-        dotSize += 5;
-        if (dotSize > 50) dotSize = 8;
-      }
-
-      if (mode === "string" && x >= canvas.width / 2) {
-        stringLength += 30;
-        if (stringLength > 350) stringLength = 60;
-      }
+      const sx = canvas.width / rect.width;
+      const sy = canvas.height / rect.height;
+      handleHit((e.clientX - rect.left) * sx, (e.clientY - rect.top) * sy);
     });
 
+    canvas.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      const sx = canvas.width / rect.width;
+      const sy = canvas.height / rect.height;
+      const t = e.touches[0];
+      handleHit((t.clientX - rect.left) * sx, (t.clientY - rect.top) * sy);
+    }, { passive: false });
+
     modeButton.addEventListener("click", () => {
-      if (mode === "dot") {
-        mode = "string";
-        modeButton.textContent = "Switch to DOT";
-      } else {
-        mode = "dot";
-        modeButton.textContent = "Switch to STRING";
-      }
+      mode = mode === "laser" ? "wand" : "laser";
+      modeButton.textContent = mode === "laser" ? "Switch to FEATHER WAND" : "Switch to LASER";
     });
 
     loop();
