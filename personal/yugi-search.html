@@ -28,7 +28,7 @@
 
 <h2>NZ YGO Card Search</h2>
 
-<input id="q" placeholder="Card name or code, e.g. DUPO-EN017" />
+<input id="q" placeholder="Card name or code, e.g. DUPO-EN017" value="DUPO-EN017" />
 <button onclick="search()">Search</button>
 
 <div id="query"></div>
@@ -68,11 +68,14 @@ function fmtPrice(raw) {
   return '$' + (isCents ? (n / 100) : n).toFixed(2);
 }
 
+const PROXY = 'https://corsproxy.io/?';
+
 /* Fetch JSON with abort timeout */
 function fetchJSON(url) {
   const ctrl = new AbortController();
   const tid  = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
-  return fetch(url, { signal: ctrl.signal })
+  const proxied = PROXY + encodeURIComponent(url);
+  return fetch(proxied, { signal: ctrl.signal })
     .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
     .finally(() => clearTimeout(tid));
 }
