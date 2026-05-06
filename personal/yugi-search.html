@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>NZ YGO Card Search</title>
+
+  <style>
+    body { font-family: Arial, sans-serif; background: #111; color: #eee; margin: 16px; font-size: 12px; }
+    h2   { font-size: 14px; margin: 0 0 10px; }
+    input  { width: 340px; padding: 6px 8px; font-size: 12px; background: #222; color: #eee; border: 1px solid #444; }
+    button { padding: 6px 12px; font-size: 12px; cursor: pointer; }
+    #query  { margin-top: 8px; font-size: 12px; color: #ffd700; }
+    #status { margin-top: 4px; font-size: 11px; color: #00ffcc; }
+    .stores { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .store  { flex: 1 1 280px; padding: 7px 9px; border: 1px solid #2a2a2a; background: #181818; }
+    .store-name { font-weight: bold; font-size: 11px; color: #aaa; margin-bottom: 5px; border-bottom: 1px solid #2a2a2a; padding-bottom: 3px; }
+    .item { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; margin: 3px 0; font-size: 11px; }
+    .item a { color: #4da3ff; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+    .item a:hover { text-decoration: underline; }
+    .price    { color: #7dff7d; font-weight: bold; white-space: nowrap; font-size: 11px; }
+    .no-price { color: #555; font-size: 10px; white-space: nowrap; }
+    .muted { font-size: 10px; color: #555; }
+    .muted a { color: #4da3ff; }
+  </style>
+</head>
+
+<body>
+
+<h2>NZ YGO Card Search</h2>
+
+<input id="q" placeholder="Card name or code, e.g. DUPO-EN017" />
+<button onclick="search()">Search</button>
+
+<div id="query"></div>
+<div id="status"></div>
+<div class="stores" id="results"></div>
+
+<script>
+
+const STORES = [
+  "cardmerchant.co.nz",
+  "cardmerchanthamilton.co.nz",
+  "cardmerchantchristchurch.co.nz",
+  "cardspotnz.com",
+  "tcgcollectornz.com",
+  "thegametree.co.nz",
+  "cardmasters.co.nz",
+  "adamscardboard.co.nz"
+];
+
+const TIMEOUT_MS = 6000;
+
+/* Escape user/API text before inserting into HTML */
+function esc(s) {
+  return String(s ?? '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+/* Normalise Shopify price — handles "$10.99", "10.99", "1099" (cents) */
+function fmtPrice(raw) {
+  if (raw == null || raw === '') return '';
+  const digits = String(raw).replace(/[^0-9.]/g, '');
+  const n = parseFloat(digits);
+  if (!n) return '';
+  /* Shopify suggest.json returns cents as an integer string with no decimal */
+  const isCents = !String(raw).includes('.') && n > 200;
+  return '$' + (isCents ? (n / 100) : n).toFixed(2);
+}
+
+/* Fetch JSON with abort timeout */
+function fetchJSON(url) {
+  const ctrl = new AbortController();
+  const tid  = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+  return fetch(url, { signal: ctrl.signal })
+    .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .finally(() => clearTimeout(tid));
+}
+
+/* Query one Shopify store — suggest.json only (correct filtered endpoint) */
+async function searchStore(domain, query) {
+  const url = `https://${domain}/search/suggest.json?q=${encodeURIComponent(query)}`
+            + `&resources[type]=product&resources[limit]=8`;
+  try {
+    const data = await fetchJSON(url);
+    const products = data?.resources?.results?.products;
+    if (products?.length) {
+      return {
+        ok: true,
+        items: products.map(p => ({
+          title: p.title,
+          link:  `https://${domain}/products/${p.handle}`,
+          price: fmtPrice(p.price)
+        }))
+      };
+    }
+    return { ok: false, reason: 'empty' };
+  } catch (e) {
+    return { ok: false, reason: e.name === 'AbortError' ? 'timeout' : 'unavailable' };
+  }
+}
+
+/* Build the HTML for one store card */
+function renderStore(domain, result, query) {
+  let inner = '';
+  if (result.ok) {
+    inner = result.items.map(r =>
+      `<div class="item">
+         <a href="${esc(r.link)}" target="_blank" rel="noopener">${esc(r.title)}</a>
+         ${r.price
+           ? `<span class="price">${esc(r.price)}</span>`
+           : `<span class="no-price">—</span>`}
+       </div>`
+    ).join('');
+  } else {
+    const fb = `https://${esc(domain)}/search?q=${encodeURIComponent(query)}`;
+    const label = result.reason === 'empty' ? 'no results' : result.reason;
+    inner = `<div class="muted">${label} — <a href="${fb}" target="_blank" rel="noopener">open site</a></div>`;
+  }
+  return `<div class="store">
+    <div class="store-name">${esc(domain)}</div>
+    ${inner}
+  </div>`;
+}
+
+async function search() {
+  const q = document.getElementById('q').value.trim();
+  if (!q) return;
+
+  document.getElementById('query').textContent = 'Searching: ' + q;
+  document.getElementById('status').textContent = `Querying ${STORES.length} stores…`;
+
+  /* Create placeholder cards immediately so UI fills top-down */
+  const resultsEl = document.getElementById('results');
+  resultsEl.innerHTML = '';
+  const slots = STORES.map((domain, i) => {
+    const div = document.createElement('div');
+    div.className = 'store';
+    div.innerHTML = `<div class="store-name">${esc(domain)}</div><div class="muted">searching…</div>`;
+    resultsEl.appendChild(div);
+    return div;
+  });
+
+  let done = 0;
+  const promises = STORES.map((domain, i) =>
+    searchStore(domain, q).then(result => {
+      const fresh = document.createElement('div');
+      fresh.className = 'store';
+      fresh.innerHTML = renderStore(domain, result, q)
+        .replace(/^<div class="store">/, '').replace(/<\/div>\s*$/, '');
+      slots[i].replaceWith(fresh);
+      slots[i] = fresh;
+      done++;
+      document.getElementById('status').textContent =
+        `${done} / ${STORES.length} done`;
+    })
+  );
+
+  await Promise.all(promises);
+  document.getElementById('status').textContent = `Done — ${STORES.length} stores searched`;
+}
+
+document.getElementById('q').addEventListener('keydown', e => {
+  if (e.key === 'Enter') search();
+});
+
+</script>
+
+</body>
+</html>
