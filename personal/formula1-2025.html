@@ -1,31 +1,15 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Formula 1</title>
+  <title>F1 2025</title>
 
   <link rel="stylesheet" href="https://david-fear.github.io/stylesheet.css" />
+
   <style>
-    .iframe-wrapper {
-      width: 512px;
-      height: 260px;
-      margin: 0 auto;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .iframe-wrapper iframe {
-      width: 1024px;
-      height: 520px;
-      transform: scale(0.45);
-      transform-origin: top left;
-      border: 0;
-    }
-
-    /* F1 Points Table Styles */
+    /* F1 Points Table Styles — matching 2026 */
     table.f1-points {
       border-collapse: collapse;
       width: 100%;
@@ -52,7 +36,7 @@
       text-align: left;
     }
 
-    /* Gold highlight for race winner cells */
+    /* Gold highlight for race winner cells — matching 2026 */
     .max-val {
       background: linear-gradient(90deg, #b8860b, #ffd700);
       color: #000;
@@ -67,7 +51,6 @@
     }
   </style>
 
-  <!-- CSV & Chart.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -82,117 +65,56 @@
       .then(data => {
         const container = document.getElementById('menu-container');
         container.innerHTML = data;
-
         const toggle = document.getElementById('menu-toggle');
-        const menu = document.getElementById('menu-nav');
-
+        const menu   = document.getElementById('menu-nav');
         toggle.addEventListener('click', () => {
           const expanded = toggle.getAttribute('aria-expanded') === 'true';
           toggle.setAttribute('aria-expanded', String(!expanded));
-          if (menu.hasAttribute('hidden')) {
-            menu.removeAttribute('hidden');
-          } else {
-            menu.setAttribute('hidden', '');
-          }
+          if (menu.hasAttribute('hidden')) menu.removeAttribute('hidden');
+          else menu.setAttribute('hidden', '');
         });
-
-        toggle.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            toggle.click();
-          }
+        toggle.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle.click(); }
         });
       })
       .catch(e => console.error('Failed to load menu:', e));
   </script>
 
   <header>
-    <h1>Formula One - Links</h1>
-    <p>The Best Links - centered around Liam Lawson</p>
+    <h1>Formula One 2025</h1>
+    <p>Driver &amp; Constructor Standings</p>
   </header>
 
   <main>
 
-    <!-- Existing sections -->
+    <!-- ── DRIVER CHART & TABLE ── -->
     <section>
-      <h2 class="mid">Next Race</h2>
-      <div id="race-info" class="iframe-wrapper">
-        <iframe src="https://www.f1timer.com/" width="600" height="300" frameborder="0" scrolling="no" loading="lazy">
-        </iframe>
-      </div>
-    </section>
-
-    <section>
-      <center>
-        <h2>Racing Bulls Performance</h2>
-        <table>
-          <tr>
-            <td width="50px;">2026</td>
-            <td width="90px;"><code>LAW vs LIN</code></td>
-            <td width="90px;"><a href="https://www.f1teammatequali.com/quali_season_teammates/2026/166/440/454">Qualifying</a></td>
-            <td width="90px;"><a href="https://www.f1teammatequali.com/race_season_teammates/2026/166/440/454">Race</a></td>
-          </tr>
-          <tr>
-            <td width="50px;">2025</td>
-            <td width="90px;"><code>LAW vs HAD</code></td>
-            <td width="90px;"><a href="https://www.f1teammatequali.com/quali_season_drivers/2025/440/325">Qualifying</a></td>
-            <td width="90px;"><a href="https://www.f1teammatequali.com/quali_season_teammates/2025/166/440/325">Race</a></td>
-          </tr>
-        </table>
-      </center>
-    </section>
-
-    <section>
-      <center>
-        <h2>x.com (ex-Twitter)</h2>
-        <table>
-          <tr>
-            <td width="120px;">F1 Troll</td>
-            <td><a href="https://x.com/f1trollofficial">https://x.com/f1trollofficial</a></td>
-          </tr>
-          <tr>
-            <td>F1 Visualized</td>
-            <td><a href="https://x.com/f1visualized">https://x.com/f1visualized</a></td>
-          </tr>
-        </table>
-      </center>
-    </section>
-
-    <section>
-      <center>
-        <h2>Other Links</h2>
-        <table>
-          <tr>
-            <td width="200px;">F1 Countdown</td>
-            <td><a href="https://formulacountdown.com/">https://formulacountdown.com/</a></td>
-          </tr>
-          <tr>
-            <td width="200px;">F1 Pace</td>
-            <td><a href="https://f1pace.com/">https://f1pace.com/</a></td>
-          </tr>
-          <tr>
-            <td>Youtube - TacticalRab</td>
-            <td><a href="https://www.youtube.com/@F1NewsTR/videos">https://www.youtube.com/@F1NewsTR</a></td>
-          </tr>
-          <tr>
-            <td>Youtube - LawVS</td>
-            <td><a href="https://www.youtube.com/@LawVS/videos">https://www.youtube.com/@LawVS</a></td>
-          </tr>
-        </table>
-      </center>
-    </section>
-
-    <!-- F1 2026 Points Table & Chart -->
-    <section>
-      <h2>F1 2026 Cumulative Points Chart</h2>
+      <h2>F1 2025 Cumulative Points Chart</h2>
       <div style="position:relative; height:500px; min-height:500px; max-height:500px; width:100%;">
-        <canvas id="pointsChart"></canvas>
+        <canvas id="driverChart"></canvas>
       </div>
 
-      <h2>F1 2026 Points Table</h2>
+      <h2>F1 2025 Points Table</h2>
       <details>
         <summary>Show / Hide Table</summary>
-        <table id="f1Table" class="f1-points">
+        <table id="driverTable" class="f1-points">
+          <thead></thead>
+          <tbody></tbody>
+        </table>
+      </details>
+    </section>
+
+    <!-- ── CONSTRUCTOR CHART & TABLE ── -->
+    <section>
+      <h2>F1 2025 Constructor Cumulative Points Chart</h2>
+      <div style="position:relative; height:500px; min-height:500px; max-height:500px; width:100%;">
+        <canvas id="constructorChart"></canvas>
+      </div>
+
+      <h2>F1 2025 Constructor Points Table</h2>
+      <details>
+        <summary>Show / Hide Table</summary>
+        <table id="constructorTable" class="f1-points">
           <thead></thead>
           <tbody></tbody>
         </table>
@@ -201,248 +123,12 @@
 
   </main>
 
-  <!-- F1 Points Table & Chart Script -->
   <script>
-    const csvURL = 'https://david-fear.github.io/personal/formula1-data.csv';
+  (function () {
 
-    /* Helper: 3-letter driver code from surname */
-    function driverCode(name) {
-      if (!name) return '';
-      const parts = name.trim().split(' ');
-      const last = parts[parts.length - 1];
-      return last.substring(0, 3).toUpperCase();
-    }
+    const csvURL = 'https://david-fear.github.io/personal/formula1-data-2025.csv';
 
-    Papa.parse(csvURL, {
-      download: true,
-      header: true,
-      dynamicTyping: true,
-      complete: function (results) {
-        const data = results.data.filter(r => r.driver);
-        const races = Object.keys(data[0]).filter(k => !['driver', 'constructor', 'total'].includes(k));
-
-        buildTable(data, races);
-        buildChart(data, races);
-      }
-    });
-
-    function buildTable(data, races) {
-      const thead = document.querySelector('#f1Table thead');
-      const tbody = document.querySelector('#f1Table tbody');
-
-      /* Find max points per race across all drivers */
-      const maxPerRace = {};
-      races.forEach(r => {
-        maxPerRace[r] = Math.max(...data.map(row => row[r] || 0));
-      });
-
-      // Build header row
-      let headerHTML = '<tr><th>Driver</th><th>Constructor</th>';
-      races.forEach(r => headerHTML += `<th>${r}</th>`);
-      headerHTML += '<th>Total</th></tr>';
-      thead.innerHTML = headerHTML;
-
-      // Build body rows
-      let bodyHTML = '';
-      data.forEach(row => {
-        let total = 0;
-        let rowHTML = `<tr><td>${row.driver}</td><td>${row.constructor}</td>`;
-        races.forEach(r => {
-          const val = row[r] || 0;
-          total += val;
-          const isMax = val === maxPerRace[r] && val !== 0;
-          rowHTML += `<td class="${isMax ? 'max-val' : ''}">${val}</td>`;
-        });
-        rowHTML += `<td>${total}</td></tr>`;
-        bodyHTML += rowHTML;
-      });
-      tbody.innerHTML = bodyHTML;
-    }
-
-    function buildChart(data, races) {
-      const ctx = document.getElementById('pointsChart').getContext('2d');
-
-      const teamColors = {
-        'Mercedes':     '#00D2BE',
-        'Ferrari':      '#DC0000',
-        'McLaren':      '#FF8000',
-        'Red Bull':     '#3671C6',
-        'Racing Bulls': '#8874D8',
-        'Williams':     '#37BEDD',
-        'Alpine':       '#FF87BC',
-        'Haas':         '#FFFFFF',
-        'Audi':         '#4E7C59',
-        'Aston Martin': '#006F62',
-        'Cadillac':     '#C8AA44'
-      };
-
-      const driverAbbr = {
-        'Antonelli': 'ANT', 'Russell':   'RUS', 'Leclerc':   'LEC', 'Hamilton':  'HAM',
-        'Norris':    'NOR', 'Piastri':   'PIA', 'Bearman':   'BEA', 'Gasly':     'GAS',
-        'Verstappen':'VER', 'Lawson':    'LAW', 'Lindblad':  'LIN', 'Hadjar':    'HAD',
-        'Bortoleto': 'BOR', 'Ocon':      'OCO', 'Sainz':     'SAI', 'Colapinto': 'COL',
-        'Hulkenberg':'HUL', 'Albon':     'ALB', 'Bottas':    'BOT', 'Perez':     'PER',
-        'Alonso':    'ALO', 'Stroll':    'STR'
-      };
-
-      // First pass: determine solid vs dotted by CSV row order within each team
-      const teamCount = {};
-      const driverDash = {};
-      data.forEach(row => {
-        const team = row.constructor;
-        if (!teamCount[team]) teamCount[team] = 0;
-        teamCount[team]++;
-        driverDash[row.driver] = teamCount[team] === 1 ? [] : [2, 4];
-      });
-
-      // Sort drivers by total points descending
-      const sortedData = data.slice().sort((a, b) => {
-        const totalA = races.reduce((s, r) => s + (a[r] || 0), 0);
-        const totalB = races.reduce((s, r) => s + (b[r] || 0), 0);
-        return totalB - totalA;
-      });
-
-      const datasets = sortedData.map((driver, index) => {
-        const color = teamColors[driver.constructor] || '#888888';
-        let cumulative = 0;
-        const points = races.map(r => {
-          cumulative += driver[r] || 0;
-          return cumulative;
-        });
-        return {
-          label: driver.driver,
-          data: points,
-          fill: false,
-          borderColor: color,
-          backgroundColor: color,
-          borderDash: driverDash[driver.driver],
-          borderWidth: 2,
-          tension: 0.2,
-          hidden: index >= sortedData.length - 10
-        };
-      });
-
-      let hoveredDatasetIndex = -1;
-
-      const glowPlugin = {
-        id: 'glowPlugin',
-        beforeDatasetDraw(chart, args) {
-          if (args.index === hoveredDatasetIndex) {
-            chart.ctx.save();
-            chart.ctx.shadowColor = 'rgba(255, 255, 255, 1)';
-            chart.ctx.shadowBlur = 5;
-          }
-        },
-        afterDatasetDraw(chart, args) {
-          if (args.index === hoveredDatasetIndex) {
-            chart.ctx.restore();
-          }
-        }
-      };
-
-      const driverLabelsPlugin = {
-        id: 'driverLabelsPlugin',
-        afterDraw(chart) {
-          const c = chart.ctx;
-          chart.data.datasets.forEach((dataset, i) => {
-            const meta = chart.getDatasetMeta(i);
-            if (!meta.visible) return;
-            const lastPoint = meta.data[meta.data.length - 1];
-            if (!lastPoint) return;
-            c.save();
-            c.font = 'bold 8px sans-serif';
-            c.fillStyle = dataset.borderColor;
-            c.textAlign = 'left';
-            c.textBaseline = 'middle';
-            c.fillText(driverAbbr[dataset.label] || dataset.label.substring(0, 3).toUpperCase(), lastPoint.x + 4, lastPoint.y);
-            c.restore();
-          });
-        }
-      };
-
-      new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: races,
-          datasets: datasets
-        },
-        plugins: [glowPlugin, driverLabelsPlugin],
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          layout: {
-            padding: { right: 40 }
-          },
-          plugins: {
-            legend: {
-              position: 'top',
-              labels: {
-                usePointStyle: true,
-                generateLabels: function(chart) {
-                  const original = Chart.defaults.plugins.legend.labels.generateLabels(chart);
-                  original.forEach(label => {
-                    const dataset = chart.data.datasets[label.datasetIndex];
-                    label.lineDash = dataset.borderDash || [];
-                    label.text = driverAbbr[label.text] || label.text.substring(0, 3).toUpperCase();
-                  });
-                  return original;
-                }
-              },
-              onHover: function(event, legendItem, legend) {
-                hoveredDatasetIndex = legendItem.datasetIndex;
-                legend.chart.update('none');
-              },
-              onLeave: function(event, legendItem, legend) {
-                hoveredDatasetIndex = -1;
-                legend.chart.update('none');
-              }
-            },
-            title: { display: true, text: 'F1 2026 Cumulative Points' }
-          },
-          onHover: function(event, elements, chart) {
-            if (elements && elements.length > 0) {
-              const newIndex = elements[0].datasetIndex;
-              if (newIndex !== hoveredDatasetIndex) {
-                hoveredDatasetIndex = newIndex;
-                chart.update('none');
-              }
-            } else {
-              if (hoveredDatasetIndex !== -1) {
-                hoveredDatasetIndex = -1;
-                chart.update('none');
-              }
-            }
-          },
-          scales: {
-            y: { beginAtZero: true }
-          }
-        }
-      });
-    }
-  </script>
-
-  <!-- F1 2026 Constructor Points Chart -->
-  <section>
-    <h2>F1 2026 Constructor Cumulative Points Chart</h2>
-    <div style="position:relative; height:500px; min-height:500px; max-height:500px; width:100%;">
-      <canvas id="constructorChart"></canvas>
-    </div>
-
-    <h2>F1 2026 Constructor Points Table</h2>
-    <details>
-      <summary>Show / Hide Table</summary>
-      <table id="constructorTable" class="f1-points">
-        <thead></thead>
-        <tbody></tbody>
-      </table>
-    </details>
-  </section>
-
-  <!-- Constructor Chart & Table Script -->
-  <script>
-  (function() {
-    const csvURL = 'https://david-fear.github.io/personal/formula1-data.csv';
-
+    /* ── COLOURS ── */
     const teamColors = {
       'Mercedes':     '#00D2BE',
       'Ferrari':      '#DC0000',
@@ -451,12 +137,25 @@
       'Racing Bulls': '#8874D8',
       'Williams':     '#37BEDD',
       'Alpine':       '#FF87BC',
-      'Haas':         '#B0B0B0',
+      'Haas':         '#FFFFFF',
       'Audi':         '#4E7C59',
       'Aston Martin': '#006F62',
       'Cadillac':     '#C8AA44'
     };
 
+    /* ── DRIVER ABBREVIATIONS ── */
+    const driverAbbr = {
+      'Verstappen': 'VER', 'Norris':    'NOR', 'Piastri':   'PIA',
+      'Leclerc':   'LEC', 'Hamilton':  'HAM', 'Russell':   'RUS',
+      'Sainz':     'SAI', 'Antonelli': 'ANT', 'Alonso':    'ALO',
+      'Stroll':    'STR', 'Gasly':     'GAS', 'Doohan':    'DOO',
+      'Lawson':    'LAW', 'Tsunoda':   'TSU', 'Hadjar':    'HAD',
+      'Bearman':   'BEA', 'Ocon':      'OCO', 'Bortoleto': 'BOR',
+      'Hulkenberg':'HUL', 'Albon':     'ALB', 'Colapinto': 'COL',
+      'Perez':     'PER'
+    };
+
+    /* ── TEAM ABBREVIATIONS (end-label on chart) ── */
     const teamAbbr = {
       'Mercedes':     'Mercedes',
       'Ferrari':      'Ferrari',
@@ -467,67 +166,267 @@
       'Alpine':       'Alpine',
       'Haas':         'Haas',
       'Audi':         'Audi',
-      'Aston Martin': 'Autin',
+      'Aston Martin': 'Aston Martin',
       'Cadillac':     'Cadillac'
     };
 
-    /* Helper: 3-letter driver code from surname */
-    function driverCode(name) {
-      if (!name) return '';
-      const parts = name.trim().split(' ');
-      const last = parts[parts.length - 1];
-      return last.substring(0, 3).toUpperCase();
+    /* ── GLOW PLUGIN (shared) ── */
+    function makeGlowPlugin() {
+      return {
+        id: 'glowPlugin',
+        beforeDatasetDraw(chart, args) {
+          if (args.index === chart._hoveredIdx) {
+            chart.ctx.save();
+            chart.ctx.shadowColor = 'rgba(255, 255, 255, 1)';
+            chart.ctx.shadowBlur  = 5;
+          }
+        },
+        afterDatasetDraw(chart, args) {
+          if (args.index === chart._hoveredIdx) {
+            chart.ctx.restore();
+          }
+        }
+      };
     }
 
+    /* ── END-LABEL PLUGIN (driver abbreviations) ── */
+    const driverEndLabels = {
+      id: 'driverEndLabels',
+      afterDraw(chart) {
+        const c = chart.ctx;
+        chart.data.datasets.forEach((dataset, i) => {
+          const meta = chart.getDatasetMeta(i);
+          if (!meta.visible) return;
+          const last = meta.data[meta.data.length - 1];
+          if (!last) return;
+          c.save();
+          c.font         = 'bold 8px sans-serif';
+          c.fillStyle    = dataset.borderColor;
+          c.textAlign    = 'left';
+          c.textBaseline = 'middle';
+          const abbr = driverAbbr[dataset.label] || dataset.label.substring(0, 3).toUpperCase();
+          c.fillText(abbr, last.x + 4, last.y);
+          c.restore();
+        });
+      }
+    };
+
+    /* ── END-LABEL PLUGIN (team names) ── */
+    const teamEndLabels = {
+      id: 'teamEndLabels',
+      afterDraw(chart) {
+        const c = chart.ctx;
+        chart.data.datasets.forEach((dataset, i) => {
+          const meta = chart.getDatasetMeta(i);
+          if (!meta.visible) return;
+          const last = meta.data[meta.data.length - 1];
+          if (!last) return;
+          c.save();
+          c.font         = 'bold 8px sans-serif';
+          c.fillStyle    = dataset.borderColor;
+          c.textAlign    = 'left';
+          c.textBaseline = 'middle';
+          c.fillText(teamAbbr[dataset.label] || dataset.label.substring(0, 3).toUpperCase(), last.x + 4, last.y);
+          c.restore();
+        });
+      }
+    };
+
+    /* ── HOVER HANDLER FACTORY ── */
+    function hoverHandler(chart) {
+      return function (event, elements) {
+        const idx = elements && elements.length ? elements[0].datasetIndex : -1;
+        if (idx !== chart._hoveredIdx) {
+          chart._hoveredIdx = idx;
+          chart.update('none');
+        }
+      };
+    }
+
+    /* ── LEGEND HOVER/LEAVE ── */
+    function legendHover(event, legendItem, legend) {
+      legend.chart._hoveredIdx = legendItem.datasetIndex;
+      legend.chart.update('none');
+    }
+    function legendLeave(event, legendItem, legend) {
+      legend.chart._hoveredIdx = -1;
+      legend.chart.update('none');
+    }
+
+    /* ── PARSE & BUILD ── */
     Papa.parse(csvURL, {
-      download: true,
-      header: true,
+      download:      true,
+      header:        true,
       dynamicTyping: true,
-      complete: function(results) {
-        const data = results.data.filter(r => r.driver);
+      complete: function (results) {
+
+        const data  = results.data.filter(r => r.driver);
         const races = Object.keys(data[0]).filter(k => !['driver', 'constructor', 'total'].includes(k));
 
-        // Sum points per team per race & collect driver codes
-        const teamRacePoints = {};
-        const teamDrivers = {};
-
-        data.forEach(row => {
-          const team = row.constructor;
-          if (!teamRacePoints[team]) {
-            teamRacePoints[team] = {};
-            teamDrivers[team] = new Set();
-          }
-          teamDrivers[team].add(driverCode(row.driver));
-          races.forEach(r => {
-            teamRacePoints[team][r] = (teamRacePoints[team][r] || 0) + (row[r] || 0);
-          });
-        });
-
-        // Sort teams by total points descending
-        const teamTotals = {};
-        Object.keys(teamRacePoints).forEach(team => {
-          teamTotals[team] = races.reduce((s, r) => s + teamRacePoints[team][r], 0);
-        });
-        const sortedTeams = Object.keys(teamRacePoints).sort((a, b) => teamTotals[b] - teamTotals[a]);
-
-        const teamDriverString = {};
-        sortedTeams.forEach(t => {
-          teamDriverString[t] = Array.from(teamDrivers[t]).join(' ');
-        });
-
-        buildConstructorTable(sortedTeams, teamRacePoints, teamTotals, teamDriverString, races);
-        buildConstructorChart(sortedTeams, teamRacePoints, races);
+        buildDriverChart(data, races);
+        buildDriverTable(data, races);
+        buildConstructorChartAndTable(data, races);
       }
     });
 
-    function buildConstructorTable(sortedTeams, teamRacePoints, teamTotals, teamDriverString, races) {
+    /* ═══════════════════════════════════════════
+       DRIVER CHART
+       • Lawson / Tsunoda may appear twice (different teams).
+       • Solid line = first entry for that driver/team combo.
+       • Dotted line = second entry (same driver, different team).
+    ═══════════════════════════════════════════ */
+    function buildDriverChart(data, races) {
+      const ctx = document.getElementById('driverChart').getContext('2d');
+
+      /* Work out dash pattern: first occurrence solid, later dotted */
+      const seen = {};
+      const driverDash = data.map(row => {
+        const key = row.driver;
+        seen[key] = (seen[key] || 0) + 1;
+        return seen[key] === 1 ? [] : [4, 4];
+      });
+
+      /* Sort by total descending */
+      const totals = data.map(row => races.reduce((s, r) => s + (row[r] || 0), 0));
+      const order  = totals.map((_, i) => i).sort((a, b) => totals[b] - totals[a]);
+
+      const datasets = order.map((idx, rank) => {
+        const row   = data[idx];
+        const color = teamColors[row.constructor] || '#888888';
+        let cumul   = 0;
+        return {
+          label:       row.driver,
+          data:        races.map(r => { cumul += row[r] || 0; return cumul; }),
+          fill:        false,
+          borderColor: color,
+          backgroundColor: color,
+          borderDash:  driverDash[idx],
+          borderWidth: 2,
+          tension:     0.2,
+          hidden:      rank >= data.length - 10   /* hide bottom 10 like 2026 */
+        };
+      });
+
+      const glowPlugin = makeGlowPlugin();
+
+      const chart = new Chart(ctx, {
+        type: 'line',
+        data: { labels: races, datasets },
+        plugins: [glowPlugin, driverEndLabels],
+        options: {
+          responsive:          true,
+          maintainAspectRatio: false,
+          layout: { padding: { right: 40 } },
+          onHover: (event, elements) => hoverHandler(chart)(event, elements),
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                usePointStyle: true,
+                generateLabels(c) {
+                  const orig = Chart.defaults.plugins.legend.labels.generateLabels(c);
+                  orig.forEach(label => {
+                    const ds      = c.data.datasets[label.datasetIndex];
+                    label.lineDash = ds.borderDash || [];
+                    label.text    = driverAbbr[label.text] || label.text.substring(0, 3).toUpperCase();
+                  });
+                  return orig;
+                }
+              },
+              onHover: legendHover,
+              onLeave: legendLeave
+            },
+            title: { display: true, text: 'F1 2025 Cumulative Points' }
+          },
+          scales: { y: { beginAtZero: true } }
+        }
+      });
+
+      chart._hoveredIdx = -1;
+    }
+
+    /* ═══════════════════════════════════════════
+       DRIVER TABLE
+       Handles same driver appearing twice with
+       a note showing which team each stint was for.
+    ═══════════════════════════════════════════ */
+    function buildDriverTable(data, races) {
+      const thead = document.querySelector('#driverTable thead');
+      const tbody = document.querySelector('#driverTable tbody');
+
+      /* Max per race for gold highlight */
+      const maxPerRace = {};
+      races.forEach(r => {
+        maxPerRace[r] = Math.max(...data.map(row => row[r] || 0));
+      });
+
+      /* Header */
+      let headerHTML = '<tr><th>Driver</th><th>Constructor</th>';
+      races.forEach(r => headerHTML += `<th>${r}</th>`);
+      headerHTML += '<th>Total</th></tr>';
+      thead.innerHTML = headerHTML;
+
+      /* Body — keep original CSV order */
+      let bodyHTML = '';
+      data.forEach(row => {
+        let total = 0;
+        let rowHTML = `<tr><td>${row.driver}</td><td>${row.constructor}</td>`;
+        races.forEach(r => {
+          const val   = row[r] || 0;
+          total      += val;
+          const isMax = val === maxPerRace[r] && val !== 0;
+          rowHTML    += `<td class="${isMax ? 'max-val' : ''}">${val}</td>`;
+        });
+        rowHTML += `<td>${total}</td></tr>`;
+        bodyHTML += rowHTML;
+      });
+      tbody.innerHTML = bodyHTML;
+    }
+
+    /* ═══════════════════════════════════════════
+       CONSTRUCTOR CHART & TABLE
+    ═══════════════════════════════════════════ */
+    function buildConstructorChartAndTable(data, races) {
+
+      /* Aggregate per team */
+      const teamRacePoints = {};
+      const teamDrivers    = {};
+
+      data.forEach(row => {
+        const team = row.constructor;
+        if (!teamRacePoints[team]) {
+          teamRacePoints[team] = {};
+          teamDrivers[team]    = new Set();
+        }
+        teamDrivers[team].add(driverAbbr[row.driver] || row.driver.substring(0, 3).toUpperCase());
+        races.forEach(r => {
+          teamRacePoints[team][r] = (teamRacePoints[team][r] || 0) + (row[r] || 0);
+        });
+      });
+
+      /* Sort by total */
+      const teamTotals  = {};
+      Object.keys(teamRacePoints).forEach(t => {
+        teamTotals[t] = races.reduce((s, r) => s + teamRacePoints[t][r], 0);
+      });
+      const sortedTeams = Object.keys(teamRacePoints).sort((a, b) => teamTotals[b] - teamTotals[a]);
+
+      const teamDriverStr = {};
+      sortedTeams.forEach(t => {
+        teamDriverStr[t] = Array.from(teamDrivers[t]).join(' ');
+      });
+
+      buildConstructorTable(sortedTeams, teamRacePoints, teamTotals, teamDriverStr, races);
+      buildConstructorChart(sortedTeams, teamRacePoints, races);
+    }
+
+    function buildConstructorTable(sortedTeams, teamRacePoints, teamTotals, teamDriverStr, races) {
       const thead = document.querySelector('#constructorTable thead');
       const tbody = document.querySelector('#constructorTable tbody');
 
-      /* Find max points per race across all constructors */
       const maxPerRace = {};
       races.forEach(r => {
-        maxPerRace[r] = Math.max(...sortedTeams.map(team => teamRacePoints[team][r] || 0));
+        maxPerRace[r] = Math.max(...sortedTeams.map(t => teamRacePoints[t][r] || 0));
       });
 
       let headerHTML = '<tr><th>Constructor</th><th>Drivers</th>';
@@ -537,16 +436,14 @@
 
       let bodyHTML = '';
       sortedTeams.forEach(team => {
-        let total = 0;
-        let rowHTML = `<tr><td>${team}</td><td>${teamDriverString[team] || ''}</td>`;
-
+        let total   = 0;
+        let rowHTML = `<tr><td>${team}</td><td>${teamDriverStr[team] || ''}</td>`;
         races.forEach(r => {
-          const val = teamRacePoints[team][r] || 0;
-          total += val;
+          const val   = teamRacePoints[team][r] || 0;
+          total      += val;
           const isMax = val === maxPerRace[r] && val !== 0;
-          rowHTML += `<td class="${isMax ? 'max-val' : ''}">${val}</td>`;
+          rowHTML    += `<td class="${isMax ? 'max-val' : ''}">${val}</td>`;
         });
-
         rowHTML += `<td>${total}</td></tr>`;
         bodyHTML += rowHTML;
       });
@@ -557,111 +454,54 @@
       const ctx = document.getElementById('constructorChart').getContext('2d');
 
       const datasets = sortedTeams.map(team => {
-        let cumulative = 0;
-        const points = races.map(r => {
-          cumulative += teamRacePoints[team][r] || 0;
-          return cumulative;
-        });
-        const totalPoints = races.reduce((s, r) => s + (teamRacePoints[team][r] || 0), 0);
+        let cumul = 0;
+        const totalPts = races.reduce((s, r) => s + (teamRacePoints[team][r] || 0), 0);
         return {
-          label: team,
-          data: points,
-          fill: false,
-          borderColor: teamColors[team] || '#888888',
+          label:           team,
+          data:            races.map(r => { cumul += teamRacePoints[team][r] || 0; return cumul; }),
+          fill:            false,
+          borderColor:     teamColors[team] || '#888888',
           backgroundColor: teamColors[team] || '#888888',
-          borderWidth: 2.5,
-          tension: 0.2,
-          pointRadius: 3,
+          borderWidth:     2.5,
+          tension:         0.2,
+          pointRadius:     3,
           pointHoverRadius: 5,
-          hidden: totalPoints === 0
+          hidden:          totalPts === 0
         };
       });
 
-      let hoveredDatasetIndex = -1;
+      const glowPlugin = makeGlowPlugin();
 
-      const glowPlugin = {
-        id: 'glowPlugin',
-        beforeDatasetDraw(chart, args) {
-          if (args.index === hoveredDatasetIndex) {
-            chart.ctx.save();
-            chart.ctx.shadowColor = 'rgba(255,255,255,1)';
-            chart.ctx.shadowBlur = 5;
-          }
-        },
-        afterDatasetDraw(chart, args) {
-          if (args.index === hoveredDatasetIndex) {
-            chart.ctx.restore();
-          }
-        }
-      };
-
-      const endLabelsPlugin = {
-        id: 'endLabelsPlugin',
-        afterDraw(chart) {
-          const c = chart.ctx;
-          chart.data.datasets.forEach((dataset, i) => {
-            const meta = chart.getDatasetMeta(i);
-            if (!meta.visible) return;
-            const lastPoint = meta.data[meta.data.length - 1];
-            if (!lastPoint) return;
-            c.save();
-            c.font = 'bold 8px sans-serif';
-            c.fillStyle = dataset.borderColor;
-            c.textAlign = 'left';
-            c.textBaseline = 'middle';
-            c.fillText(teamAbbr[dataset.label] || dataset.label.substring(0, 3).toUpperCase(), lastPoint.x + 4, lastPoint.y);
-            c.restore();
-          });
-        }
-      };
-
-      new Chart(ctx, {
+      const chart = new Chart(ctx, {
         type: 'line',
-        data: {
-          labels: races,
-          datasets: datasets
-        },
-        plugins: [glowPlugin, endLabelsPlugin],
+        data: { labels: races, datasets },
+        plugins: [glowPlugin, teamEndLabels],
         options: {
-          responsive: true,
+          responsive:          true,
           maintainAspectRatio: false,
-          layout: {
-            padding: { right: 44 }
-          },
-          onHover: function(event, elements, chart) {
-            const idx = elements && elements.length ? elements[0].datasetIndex : -1;
-            if (idx !== hoveredDatasetIndex) {
-              hoveredDatasetIndex = idx;
-              chart.update('none');
-            }
-          },
+          layout: { padding: { right: 80 } },
+          onHover: (event, elements) => hoverHandler(chart)(event, elements),
           plugins: {
             legend: {
               position: 'top',
               labels: {
                 usePointStyle: true,
-                generateLabels: function(chart) {
-                  const original = Chart.defaults.plugins.legend.labels.generateLabels(chart);
-                  original.forEach(label => {
+                generateLabels(c) {
+                  const orig = Chart.defaults.plugins.legend.labels.generateLabels(c);
+                  orig.forEach(label => {
                     label.text = teamAbbr[label.text] || label.text.substring(0, 3).toUpperCase();
                   });
-                  return original;
+                  return orig;
                 }
               },
-              onHover: function(event, legendItem, legend) {
-                hoveredDatasetIndex = legendItem.datasetIndex;
-                legend.chart.update('none');
-              },
-              onLeave: function(event, legendItem, legend) {
-                hoveredDatasetIndex = -1;
-                legend.chart.update('none');
-              }
+              onHover: legendHover,
+              onLeave: legendLeave
             },
-            title: { display: true, text: 'F1 2026 Cumulative Constructor Points' },
+            title: { display: true, text: 'F1 2025 Cumulative Constructor Points' },
             tooltip: {
               callbacks: {
                 title: items => items[0].dataset.label,
-                label: item => `After ${item.label}: ${item.raw} pts`
+                label: item  => `After ${item.label}: ${item.raw} pts`
               }
             }
           },
@@ -671,7 +511,10 @@
           }
         }
       });
+
+      chart._hoveredIdx = -1;
     }
+
   })();
   </script>
 
@@ -680,12 +523,8 @@
   <script>
     fetch('https://david-fear.github.io/components/footer.html')
       .then(response => response.text())
-      .then(data => {
-        document.getElementById('footer-container').innerHTML = data;
-      })
-      .catch(error => {
-        console.error('Failed to load footer:', error);
-      });
+      .then(data => { document.getElementById('footer-container').innerHTML = data; })
+      .catch(error => { console.error('Failed to load footer:', error); });
   </script>
 
 </body>
