@@ -18,7 +18,8 @@
     .item a { color: #4da3ff; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
     .item a:hover { text-decoration: underline; }
     .price    { color: #7dff7d; font-weight: bold; white-space: nowrap; font-size: 11px; }
-    .no-price { color: #555; font-size: 10px; white-space: nowrap; }
+    .no-price  { color: #555; font-size: 10px; white-space: nowrap; }
+    .sold-out  { color: #ff4444; font-weight: bold; white-space: nowrap; font-size: 11px; }
     .muted { font-size: 10px; color: #555; }
     .muted a { color: #4da3ff; }
   </style>
@@ -38,14 +39,29 @@
 <script>
 
 const STORES = [
-  "cardmerchant.co.nz",
-  "cardmerchanthamilton.co.nz",
-  "cardmerchantchristchurch.co.nz",
-  "cardspotnz.com",
-  "tcgcollectornz.com",
-  "thegametree.co.nz",
-  "cardmasters.co.nz",
-  "adamscardboard.co.nz"
+  // ── Shopify (live API results) ───────────────────────────
+  { d: "cardmerchant.co.nz" },
+  { d: "cardmerchanthamilton.co.nz" },
+  { d: "www.cardmerchanttakapuna.co.nz" },
+  { d: "cardmerchantchristchurch.co.nz" },
+  { d: "cardmerchantnelson.co.nz" },
+  { d: "www.cardmerchantwhangarei.co.nz" },
+  { d: "cardspotnz.com" },
+  { d: "tcgcollectornz.com" },
+  { d: "thegametree.co.nz" },
+  { d: "cardmasters.co.nz" },
+  { d: "theboardgamer.co.nz" },
+  { d: "cardbard.co.nz" },
+  { d: "spellboundgames.co.nz" },
+  { d: "otakumart.co.nz" },
+  { d: "valkyrie-games-nz.myshopify.com" },
+  // ── Link-only (non-Shopify — opens search page) ──────────
+  { d: "hobbymaster.co.nz",         link: q => `https://hobbymaster.co.nz/search?search=${encodeURIComponent(q)}` },
+  { d: "gamersrevelationtcg.co.nz", link: q => `https://gamersrevelationtcg.co.nz/search.php?search_query=${encodeURIComponent(q)}` },
+  { d: "cardtopia.co.nz",           link: q => `https://www.cardtopia.co.nz/?s=${encodeURIComponent(q)}&post_type=product&type_aws=true` },
+  { d: "trademe.co.nz",             link: q => `https://www.trademe.co.nz/a/search?search_string=${encodeURIComponent(q)}` },
+  { d: "vagabond.co.nz",            link: q => `https://vagabond.co.nz/search.php?search_query=${encodeURIComponent(q)}&section=product` },
+  { d: "iconix-comics-games.co.nz", link: q => `https://www.iconix-comics-games.co.nz/?q=${encodeURIComponent(q)}` },
 ];
 
 const TIMEOUT_MS = 6000;
@@ -80,8 +96,10 @@ function fetchJSON(url) {
     .finally(() => clearTimeout(tid));
 }
 
-/* Query one Shopify store — suggest.json only (correct filtered endpoint) */
-async function searchStore(domain, query) {
+/* Query one Shopify store via suggest.json */
+async function searchStore(store, query) {
+  const domain = store.d;
+  const fallback = `https://${domain}/search?q=${encodeURIComponent(query)}`;
   const url = `https://${domain}/search/suggest.json?q=${encodeURIComponent(query)}`
             + `&resources[type]=product&resources[limit]=8`;
   try {
@@ -91,73 +109,80 @@ async function searchStore(domain, query) {
       return {
         ok: true,
         items: products.map(p => ({
-          title: p.title,
-          link:  `https://${domain}/products/${p.handle}`,
-          price: fmtPrice(p.price)
+          title:   p.title,
+          link:    `https://${domain}/products/${p.handle}`,
+          price:   fmtPrice(p.price),
+          soldOut: p.available === false
         }))
       };
     }
-    return { ok: false, reason: 'empty' };
+    return { ok: false, reason: 'empty', href: fallback };
   } catch (e) {
-    return { ok: false, reason: e.name === 'AbortError' ? 'timeout' : 'unavailable' };
+    return { ok: false, reason: e.name === 'AbortError' ? 'timeout' : 'unavailable', href: fallback };
   }
 }
 
 /* Build the HTML for one store card */
-function renderStore(domain, result, query) {
+function renderStore(store, result, query) {
+  const domain = store.d;
   let inner = '';
   if (result.ok) {
-    inner = result.items.map(r =>
-      `<div class="item">
-         <a href="${esc(r.link)}" target="_blank" rel="noopener">${esc(r.title)}</a>
-         ${r.price
-           ? `<span class="price">${esc(r.price)}</span>`
-           : `<span class="no-price">—</span>`}
-       </div>`
-    ).join('');
+    inner = result.items.map(r => {
+      const badge = r.soldOut
+        ? `<span class="sold-out">SOLD OUT</span>`
+        : r.price
+          ? `<span class="price">${esc(r.price)}</span>`
+          : `<span class="no-price">—</span>`;
+      return `<div class="item"><a href="${esc(r.link)}" target="_blank" rel="noopener">${esc(r.title)}</a>${badge}</div>`;
+    }).join('');
+  } else if (result.reason === 'link') {
+    inner = `<div class="muted"><a href="${esc(result.href)}" target="_blank" rel="noopener">open search →</a></div>`;
   } else {
-    const fb = `https://${esc(domain)}/search?q=${encodeURIComponent(query)}`;
     const label = result.reason === 'empty' ? 'no results' : result.reason;
-    inner = `<div class="muted">${label} — <a href="${fb}" target="_blank" rel="noopener">open site</a></div>`;
+    inner = `<div class="muted">${label} — <a href="${esc(result.href)}" target="_blank" rel="noopener">open site</a></div>`;
   }
-  return `<div class="store">
-    <div class="store-name">${esc(domain)}</div>
-    ${inner}
-  </div>`;
+  return `<div class="store"><div class="store-name">${esc(domain)}</div>${inner}</div>`;
 }
 
 async function search() {
   const q = document.getElementById('q').value.trim();
   if (!q) return;
 
+  const shopifyStores = STORES.filter(s => !s.link);
   document.getElementById('query').textContent = 'Searching: ' + q;
-  document.getElementById('status').textContent = `Querying ${STORES.length} stores…`;
+  document.getElementById('status').textContent = `Querying ${shopifyStores.length} Shopify stores + ${STORES.length - shopifyStores.length} link-only…`;
 
-  /* Create placeholder cards immediately so UI fills top-down */
   const resultsEl = document.getElementById('results');
   resultsEl.innerHTML = '';
-  const slots = STORES.map((domain, i) => {
+
+  /* Render all slots — link-only stores populate immediately, Shopify show placeholder */
+  const slots = STORES.map(store => {
     const div = document.createElement('div');
     div.className = 'store';
-    div.innerHTML = `<div class="store-name">${esc(domain)}</div><div class="muted">searching…</div>`;
+    if (store.link) {
+      div.innerHTML = renderStore(store, { ok: false, reason: 'link', href: store.link(q) }, q)
+        .replace(/^<div class="store">/, '').replace(/<\/div>$/, '');
+    } else {
+      div.innerHTML = `<div class="store-name">${esc(store.d)}</div><div class="muted">searching…</div>`;
+    }
     resultsEl.appendChild(div);
     return div;
   });
 
   let done = 0;
-  const promises = STORES.map((domain, i) =>
-    searchStore(domain, q).then(result => {
+  const promises = STORES.map((store, i) => {
+    if (store.link) return Promise.resolve();
+    return searchStore(store, q).then(result => {
       const fresh = document.createElement('div');
       fresh.className = 'store';
-      fresh.innerHTML = renderStore(domain, result, q)
-        .replace(/^<div class="store">/, '').replace(/<\/div>\s*$/, '');
+      fresh.innerHTML = renderStore(store, result, q)
+        .replace(/^<div class="store">/, '').replace(/<\/div>$/, '');
       slots[i].replaceWith(fresh);
       slots[i] = fresh;
       done++;
-      document.getElementById('status').textContent =
-        `${done} / ${STORES.length} done`;
-    })
-  );
+      document.getElementById('status').textContent = `${done} / ${shopifyStores.length} Shopify done`;
+    });
+  });
 
   await Promise.all(promises);
   document.getElementById('status').textContent = `Done — ${STORES.length} stores searched`;
