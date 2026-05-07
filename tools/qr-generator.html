@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>QR Code Generator</title>
+
+<link rel="stylesheet" href="https://david-fear.github.io/stylesheet.css" />
+
+<style>
+  .qr-layout {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+  .qr-controls {
+    flex: 1;
+    min-width: 280px;
+    max-width: 420px;
+  }
+  .qr-preview {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+  .qr-preview #qr-canvas {
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    background: #fff;
+  }
+  .form-group {
+    margin-bottom: 1.1rem;
+  }
+  .form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 0.3rem;
+    font-size: 0.95rem;
+  }
+  .form-group input[type="text"],
+  .form-group input[type="number"],
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 0.45rem 0.6rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+  }
+  .form-group textarea {
+    resize: vertical;
+    min-height: 70px;
+  }
+  .form-row {
+    display: flex;
+    gap: 0.8rem;
+  }
+  .form-row .form-group {
+    flex: 1;
+  }
+  .color-row {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+  .color-row input[type="color"] {
+    width: 44px;
+    height: 36px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 2px;
+    cursor: pointer;
+  }
+  .color-row label {
+    font-size: 0.9rem;
+  }
+  .image-upload-area {
+    border: 2px dashed #aaa;
+    border-radius: 8px;
+    padding: 0.8rem;
+    text-align: center;
+    cursor: pointer;
+    font-size: 0.88rem;
+    color: #555;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+  .image-upload-area:hover { border-color: #555; }
+  .image-upload-area input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+  }
+  #logo-preview {
+    max-width: 60px;
+    max-height: 60px;
+    border-radius: 6px;
+    display: none;
+    margin: 0.4rem auto 0;
+  }
+  .clear-logo {
+    font-size: 0.8rem;
+    color: #c00;
+    cursor: pointer;
+    text-decoration: underline;
+    display: none;
+    margin-top: 0.3rem;
+  }
+  .section-divider {
+    border: none;
+    border-top: 1px solid #ddd;
+    margin: 1.2rem 0;
+  }
+  .style-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+  .style-btn {
+    border: 2px solid #ccc;
+    border-radius: 6px;
+    background: #f9f9f9;
+    padding: 0.4rem 0.2rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+    text-align: center;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .style-btn.active {
+    border-color: #444;
+    background: #e8e8e8;
+    font-weight: bold;
+  }
+  .style-btn canvas {
+    display: block;
+    margin: 0 auto 3px;
+    pointer-events: none;
+  }
+  .download-row {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .download-row a, .download-row button {
+    padding: 0.5rem 1.2rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border: 1px solid #555;
+    text-decoration: none;
+    background: #fff;
+    color: #222;
+    transition: background 0.15s;
+  }
+  .download-row a:hover, .download-row button:hover { background: #eee; }
+  .qr-empty-msg {
+    color: #888;
+    font-size: 0.9rem;
+    text-align: center;
+    padding: 1.5rem;
+  }
+  fieldset {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 0.7rem 0.9rem;
+    margin: 0;
+  }
+  legend {
+    font-weight: bold;
+    font-size: 0.9rem;
+    padding: 0 0.4rem;
+    color: #444;
+  }
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.92rem;
+    cursor: pointer;
+  }
+</style>
+</head>
+
+<body>
+
+<!-- Dynamic sidebar menu START -->
+<div id="menu-container"></div>
+<script>
+  fetch('https://david-fear.github.io/components/menu.html')
+    .then(r => r.text())
+    .then(data => {
+      const container = document.getElementById('menu-container');
+      container.innerHTML = data;
+      const toggle = document.getElementById('menu-toggle');
+      const menu = document.getElementById('menu-nav');
+      toggle.addEventListener('click', () => {
+        const expanded = toggle.getAttribute('aria-expanded') === 'true';
+        toggle.setAttribute('aria-expanded', String(!expanded));
+        menu.hasAttribute('hidden') ? menu.removeAttribute('hidden') : menu.setAttribute('hidden', '');
+      });
+      toggle.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle.click(); }
+      });
+    })
+    .catch(e => console.error('Failed to load menu:', e));
+</script>
+<!-- Dynamic sidebar menu END -->
+
+<header>
+  <h1>QR Code Generator</h1>
+  <p>Generate styled QR codes for text or URLs, with optional centre logo.</p>
+</header>
+
+<main>
+  <section>
+    <div class="qr-layout">
+
+      <!-- Controls -->
+      <div class="qr-controls">
+
+        <div class="form-group">
+          <label for="qr-content">Content</label>
+          <textarea id="qr-content" placeholder="Enter URL or any text...">https://david-fear.github.io</textarea>
+        </div>
+
+        <hr class="section-divider" />
+
+        <!-- Style picker -->
+        <fieldset>
+          <legend>Dot Style</legend>
+          <div class="style-grid" id="dot-style-grid">
+            <button class="style-btn active" data-dots="square">Square</button>
+            <button class="style-btn" data-dots="rounded">Rounded</button>
+            <button class="style-btn" data-dots="extra-rounded">Extra Rounded</button>
+            <button class="style-btn" data-dots="classy">Classy</button>
+            <button class="style-btn" data-dots="classy-rounded">Classy Rounded</button>
+            <button class="style-btn" data-dots="dot">Dot</button>
+          </div>
+        </fieldset>
+
+        <br />
+
+        <fieldset>
+          <legend>Corner Style</legend>
+          <div class="style-grid" id="corner-style-grid">
+            <button class="style-btn active" data-corners="square">Square</button>
+            <button class="style-btn" data-corners="extra-rounded">Rounded</button>
+            <button class="style-btn" data-corners="dot">Dot</button>
+          </div>
+        </fieldset>
+
+        <br />
+
+        <fieldset>
+          <legend>Colours</legend>
+          <div class="color-row" style="margin-bottom:0.7rem">
+            <input type="color" id="color-dots" value="#000000" />
+            <label for="color-dots">Dots</label>
+            <input type="color" id="color-bg" value="#ffffff" />
+            <label for="color-bg">Background</label>
+            <input type="color" id="color-corners" value="#000000" />
+            <label for="color-corners">Corners</label>
+          </div>
+          <label class="checkbox-label">
+            <input type="checkbox" id="transparent-bg" /> Transparent background
+          </label>
+        </fieldset>
+
+        <br />
+
+        <fieldset>
+          <legend>Size &amp; Border</legend>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="qr-size">Size (px)</label>
+              <input type="number" id="qr-size" value="300" min="100" max="1000" step="50" />
+            </div>
+            <div class="form-group">
+              <label for="qr-margin">Border (px)</label>
+              <input type="number" id="qr-margin" value="16" min="0" max="100" step="4" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="qr-ecl">Error Correction</label>
+            <select id="qr-ecl">
+              <option value="L">L — Low (7%) — best for logos</option>
+              <option value="M" selected>M — Medium (15%)</option>
+              <option value="Q">Q — Quartile (25%)</option>
+              <option value="H">H — High (30%)</option>
+            </select>
+          </div>
+        </fieldset>
+
+        <br />
+
+        <fieldset>
+          <legend>Centre Logo (optional)</legend>
+          <div class="image-upload-area" id="upload-area">
+            <input type="file" id="logo-file" accept="image/*" />
+            Click or drag an image here
+            <img id="logo-preview" src="" alt="Logo preview" />
+          </div>
+          <div style="text-align:center">
+            <span class="clear-logo" id="clear-logo">&#x2715; Remove logo</span>
+          </div>
+          <div class="form-row" style="margin-top:0.7rem">
+            <div class="form-group">
+              <label for="logo-size">Logo size %</label>
+              <input type="number" id="logo-size" value="25" min="5" max="40" step="1" />
+            </div>
+            <div class="form-group">
+              <label for="logo-margin">Logo margin</label>
+              <input type="number" id="logo-margin" value="5" min="0" max="20" step="1" />
+            </div>
+          </div>
+          <label class="checkbox-label">
+            <input type="checkbox" id="logo-hide-dots" checked /> Hide dots behind logo
+          </label>
+        </fieldset>
+
+        <br />
+        <button onclick="generate()" style="width:100%;padding:0.6rem;font-size:1rem;cursor:pointer;border-radius:6px;border:2px solid #333;background:#222;color:#fff;">
+          Generate QR Code
+        </button>
+
+      </div>
+
+      <!-- Preview -->
+      <div class="qr-preview">
+        <div id="qr-canvas">
+          <div class="qr-empty-msg">QR code will appear here</div>
+        </div>
+        <div class="download-row" id="download-row" style="display:none">
+          <a id="dl-png" download="qrcode.png">Download PNG</a>
+          <a id="dl-svg" download="qrcode.svg">Download SVG</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</main>
+
+<!-- Footer -->
+<div id="footer-container"></div>
+<script>
+  fetch('https://david-fear.github.io/components/footer.html')
+    .then(r => r.text())
+    .then(data => { document.getElementById('footer-container').innerHTML = data; })
+    .catch(e => console.error('Failed to load footer:', e));
+</script>
+
+<script src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+<script>
+  let logoDataUrl = null;
+  let qrInstance  = null;
+
+  // --- Dot style buttons ---
+  document.getElementById('dot-style-grid').addEventListener('click', e => {
+    const btn = e.target.closest('[data-dots]');
+    if (!btn) return;
+    document.querySelectorAll('[data-dots]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+
+  // --- Corner style buttons ---
+  document.getElementById('corner-style-grid').addEventListener('click', e => {
+    const btn = e.target.closest('[data-corners]');
+    if (!btn) return;
+    document.querySelectorAll('[data-corners]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+
+  // --- Logo upload ---
+  document.getElementById('logo-file').addEventListener('change', function () {
+    const file = this.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      logoDataUrl = e.target.result;
+      const preview = document.getElementById('logo-preview');
+      preview.src = logoDataUrl;
+      preview.style.display = 'block';
+      document.getElementById('clear-logo').style.display = 'block';
+      document.getElementById('upload-area').querySelector('input[type=file]').value = '';
+    };
+    reader.readAsDataURL(file);
+  });
+
+  document.getElementById('clear-logo').addEventListener('click', () => {
+    logoDataUrl = null;
+    document.getElementById('logo-preview').style.display = 'none';
+    document.getElementById('logo-preview').src = '';
+    document.getElementById('clear-logo').style.display = 'none';
+  });
+
+  // --- Transparent background toggle ---
+  document.getElementById('transparent-bg').addEventListener('change', function () {
+    document.getElementById('color-bg').disabled = this.checked;
+  });
+
+  // --- Generate ---
+  function generate() {
+    const content = document.getElementById('qr-content').value.trim();
+    if (!content) { alert('Please enter some content.'); return; }
+
+    const dotsType    = document.querySelector('[data-dots].active')?.dataset.dots    || 'square';
+    const cornersType = document.querySelector('[data-corners].active')?.dataset.corners || 'square';
+    const colorDots   = document.getElementById('color-dots').value;
+    const colorCorners= document.getElementById('color-corners').value;
+    const transparentBg = document.getElementById('transparent-bg').checked;
+    const colorBg     = transparentBg ? 'transparent' : document.getElementById('color-bg').value;
+    const size        = parseInt(document.getElementById('qr-size').value)   || 300;
+    const margin      = parseInt(document.getElementById('qr-margin').value) ?? 16;
+    const ecl         = document.getElementById('qr-ecl').value;
+    const logoSize    = parseInt(document.getElementById('logo-size').value) / 100 || 0.25;
+    const logoMargin  = parseInt(document.getElementById('logo-margin').value) ?? 5;
+    const logoHideDots= document.getElementById('logo-hide-dots').checked;
+
+    const options = {
+      width:  size,
+      height: size,
+      type: 'canvas',
+      data: content,
+      margin: margin,
+      qrOptions: { errorCorrectionLevel: ecl },
+      dotsOptions:          { type: dotsType,    color: colorDots },
+      cornersSquareOptions: { type: cornersType, color: colorCorners },
+      cornersDotOptions:    { type: cornersType === 'extra-rounded' ? 'dot' : cornersType, color: colorCorners },
+      backgroundOptions:    { color: colorBg },
+    };
+
+    if (logoDataUrl) {
+      options.image = logoDataUrl;
+      options.imageOptions = {
+        crossOrigin: 'anonymous',
+        imageSize: logoSize,
+        margin: logoMargin,
+        hideBackgroundDots: logoHideDots,
+      };
+    }
+
+    const container = document.getElementById('qr-canvas');
+    container.innerHTML = '';
+
+    qrInstance = new QRCodeStyling(options);
+    qrInstance.append(container);
+
+    // Wire up download buttons
+    document.getElementById('download-row').style.display = 'flex';
+
+    document.getElementById('dl-png').onclick = e => {
+      e.preventDefault();
+      qrInstance.download({ name: 'qrcode', extension: 'png' });
+    };
+    document.getElementById('dl-svg').onclick = e => {
+      e.preventDefault();
+      qrInstance.download({ name: 'qrcode', extension: 'svg' });
+    };
+  }
+
+  // Auto-generate on load
+  generate();
+</script>
+
+</body>
+</html>
