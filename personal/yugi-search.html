@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>NZ YGO Card Search</title>
   <link rel="stylesheet" href="https://david-fear.github.io/stylesheet.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" />
   <style>
     .search-header {
       display: flex;
@@ -103,8 +104,12 @@
       display: block;
       text-decoration: none;
       padding-right: 66px;
-      word-break: break-word;
-      line-height: 1.4;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-family: 'Roboto Condensed', Arial Narrow, Arial, sans-serif;
+      line-height: 1.3;
+      letter-spacing: -0.2px;
     }
 
     .item a:hover {
