@@ -7,11 +7,38 @@
   <title>NZ YGO Card Search</title>
   <link rel="stylesheet" href="https://david-fear.github.io/stylesheet.css" />
   <style>
+    .search-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
     .search-row {
       display: flex;
       flex-wrap: wrap;
       gap: 4px;
       align-items: center;
+    }
+
+    .legend {
+      font-size: 10px;
+      color: #888;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .legend-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 4px;
+      vertical-align: middle;
     }
 
     input {
@@ -41,14 +68,13 @@
     }
 
     .stores {
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 8px;
       margin-top: 10px;
     }
 
     .store {
-      flex: 1 1 280px;
       padding: 7px 9px;
       border: 1px solid #2a2a2a;
       background: #181818;
@@ -116,12 +142,6 @@
       padding-left: 10px;
     }
 
-    @media (max-width: 500px) {
-      .store {
-        flex: 1 1 100%;
-      }
-    }
-
     .muted {
       font-size: 10px;
       color: #a0a0a0;
@@ -180,12 +200,21 @@
 
   <main>
     <section>
-      <h2>NZ Yu-Gi-Oh Card Search</h1>
-        <div class="search-row">
-          <input id="q" placeholder="Card name or code, e.g. DUPO-EN017" value="DUPO-EN017" title="Card name or code" />
-          <input id="limit" type="number" min="1" max="20" value="6" style="width:50px;" title="Results per site" />
-          <button onclick="search()">Search</button>
+      <div class="search-header">
+        <div>
+          <h2>NZ Yu-Gi-Oh Card Search</h2>
+          <div class="search-row">
+            <input id="q" placeholder="Card name or code, e.g. DUPO-EN017" value="DUPO-EN017" title="Card name or code" />
+            <input id="limit" type="number" min="1" max="20" value="6" style="width:50px;" title="Results per site" />
+            <button onclick="search()">Search</button>
+          </div>
         </div>
+        <div class="legend">
+          <div><span class="legend-dot" style="background:#7dff7d"></span>In stock</div>
+          <div><span class="legend-dot" style="background:#ff4444"></span>Sold out</div>
+          <div><span class="legend-dot" style="background:#555"></span>No price</div>
+        </div>
+      </div>
     </section>
   </main>
 
