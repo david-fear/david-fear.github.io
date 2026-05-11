@@ -69,9 +69,13 @@
 
     .stores {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
       gap: 8px;
       margin-top: 10px;
+    }
+
+    @media (max-width: 400px) {
+      .stores { grid-template-columns: 1fr; }
     }
 
     .store {
@@ -98,10 +102,9 @@
     .item a {
       display: block;
       text-decoration: none;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      padding-right: 62px;
+      padding-right: 66px;
+      word-break: break-word;
+      line-height: 1.4;
     }
 
     .item a:hover {
