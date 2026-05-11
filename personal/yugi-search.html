@@ -2,24 +2,28 @@
 <html>
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>NZ YGO Card Search</title>
 
   <style>
     body { font-family: Arial, sans-serif; background: #111; color: #eee; margin: 16px; font-size: 12px; }
     h2   { font-size: 14px; margin: 0 0 10px; }
-    input  { width: 340px; padding: 6px 8px; font-size: 12px; background: #222; color: #eee; border: 1px solid #444; }
+    .search-row { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+    input  { padding: 6px 8px; font-size: 12px; background: #222; color: #eee; border: 1px solid #444; }
+    #q { flex: 1; min-width: 160px; max-width: 340px; }
     button { padding: 6px 12px; font-size: 12px; cursor: pointer; }
     #query  { margin-top: 8px; font-size: 12px; color: #ffd700; }
     #status { margin-top: 4px; font-size: 11px; color: #00ffcc; }
     .stores { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
     .store  { flex: 1 1 280px; padding: 7px 9px; border: 1px solid #2a2a2a; background: #181818; }
     .store-name { font-weight: bold; font-size: 11px; color: #aaa; margin-bottom: 5px; border-bottom: 1px solid #2a2a2a; padding-bottom: 3px; }
-    .item { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; margin: 3px 0; font-size: 11px; }
-    .item a { color: #4da3ff; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+    .item { position: relative; margin: 3px 0; font-size: 11px; }
+    .item a { display: block; color: #4da3ff; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-right: 62px; }
     .item a:hover { text-decoration: underline; }
-    .price    { color: #7dff7d; font-weight: bold; white-space: nowrap; font-size: 11px; }
-    .no-price  { color: #555; font-size: 10px; white-space: nowrap; }
-    .sold-out  { color: #ff4444; font-weight: bold; white-space: nowrap; font-size: 11px; }
+    .price    { position: absolute; right: 0; top: 0; color: #7dff7d; font-weight: bold; white-space: nowrap; font-size: 11px; background: linear-gradient(to right, transparent, #181818 22%); padding-left: 10px; }
+    .no-price  { position: absolute; right: 0; top: 0; color: #555; font-size: 10px; white-space: nowrap; background: #181818; }
+    .sold-out  { position: absolute; right: 0; top: 0; color: #ff4444; font-weight: bold; white-space: nowrap; font-size: 11px; background: linear-gradient(to right, transparent, #181818 22%); padding-left: 10px; }
+    @media (max-width: 500px) { .store { flex: 1 1 100%; } }
     .muted { font-size: 10px; color: #555; }
     .muted a { color: #4da3ff; }
     .json-link { font-size: 9px; font-weight: normal; color: #555; margin-left: 6px; }
@@ -31,9 +35,11 @@
 
 <h2>NZ YGO Card Search</h2>
 
-<input id="q" placeholder="Card name or code, e.g. DUPO-EN017" value="DUPO-EN017" />
-<input id="limit" type="number" min="1" max="20" value="10" style="width:50px;" title="Results per site" />
-<button onclick="search()">Search</button>
+<div class="search-row">
+  <input id="q" placeholder="Card name or code, e.g. DUPO-EN017" value="DUPO-EN017" />
+  <input id="limit" type="number" min="1" max="20" value="10" style="width:50px;" title="Results per site" />
+  <button onclick="search()">Search</button>
+</div>
 
 <div id="query"></div>
 <div id="status"></div>
