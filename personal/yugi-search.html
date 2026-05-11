@@ -113,7 +113,7 @@ async function searchStore(store, query, limit) {
         items: products.map(p => ({
           title:   p.title,
           link:    `https://${domain}/products/${p.handle}`,
-          price:   fmtPrice(p.price),
+          price:   fmtPrice(p.price_max),
           soldOut: p.available === false
         }))
       };
@@ -134,7 +134,7 @@ function renderStore(store, result, query) {
   if (result.ok) {
     inner = result.items.map(r => {
       const badge = r.soldOut
-        ? `<span class="sold-out">SOLD OUT${r.price ? ' ' + r.price : ''}</span>`
+        ? `<span class="sold-out">${r.price ? r.price : '—'}</span>`
         : r.price
           ? `<span class="price">${esc(r.price)}</span>`
           : `<span class="no-price">—</span>`;
