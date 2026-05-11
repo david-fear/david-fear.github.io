@@ -70,12 +70,16 @@
 
     .stores {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      grid-template-columns: repeat(3, 1fr);
       gap: 8px;
       margin-top: 10px;
     }
 
-    @media (max-width: 400px) {
+    @media (max-width: 700px) {
+      .stores { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 420px) {
       .stores { grid-template-columns: 1fr; }
     }
 
