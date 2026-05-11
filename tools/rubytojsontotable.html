@@ -3,17 +3,84 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ruby Hash → JSON → HTML Tables</title>
+<title>Ruby Hash → JSON → HTML Tables / CSV</title>
+
 <link rel="stylesheet" href="https://david-fear.github.io/stylesheet.css" />
+
 <style>
-  textarea { width: 100%; box-sizing: border-box; font-family: monospace; margin-bottom: 10px; font-size: 0.8em;}
-  #inputBox { height: 100px; font-family: monospace;  font-size: 0.8em;}
-  #outputBox { height: 250px; font-family: monospace;  font-size: 0.8em;}
-  #tableBox { height: 10000px; overflow: auto; border: 1px solid #ccc; padding: 1px; font-family: monospace; font-size: 0.8em;}
-  button { padding: 10px 20px; font-size: 16px; margin-bottom: 10px; }
-  table { border-collapse: collapse; margin: 1px 0; }
-  table, th, td { border: 1px solid #999; }
-  th, td { padding: 0 3px; text-align: left; vertical-align: top; }
+  body {
+    font-family: Arial, sans-serif;
+  }
+
+  textarea {
+    width: 100%;
+    box-sizing: border-box;
+    font-family: monospace;
+    margin-bottom: 10px;
+    font-size: 0.8em;
+  }
+
+  #inputBox {
+    height: 120px;
+  }
+
+  #outputBox {
+    height: 250px;
+  }
+
+  #csvBox {
+    height: 250px;
+  }
+
+  #tableBox {
+    height: 500px;
+    overflow: auto;
+    border: 1px solid #ccc;
+    padding: 5px;
+    font-family: monospace;
+    font-size: 0.8em;
+    margin-bottom: 20px;
+  }
+
+  button {
+    padding: 8px 16px;
+    font-size: 14px;
+    margin-right: 5px;
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+
+  table {
+    border-collapse: collapse;
+    margin: 2px 0;
+  }
+
+  table, th, td {
+    border: 1px solid #999;
+  }
+
+  th, td {
+    padding: 2px 4px;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  h2, h3 {
+    margin-top: 15px;
+  }
+
+  .controls {
+    margin-bottom: 15px;
+  }
+
+  label {
+    margin-right: 10px;
+    font-size: 0.9em;
+  }
+
+  select {
+    padding: 4px;
+  }
 </style>
 </head>
 
@@ -51,67 +118,401 @@
     .catch(e => console.error('Failed to load menu:', e));
 </script>
 <!-- Dynamic sidebar menu END -->
-  
-<h2>Ruby Hash → JSON → HTML Tables</h2>
 
-<textarea id="inputBox" placeholder="Paste your Ruby hash here..."></textarea>
-<br>
-<button onclick="convertRubyHash()">Convert to JSON</button>
-<textarea id="outputBox" placeholder="Converted JSON will appear here..."></textarea>
-<br>
-<button onclick="convertJSONtoTables()">Convert JSON → HTML Tables</button>
-<div id="tableBox" placeholder="HTML tables will appear here..."></div>
+<h2>Ruby Hash → JSON → HTML Tables / CSV</h2>
+
+<textarea id="inputBox"
+placeholder="Paste your Ruby hash here..."></textarea>
+
+<div class="controls">
+  <button onclick="convertRubyHash()">
+    Convert Ruby → JSON
+  </button>
+</div>
+
+<h3>JSON Output</h3>
+
+<textarea id="outputBox"
+placeholder="Converted JSON will appear here..."></textarea>
+
+<div class="controls">
+
+  <label>
+    CSV Header Layer:
+    <select id="headerLayer">
+      <option value="0">0 (top level)</option>
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+    </select>
+  </label>
+
+  <button onclick="convertJSONtoTables()">
+    Convert JSON → HTML Tables
+  </button>
+
+  <button onclick="convertJSONtoCSV()">
+    Convert JSON → CSV
+  </button>
+
+  <button onclick="downloadCSV()">
+    Download CSV
+  </button>
+
+</div>
+
+<h3>HTML Tables</h3>
+
+<div id="tableBox"></div>
+
+<h3>CSV Output</h3>
+
+<textarea id="csvBox"
+placeholder="CSV output will appear here..."></textarea>
 
 <script>
+
 // 1️⃣ Convert Ruby Hash → JSON
 function convertRubyHash() {
-  let rubyStr = document.getElementById('inputBox').value;
+
+  let rubyStr =
+    document.getElementById('inputBox').value;
 
   try {
-    let jsonStr = rubyStr.replace(/=>/g, ':');       // hash rockets
-    jsonStr = jsonStr.replace(/\bnil\b/g, 'null');  // nil → null
-    jsonStr = jsonStr.replace(/'((?:\\'|[^'])*)'/g, function(match, p1){
-      return `"${p1.replace(/"/g, '\\"')}"`;
-    });
-    jsonStr = jsonStr.replace(/,(\s*[}\]])/g, '$1'); // trailing commas
 
-    let parsed = JSON.parse(jsonStr);
-    document.getElementById('outputBox').value = JSON.stringify(parsed, null, 2);
+    let jsonStr =
+      rubyStr.replace(/=>/g, ':');
+
+    jsonStr =
+      jsonStr.replace(/\bnil\b/g, 'null');
+
+    jsonStr =
+      jsonStr.replace(
+        /'((?:\\'|[^'])*)'/g,
+        function(match, p1) {
+          return `"${p1.replace(/"/g, '\\"')}"`;
+        }
+      );
+
+    jsonStr =
+      jsonStr.replace(/,(\s*[}\]])/g, '$1');
+
+    let parsed =
+      JSON.parse(jsonStr);
+
+    document.getElementById('outputBox').value =
+      JSON.stringify(parsed, null, 2);
+
   } catch (err) {
-    document.getElementById('outputBox').value = 'ERROR: Invalid Ruby hash or parsing issue:\n' + err;
+
+    document.getElementById('outputBox').value =
+      'ERROR: Invalid Ruby hash or parsing issue:\n\n' + err;
   }
 }
 
 // 2️⃣ Convert JSON → HTML Tables
 function convertJSONtoTables() {
-  let jsonText = document.getElementById('outputBox').value;
-  if (!jsonText) return alert('No JSON to convert!');
+
+  let jsonText =
+    document.getElementById('outputBox').value;
+
+  if (!jsonText) {
+    alert('No JSON to convert!');
+    return;
+  }
 
   try {
-    let obj = JSON.parse(jsonText);
-    let html = jsonToTable(obj);
-    document.getElementById('tableBox').innerHTML = html;
+
+    let obj =
+      JSON.parse(jsonText);
+
+    let html =
+      jsonToTable(obj);
+
+    document.getElementById('tableBox').innerHTML =
+      html;
+
   } catch (err) {
-    document.getElementById('tableBox').innerHTML = 'ERROR: Invalid JSON:\n' + err;
+
+    document.getElementById('tableBox').innerHTML =
+      'ERROR: Invalid JSON:\n\n' + err;
   }
 }
 
-// Recursive function to convert any JSON to HTML table
+// Recursive JSON → HTML table
 function jsonToTable(obj) {
+
   if (Array.isArray(obj)) {
-    let rows = obj.map(item => `<tr><td>${jsonToTable(item)}</td></tr>`).join('');
+
+    let rows =
+      obj.map(item =>
+        `<tr><td>${jsonToTable(item)}</td></tr>`
+      ).join('');
+
     return `<table>${rows}</table>`;
-  } else if (obj !== null && typeof obj === 'object') {
+
+  } else if (
+    obj !== null &&
+    typeof obj === 'object'
+  ) {
+
     let rows = '';
+
     for (let key in obj) {
-      rows += `<tr><th>${key}</th><td>${jsonToTable(obj[key])}</td></tr>`;
+
+      rows += `
+        <tr>
+          <th>${escapeHTML(key)}</th>
+          <td>${jsonToTable(obj[key])}</td>
+        </tr>
+      `;
     }
+
     return `<table>${rows}</table>`;
+
   } else {
-    // primitive value
-    return obj === null ? 'null' : obj.toString();
+
+    return obj === null
+      ? 'null'
+      : escapeHTML(String(obj));
   }
 }
+
+// 3️⃣ Get nested object at layer
+function getLayerObject(obj, targetLayer, currentLayer = 0) {
+
+  if (currentLayer >= targetLayer) {
+    return obj;
+  }
+
+  if (Array.isArray(obj)) {
+
+    return obj.flatMap(item =>
+      getLayerObject(
+        item,
+        targetLayer,
+        currentLayer + 1
+      )
+    );
+  }
+
+  if (
+    obj !== null &&
+    typeof obj === 'object'
+  ) {
+
+    let results = [];
+
+    for (let key in obj) {
+
+      results.push(
+        getLayerObject(
+          obj[key],
+          targetLayer,
+          currentLayer + 1
+        )
+      );
+    }
+
+    return results.flat();
+  }
+
+  return [];
+}
+
+// 4️⃣ Flatten object
+function flattenObject(
+  obj,
+  prefix = '',
+  result = {}
+) {
+
+  for (let key in obj) {
+
+    let value = obj[key];
+
+    let newKey =
+      prefix
+        ? `${prefix}.${key}`
+        : key;
+
+    if (Array.isArray(value)) {
+
+      result[newKey] =
+        JSON.stringify(value);
+
+    } else if (
+      value !== null &&
+      typeof value === 'object'
+    ) {
+
+      flattenObject(
+        value,
+        newKey,
+        result
+      );
+
+    } else {
+
+      result[newKey] = value;
+    }
+  }
+
+  return result;
+}
+
+// 5️⃣ Convert JSON → CSV
+function convertJSONtoCSV() {
+
+  let jsonText =
+    document.getElementById('outputBox').value;
+
+  if (!jsonText) {
+    alert('No JSON to convert!');
+    return;
+  }
+
+  try {
+
+    let data =
+      JSON.parse(jsonText);
+
+    let layer =
+      parseInt(
+        document.getElementById('headerLayer').value
+      );
+
+    // Get data from selected layer
+    if (layer > 0) {
+
+      data =
+        getLayerObject(data, layer);
+
+      // remove non-objects
+      data =
+        data.filter(item =>
+          item &&
+          typeof item === 'object' &&
+          !Array.isArray(item)
+        );
+    }
+
+    // force array
+    if (!Array.isArray(data)) {
+      data = [data];
+    }
+
+    let flatRows =
+      data.map(row =>
+        flattenObject(row)
+      );
+
+    let headers =
+      [...new Set(
+        flatRows.flatMap(row =>
+          Object.keys(row)
+        )
+      )];
+
+    let csv = [];
+
+    // Header row
+    csv.push(headers.join(','));
+
+    // Data rows
+    for (let row of flatRows) {
+
+      let values =
+        headers.map(header => {
+
+          let val = row[header];
+
+          if (
+            val === null ||
+            val === undefined
+          ) {
+            return '';
+          }
+
+          val = String(val);
+
+          val =
+            val.replace(/"/g, '""');
+
+          if (
+            val.includes(',') ||
+            val.includes('"') ||
+            val.includes('\n')
+          ) {
+            val = `"${val}"`;
+          }
+
+          return val;
+        });
+
+      csv.push(values.join(','));
+    }
+
+    document.getElementById('csvBox').value =
+      csv.join('\n');
+
+  } catch (err) {
+
+    document.getElementById('csvBox').value =
+      'ERROR: Invalid JSON:\n\n' + err;
+  }
+}
+
+// 6️⃣ Download CSV
+function downloadCSV() {
+
+  let csvContent =
+    document.getElementById('csvBox').value;
+
+  if (!csvContent) {
+    alert('No CSV data!');
+    return;
+  }
+
+  let blob =
+    new Blob(
+      [csvContent],
+      {
+        type: 'text/csv;charset=utf-8;'
+      }
+    );
+
+  let link =
+    document.createElement('a');
+
+  let url =
+    URL.createObjectURL(blob);
+
+  link.setAttribute('href', url);
+
+  link.setAttribute(
+    'download',
+    'output.csv'
+  );
+
+  document.body.appendChild(link);
+
+  link.click();
+
+  document.body.removeChild(link);
+}
+
+// 7️⃣ Escape HTML
+function escapeHTML(str) {
+
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
 </script>
+
 </body>
 </html>
