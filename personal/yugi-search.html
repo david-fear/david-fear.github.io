@@ -4,42 +4,78 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>NZ YGO Card Search</title>
-
+  <link rel="stylesheet" href="https://david-fear.github.io/stylesheet.css" />
   <style>
-    body { font-family: Arial, sans-serif; background: #111; color: #eee; margin: 16px; font-size: 12px; }
-    h2   { font-size: 14px; margin: 0 0 10px; }
     .search-row { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
-    input  { padding: 6px 8px; font-size: 12px; background: #222; color: #eee; border: 1px solid #444; }
+    input  { padding: 5px 7px; font-size: 16px; background: #222; color: #eee; border: 1px solid #444; }
     #q { flex: 1; min-width: 160px; max-width: 340px; }
-    button { padding: 6px 12px; font-size: 12px; cursor: pointer; }
     #query  { margin-top: 8px; font-size: 12px; color: #ffd700; }
     #status { margin-top: 4px; font-size: 11px; color: #00ffcc; }
     .stores { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
     .store  { flex: 1 1 280px; padding: 7px 9px; border: 1px solid #2a2a2a; background: #181818; }
     .store-name { font-weight: bold; font-size: 11px; color: #aaa; margin-bottom: 5px; border-bottom: 1px solid #2a2a2a; padding-bottom: 3px; }
     .item { position: relative; margin: 3px 0; font-size: 11px; }
-    .item a { display: block; color: #4da3ff; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-right: 62px; }
+    .item a { display: block; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-right: 62px; }
     .item a:hover { text-decoration: underline; }
     .price    { position: absolute; right: 0; top: 0; color: #7dff7d; font-weight: bold; white-space: nowrap; font-size: 11px; background: linear-gradient(to right, transparent, #181818 22%); padding-left: 10px; }
     .no-price  { position: absolute; right: 0; top: 0; color: #555; font-size: 10px; white-space: nowrap; background: #181818; }
     .sold-out  { position: absolute; right: 0; top: 0; color: #ff4444; font-weight: bold; white-space: nowrap; font-size: 11px; background: linear-gradient(to right, transparent, #181818 22%); padding-left: 10px; }
     @media (max-width: 500px) { .store { flex: 1 1 100%; } }
-    .muted { font-size: 10px; color: #555; }
-    .muted a { color: #4da3ff; }
-    .json-link { font-size: 9px; font-weight: normal; color: #555; margin-left: 6px; }
-    .json-link:hover { color: #4da3ff; }
+    .muted { font-size: 10px; color: #a0a0a0; font-style: italic; }
+    .muted a { font-style: normal; }
+    .json-link { font-size: 9px; font-weight: normal; margin-left: 6px; }
+    .json-link:hover {  }
   </style>
 </head>
 
 <body>
 
-<h2>NZ YGO Card Search</h2>
+<!-- Dynamic sidebar menu START - right after BODY tag -->
+<div id="menu-container"></div>
+<script>
+  fetch('https://david-fear.github.io/components/menu.html')
+    .then(response => response.text())
+    .then(data => {
+      const container = document.getElementById('menu-container');
+      container.innerHTML = data;
+
+      // Now attach event listeners because the elements exist
+      const toggle = document.getElementById('menu-toggle');
+      const menu = document.getElementById('menu-nav');
+
+      toggle.addEventListener('click', () => {
+        const expanded = toggle.getAttribute('aria-expanded') === 'true';
+        toggle.setAttribute('aria-expanded', String(!expanded));
+        if (menu.hasAttribute('hidden')) {
+          menu.removeAttribute('hidden');
+        } else {
+          menu.setAttribute('hidden', '');
+        }
+      });
+
+      toggle.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggle.click();
+        }
+      });
+    })
+    .catch(e => console.error('Failed to load menu:', e));
+</script>
+<!-- Dynamic sidebar menu END -->
+
+  <main>
+    <section>
+<h2>NZ Yu-Gi-Oh Card Search</h1>
+
 
 <div class="search-row">
   <input id="q" placeholder="Card name or code, e.g. DUPO-EN017" value="DUPO-EN017" />
   <input id="limit" type="number" min="1" max="20" value="10" style="width:50px;" title="Results per site" />
   <button onclick="search()">Search</button>
 </div>
+    </section>
+  </main>
 
 <div id="query"></div>
 <div id="status"></div>
@@ -150,7 +186,7 @@ function renderStore(store, result, query) {
     inner = `<div class="muted"><a href="${esc(result.href)}" target="_blank" rel="noopener">open search →</a></div>`;
   } else {
     const label = result.reason === 'empty' ? 'no results' : result.reason;
-    inner = `<div class="muted">${label} — <a href="${esc(result.href)}" target="_blank" rel="noopener">open site</a></div>`;
+    inner = `<div class="muted">${label} → <a href="${esc(result.href)}" target="_blank" rel="noopener">open site</a></div>`;
   }
   return `<div class="store"><div class="store-name">${esc(domain)}${jsonLink}</div>${inner}</div>`;
 }
@@ -197,7 +233,7 @@ async function search() {
   });
 
   await Promise.all(promises);
-  document.getElementById('status').textContent = `Done — ${STORES.length} stores searched`;
+  document.getElementById('status').textContent = `Done - ${STORES.length} stores searched`;
 }
 
 document.getElementById('q').addEventListener('keydown', e => { if (e.key === 'Enter') search(); });
@@ -205,7 +241,7 @@ document.getElementById('limit').addEventListener('keydown', e => { if (e.key ==
 
 </script>
 
-<hr style="border-color:#2a2a2a; margin:24px 0 12px;">
+<hr /><br />
 <details>
   <summary style="cursor:pointer; font-size:11px; color:#888; user-select:none;">
     ▶ Non-Shopify endpoint tester — click links below to see what each site returns (all use <code>DUPO-EN017</code> as sample query)
