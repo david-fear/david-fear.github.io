@@ -216,7 +216,8 @@
         <div>
           <h2>NZ Yu-Gi-Oh Card Search</h2>
           <div class="search-row">
-            <input id="q" placeholder="Card name or code, e.g. DUPO-EN017" value="DUPO-EN017" title="Card name or code" />
+            <input id="q" placeholder="Card name or code, e.g. DUPO-EN017" value="DUPO-EN017" title="Card name or code"
+              autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" autofocus />
             <input id="limit" type="number" min="1" max="20" value="6" style="width:50px;" title="Results per site" />
             <button onclick="search()">Search</button>
           </div>
@@ -397,10 +398,11 @@
 
       await Promise.all(promises);
       document.getElementById('status').textContent = `Done - ${STORES.length} stores searched`;
+      document.getElementById('q').focus();
     }
 
     document.getElementById('q').addEventListener('keydown', e => { if (e.key === 'Enter') search(); });
-    document.getElementById('limit').addEventListener('keydown', e => { if (e.key === 'Enter') search(); });
+    document.getElementById('limit').addEventListener('keydown', e => { if (e.key === 'Enter') { search(); document.getElementById('q').focus(); } });
 
   </script>
 
