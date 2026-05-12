@@ -12,8 +12,13 @@
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       gap: 8px;
+    }
+
+    .search-inputs-wrap {
+      flex: 1;
+      min-width: 0;
     }
 
     .search-row {
@@ -23,6 +28,14 @@
       align-items: center;
     }
 
+    .btn-fuzzy {
+      background: #2a2a2a;
+      color: #aaa;
+      border: 1px solid #444;
+    }
+
+    .btn-fuzzy:hover { background: #333; color: #eee; }
+
     .legend {
       font-size: 10px;
       color: #888;
@@ -31,6 +44,7 @@
       gap: 3px;
       text-align: right;
       white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .legend-dot {
@@ -218,13 +232,16 @@
   <main>
     <section>
       <div class="search-header">
-        <div>
+        <div class="search-inputs-wrap">
           <h2>NZ Yu-Gi-Oh Card Search</h2>
           <div class="search-row">
             <input id="q" placeholder="Card name or code, e.g. DUPO-EN017" value="DUPO-EN017" title="Card name or code"
               autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" autofocus />
             <input id="limit" type="number" min="1" max="20" value="6" style="width:50px;" title="Results per site" />
-            <button onclick="search()">Search</button>
+          </div>
+          <div class="search-row" style="margin-top:4px;">
+            <button onclick="search(true)">Exact Search</button>
+            <button class="btn-fuzzy" onclick="search(false)">Fuzzy Search</button>
           </div>
         </div>
         <div class="legend">
@@ -308,7 +325,7 @@
     }
 
     /* Query one Shopify store via suggest.json */
-    async function searchStore(store, query, limit) {
+    async function searchStore(store, query, limit, exact) {
       const domain = store.d;
       const fallback = `https://${domain}/search?q=${encodeURIComponent(query)}`;
       const apiUrl = `https://${domain}/search/suggest.json?q=${encodeURIComponent(query)}&resources[type]=product&resources[limit]=${limit}`;
@@ -316,7 +333,7 @@
         const data = await fetchJSON(apiUrl);
         const products = data?.resources?.results?.products;
         if (products?.length) {
-          const matched = products.filter(p => matchesQuery(p, query));
+          const matched = exact ? products.filter(p => matchesQuery(p, query)) : products;
           if (matched.length) {
             return {
               ok: true,
@@ -361,13 +378,13 @@
       return `<div class="store"><div class="store-name">${esc(domain)}${jsonLink}</div>${inner}</div>`;
     }
 
-    async function search() {
+    async function search(exact = true) {
       const q = document.getElementById('q').value.trim();
       if (!q) return;
 
       const shopifyStores = STORES.filter(s => !s.link);
       const limit = Math.max(1, Math.min(20, parseInt(document.getElementById('limit').value) || 10));
-      document.getElementById('query').textContent = 'Searching: ' + q;
+      document.getElementById('query').textContent = (exact ? 'Exact search: ' : 'Fuzzy search: ') + q;
       document.getElementById('status').textContent = `Querying ${shopifyStores.length} Shopify stores + ${STORES.length - shopifyStores.length} link-only…`;
 
       const resultsEl = document.getElementById('results');
@@ -390,7 +407,7 @@
       let done = 0;
       const promises = STORES.map((store, i) => {
         if (store.link) return Promise.resolve();
-        return searchStore(store, q, limit).then(result => {
+        return searchStore(store, q, limit, exact).then(result => {
           const fresh = document.createElement('div');
           fresh.className = 'store';
           fresh.innerHTML = renderStore(store, result, q)
@@ -407,8 +424,8 @@
       document.getElementById('q').focus();
     }
 
-    document.getElementById('q').addEventListener('keydown', e => { if (e.key === 'Enter') search(); });
-    document.getElementById('limit').addEventListener('keydown', e => { if (e.key === 'Enter') { search(); document.getElementById('q').focus(); } });
+    document.getElementById('q').addEventListener('keydown', e => { if (e.key === 'Enter') search(true); });
+    document.getElementById('limit').addEventListener('keydown', e => { if (e.key === 'Enter') { search(true); document.getElementById('q').focus(); } });
 
   </script>
 
