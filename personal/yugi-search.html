@@ -340,7 +340,7 @@
               ok: true,
               apiUrl,
               items: matched.map(p => ({
-                title:   p.title,
+                title:   p.title + (domain === 'cardspotnz.com' && p.product_type ? ` (${p.product_type})` : ''),
                 link:    `https://${domain}/products/${p.handle}`,
                 price:   fmtPrice(p.price_max),
                 soldOut: p.available === false
