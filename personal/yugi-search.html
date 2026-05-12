@@ -190,6 +190,13 @@
       margin-left: 6px;
     }
 
+    .store-note {
+      font-size: 9px;
+      color: #555;
+      font-style: italic;
+      margin-left: 4px;
+    }
+
     .json-link:hover {}
   </style>
 </head>
@@ -262,7 +269,7 @@
 
     const STORES = [
       // ── Shopify (live API results) ───────────────────────────
-      { d: "cardspotnz.com" },
+      { d: "cardspotnz.com", note: "card name search only" },
       { d: "cardmerchant.co.nz" },
       { d: "cardmerchanthamilton.co.nz" },
       { d: "www.cardmerchanttakapuna.co.nz" },
@@ -340,7 +347,7 @@
               ok: true,
               apiUrl,
               items: matched.map(p => ({
-                title:   p.title + (domain === 'cardspotnz.com' && p.product_type ? ` (${p.product_type})` : ''),
+                title:   p.title + (domain === 'cardspotnz.com' && p.type ? ` (${p.type})` : ''),
                 link:    `https://${domain}/products/${p.handle}`,
                 price:   fmtPrice(p.price_max),
                 soldOut: p.available === false
@@ -357,8 +364,11 @@
     /* Build the HTML for one store card */
     function renderStore(store, result, query) {
       const domain = store.d;
+      const noteHtml = store.note
+        ? ` <span class="store-note">${esc(store.note)}</span>`
+        : '';
       const jsonLink = result.apiUrl
-        ? ` <a class="json-link" href="${esc(result.apiUrl)}" target="_blank" rel="noopener">[view JSON]</a>`
+        ? ` <a class="json-link" href="${esc(result.apiUrl)}" target="_blank" rel="noopener">[view JSON]</a>${noteHtml}`
         : '';
       let inner = '';
       if (result.ok) {
