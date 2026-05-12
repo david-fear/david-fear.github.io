@@ -175,12 +175,13 @@
 
     .muted {
       font-size: 10px;
-      color: #a0a0a0;
+      color: #808080;
       font-style: italic;
+      letter-spacing: 0.2px;
     }
 
     .muted a {
-      font-style: normal;
+      font-style: italic;
     }
 
     .json-link {
@@ -370,7 +371,7 @@
           return `<div class="item"><a href="${esc(r.link)}" target="_blank" rel="noopener">${esc(r.title)}</a>${badge}</div>`;
         }).join('');
       } else if (result.reason === 'link') {
-        inner = `<div class="muted"><a href="${esc(result.href)}" target="_blank" rel="noopener">open search →</a></div>`;
+        inner = `<div class="muted"><a href="${esc(result.href)}" target="_blank" rel="noopener">[not implemented yet - open site search →]</a></div>`;
       } else {
         const label = result.reason === 'empty' ? 'no results' : result.reason;
         inner = `<div class="muted">${label} → <a href="${esc(result.href)}" target="_blank" rel="noopener">open site</a></div>`;
