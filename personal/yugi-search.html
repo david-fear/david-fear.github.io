@@ -84,20 +84,20 @@
 
     .stores {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
       gap: 8px;
       margin-top: 10px;
     }
 
-    @media (min-width: 701px) {
-      .stores { grid-template-columns: repeat(3, minmax(220px, 1fr)); }
+    @media (min-width: 1081px) {
+      .stores { grid-template-columns: repeat(3, minmax(360px, 1fr)); }
     }
 
-    @media (max-width: 700px) {
-      .stores { grid-template-columns: repeat(2, minmax(180px, 1fr)); }
+    @media (max-width: 1080px) {
+      .stores { grid-template-columns: repeat(2, minmax(360px, 1fr)); }
     }
 
-    @media (max-width: 420px) {
+    @media (max-width: 740px) {
       .stores { grid-template-columns: 1fr; }
     }
 
