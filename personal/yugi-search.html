@@ -29,12 +29,34 @@
     }
 
     .btn-fuzzy {
-      background: #2a2a2a;
-      color: #aaa;
-      border: 1px solid #444;
+      background: #f0f0f0;
+      color: #555;
+      border: 1px solid #777;
+      border-radius: 6px;
+
+      /* actual fuzzy look */
+      filter: blur(0.8px);
+      opacity: 0.85;
+
+      /* soft glow */
+      box-shadow:
+        0 0 4px rgba(0, 0, 0, 0.25),
+        0 0 8px rgba(255, 255, 255, 0.6);
+
+      /* slightly messy text */
+      text-shadow:
+        0 0 1px rgba(0, 0, 0, 0.4),
+        0 0 2px rgba(0, 0, 0, 0.25);
+
+      transition: all 0.2s ease;
     }
 
-    .btn-fuzzy:hover { background: #333; color: #eee; }
+    .btn-fuzzy:hover,
+    .btn-fuzzy:active {
+      filter: blur(0px);
+      opacity: 1;
+    }
+
 
     .legend {
       font-size: 12px;
@@ -90,15 +112,21 @@
     }
 
     @media (min-width: 1081px) {
-      .stores { grid-template-columns: repeat(3, minmax(360px, 1fr)); }
+      .stores {
+        grid-template-columns: repeat(3, minmax(360px, 1fr));
+      }
     }
 
     @media (max-width: 1080px) {
-      .stores { grid-template-columns: repeat(2, minmax(360px, 1fr)); }
+      .stores {
+        grid-template-columns: repeat(2, minmax(360px, 1fr));
+      }
     }
 
     @media (max-width: 740px) {
-      .stores { grid-template-columns: 1fr; }
+      .stores {
+        grid-template-columns: 1fr;
+      }
     }
 
     .store {
@@ -245,7 +273,7 @@
           <div class="search-row">
             <input id="q" placeholder="Card name or code, e.g. DUPO-EN017" value="DUPO-EN017" title="Card name or code"
               autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" autofocus />
-            <input id="limit" type="number" min="1" max="20" value="6" style="width:50px;" title="Results per site" />
+            <input id="limit" type="number" min="1" max="50" value="10" style="width:50px;" title="Results per site" />
           </div>
           <div class="search-row" style="margin-top:4px;">
             <button onclick="search(true)">Exact Search</button>
@@ -347,9 +375,9 @@
               ok: true,
               apiUrl,
               items: matched.map(p => ({
-                title:   p.title + (domain === 'cardspotnz.com' && p.type ? ` (${p.type})` : ''),
-                link:    `https://${domain}/products/${p.handle}`,
-                price:   fmtPrice(p.price_max),
+                title: p.title + (domain === 'cardspotnz.com' && p.type ? ` (${p.type})` : ''),
+                link: `https://${domain}/products/${p.handle}`,
+                price: fmtPrice(p.price_max),
                 soldOut: p.available === false
               }))
             };
@@ -632,18 +660,18 @@
     </div>
   </details>
 
-<!-- Footer placeholder -->
-<div id="footer-container"></div>
-<script>
-  fetch('https://david-fear.github.io/components/footer.html')
-    .then(response => response.text())
-    .then(data => {
-      document.getElementById('footer-container').innerHTML = data;
-    })
-    .catch(error => {
-      console.error('Failed to load footer:', error);
-    });
-</script>
+  <!-- Footer placeholder -->
+  <div id="footer-container"></div>
+  <script>
+    fetch('https://david-fear.github.io/components/footer.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('footer-container').innerHTML = data;
+      })
+      .catch(error => {
+        console.error('Failed to load footer:', error);
+      });
+  </script>
 
 </body>
 
