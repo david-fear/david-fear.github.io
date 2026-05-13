@@ -4,7 +4,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>NZ YGO Card Search</title>
+  <title>NZ Yu-Gi-Oh Card Price Search | Compare YGO Card Prices Across NZ Stores</title>
+  <meta name="description" content="Search Yu-Gi-Oh cards across New Zealand online stores. Compare prices and stock at Card Merchant, Card Spot, TCG Culture, TCG Collector NZ and more NZ TCG shops." />
+  <meta name="keywords" content="Yu-Gi-Oh cards NZ, YGO cards New Zealand, buy yugioh cards NZ, yugioh card prices NZ, TCG cards New Zealand, card merchant NZ, yugioh online store NZ, yugioh price compare NZ" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://david-fear.github.io/personal/yugi-search.html" />
+  <meta property="og:title" content="NZ Yu-Gi-Oh Card Price Search | Compare YGO Prices Across NZ Stores" />
+  <meta property="og:description" content="Search Yu-Gi-Oh cards across New Zealand online stores. Compare prices and stock availability at NZ TCG shops." />
+  <meta property="og:url" content="https://david-fear.github.io/personal/yugi-search.html" />
+  <meta property="og:type" content="website" />
   <link rel="stylesheet" href="https://david-fear.github.io/stylesheet.css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" />
   <style>
@@ -271,13 +279,22 @@
         <div class="search-inputs-wrap">
           <h2>NZ Yu-Gi-Oh Card Search</h2>
           <div class="search-row">
-            <input id="q" placeholder="Card name or code, e.g. DUPO-EN017" value="DUPO-EN017" title="Card name or code"
+            <input id="q" placeholder="Card name or code, e.g. DUPO-EN017" value="" title="Card name or code"
               autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" autofocus />
             <input id="limit" type="number" min="1" max="50" value="10" style="width:50px;" title="Results per site" />
           </div>
           <div class="search-row" style="margin-top:4px;">
             <button onclick="search(true)">Exact Search</button>
             <button class="btn-fuzzy" onclick="search(false)">Fuzzy Search</button>
+          </div>
+          <div class="search-row" style="margin-top:6px; font-size:11px; color:#888;">
+            e.g.
+            <a href="#" onclick="document.getElementById('q').value='DUPO-EN017'; search(true); return false;">DUPO-EN017</a>,
+            <a href="#" onclick="document.getElementById('q').value='ash blossom quarter'; search(true); return false;">ash blossom quarter</a>,
+            <a href="#" onclick="document.getElementById('q').value='structure deck'; search(true); return false;">structure deck</a>,
+            <a href="#" onclick="document.getElementById('q').value='red eyes ghost'; search(true); return false;">red eyes ghost</a>,
+            <a href="#" onclick="document.getElementById('q').value='GFP2 ghost'; search(true); return false;">GFP2 ghost</a>,
+            <a href="#" onclick="document.getElementById('q').value='chocolate magician gold'; search(true); return false;">Chocolate Magician Gold</a>
           </div>
         </div>
         <div class="legend">
@@ -298,20 +315,20 @@
     const STORES = [
       // ── Shopify (live API results) ───────────────────────────
       { d: "cardspotnz.com", note: "card name search only" },
+      { d: "tcgcollectornz.com" },
+      { d: "tcgculture.com" },
       { d: "cardmerchant.co.nz" },
       { d: "cardmerchanthamilton.co.nz" },
       { d: "www.cardmerchanttakapuna.co.nz" },
       { d: "cardmerchantchristchurch.co.nz" },
       { d: "cardmerchantnelson.co.nz" },
       { d: "www.cardmerchantwhangarei.co.nz" },
-      { d: "tcgcollectornz.com" },
-      { d: "tcgculture.com" },
-      { d: "thegametree.co.nz" },
-      { d: "cardmasters.co.nz" },
       { d: "cardbard.co.nz" },
       { d: "spellboundgames.co.nz" },
       { d: "otakumart.co.nz" },
       { d: "valkyrie-games-nz.myshopify.com" },
+      { d: "cardmasters.co.nz" },
+      { d: "thegametree.co.nz" },
       // ── Link-only (non-Shopify — opens search page) ──────────
       { d: "hobbymaster.co.nz", link: q => `https://hobbymaster.co.nz/search?search=${encodeURIComponent(q)}` },
       { d: "gamersrevelationtcg.co.nz", link: q => `https://gamersrevelationtcg.co.nz/search.php?search_query=${encodeURIComponent(q)}` },
@@ -423,7 +440,7 @@
 
       const shopifyStores = STORES.filter(s => !s.link);
       const limit = Math.max(1, Math.min(20, parseInt(document.getElementById('limit').value) || 10));
-      document.getElementById('query').textContent = (exact ? 'Exact search: ' : 'Fuzzy search: ') + q;
+      document.getElementById('query').innerHTML = (exact ? 'Exact search: ' : 'Fuzzy search: ') + '<b>' + esc(q) + '</b>';
       document.getElementById('status').textContent = `Querying ${shopifyStores.length} Shopify stores + ${STORES.length - shopifyStores.length} link-only…`;
 
       const resultsEl = document.getElementById('results');
