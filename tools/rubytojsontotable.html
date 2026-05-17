@@ -3,144 +3,86 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ruby Hash → JSON → HTML Tables / CSV</title>
+<title>Ruby Hash → JSON → Tables / CSV (FIXED)</title>
 
 <link rel="stylesheet" href="https://david-fear.github.io/stylesheet.css" />
 
 <style>
-  body {
-    font-family: Arial, sans-serif;
-  }
+body {
+  font-family: Arial, sans-serif;
+}
 
-  textarea {
-    width: 100%;
-    box-sizing: border-box;
-    font-family: monospace;
-    margin-bottom: 10px;
-    font-size: 0.8em;
-  }
+textarea {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: monospace;
+  margin-bottom: 10px;
+  font-size: 0.8em;
+}
 
-  #inputBox {
-    height: 120px;
-  }
+#inputBox { height: 140px; }
+#outputBox { height: 220px; }
+#csvBox { height: 220px; }
 
-  #outputBox {
-    height: 250px;
-  }
+#tableBox {
+  height: 500px;
+  overflow: auto;
+  border: 1px solid #ccc;
+  padding: 5px;
+  font-family: monospace;
+  font-size: 0.8em;
+}
 
-  #csvBox {
-    height: 250px;
-  }
+button {
+  padding: 8px 14px;
+  margin-right: 6px;
+  margin-bottom: 10px;
+}
 
-  #tableBox {
-    height: 500px;
-    overflow: auto;
-    border: 1px solid #ccc;
-    padding: 5px;
-    font-family: monospace;
-    font-size: 0.8em;
-    margin-bottom: 20px;
-  }
+table {
+  border-collapse: collapse;
+}
 
-  button {
-    padding: 8px 16px;
-    font-size: 14px;
-    margin-right: 5px;
-    margin-bottom: 10px;
-    cursor: pointer;
-  }
+table, th, td {
+  border: 1px solid #999;
+}
 
-  table {
-    border-collapse: collapse;
-    margin: 2px 0;
-  }
+th, td {
+  padding: 3px 5px;
+  text-align: left;
+  vertical-align: top;
+}
 
-  table, th, td {
-    border: 1px solid #999;
-  }
-
-  th, td {
-    padding: 2px 4px;
-    text-align: left;
-    vertical-align: top;
-  }
-
-  h2, h3 {
-    margin-top: 15px;
-  }
-
-  .controls {
-    margin-bottom: 15px;
-  }
-
-  label {
-    margin-right: 10px;
-    font-size: 0.9em;
-  }
-
-  select {
-    padding: 4px;
-  }
+.controls { margin-bottom: 10px; }
 </style>
 </head>
 
 <body>
-<!-- Dynamic sidebar menu START - right after BODY tag -->
+
+<!-- MENU -->
 <div id="menu-container"></div>
 <script>
-  fetch('https://david-fear.github.io/components/menu.html')
-    .then(response => response.text())
-    .then(data => {
-      const container = document.getElementById('menu-container');
-      container.innerHTML = data;
-
-      // Now attach event listeners because the elements exist
-      const toggle = document.getElementById('menu-toggle');
-      const menu = document.getElementById('menu-nav');
-
-      toggle.addEventListener('click', () => {
-        const expanded = toggle.getAttribute('aria-expanded') === 'true';
-        toggle.setAttribute('aria-expanded', String(!expanded));
-        if (menu.hasAttribute('hidden')) {
-          menu.removeAttribute('hidden');
-        } else {
-          menu.setAttribute('hidden', '');
-        }
-      });
-
-      toggle.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          toggle.click();
-        }
-      });
-    })
-    .catch(e => console.error('Failed to load menu:', e));
+fetch('https://david-fear.github.io/components/menu.html')
+  .then(r => r.text())
+  .then(html => {
+    document.getElementById('menu-container').innerHTML = html;
+  });
 </script>
-<!-- Dynamic sidebar menu END -->
 
 <h2>Ruby Hash → JSON → HTML Tables / CSV</h2>
 
-<textarea id="inputBox"
-placeholder="Paste your Ruby hash here..."></textarea>
+<textarea id="inputBox" placeholder="Paste Ruby hash here..."></textarea>
 
-<div class="controls">
-  <button onclick="convertRubyHash()">
-    Convert Ruby → JSON
-  </button>
-</div>
+<button onclick="convertRubyHash()">Convert Ruby → JSON</button>
 
 <h3>JSON Output</h3>
-
-<textarea id="outputBox"
-placeholder="Converted JSON will appear here..."></textarea>
+<textarea id="outputBox"></textarea>
 
 <div class="controls">
-
   <label>
     CSV Header Layer:
     <select id="headerLayer">
-      <option value="0">0 (top level)</option>
+      <option value="0">0</option>
       <option value="1">1</option>
       <option value="2">2</option>
       <option value="3">3</option>
@@ -148,383 +90,319 @@ placeholder="Converted JSON will appear here..."></textarea>
     </select>
   </label>
 
-  <button onclick="convertJSONtoTables()">
-    Convert JSON → HTML Tables
-  </button>
-
-  <button onclick="convertJSONtoCSV()">
-    Convert JSON → CSV
-  </button>
-
-  <button onclick="downloadCSV()">
-    Download CSV
-  </button>
-
+  <button onclick="convertJSONtoTables()">JSON → Tables</button>
+  <button onclick="convertJSONtoCSV()">JSON → CSV</button>
+  <button onclick="downloadCSV()">Download CSV</button>
 </div>
 
 <h3>HTML Tables</h3>
-
 <div id="tableBox"></div>
 
 <h3>CSV Output</h3>
+<textarea id="csvBox"></textarea>
 
-<textarea id="csvBox"
-placeholder="CSV output will appear here..."></textarea>
+<!-- FOOTER -->
+<div id="footer-container"></div>
+<script>
+fetch('https://david-fear.github.io/components/footer.html')
+  .then(r => r.text())
+  .then(html => {
+    document.getElementById('footer-container').innerHTML = html;
+  });
+</script>
 
 <script>
 
-// 1️⃣ Convert Ruby Hash → JSON
+/* =========================================================
+   1. RUBY → JSON (ROBUST TOKEN PARSER)
+========================================================= */
+
 function convertRubyHash() {
 
-  let rubyStr =
-    document.getElementById('inputBox').value;
+  const input = document.getElementById('inputBox').value;
 
   try {
 
-    let jsonStr =
-      rubyStr.replace(/=>/g, ':');
-
-    jsonStr =
-      jsonStr.replace(/\bnil\b/g, 'null');
-
-    jsonStr =
-      jsonStr.replace(
-        /'((?:\\'|[^'])*)'/g,
-        function(match, p1) {
-          return `"${p1.replace(/"/g, '\\"')}"`;
-        }
-      );
-
-    jsonStr =
-      jsonStr.replace(/,(\s*[}\]])/g, '$1');
-
-    let parsed =
-      JSON.parse(jsonStr);
+    const tokens = tokenize(input);
+    const [obj] = parseValue(tokens, 0);
 
     document.getElementById('outputBox').value =
-      JSON.stringify(parsed, null, 2);
+      JSON.stringify(obj, null, 2);
 
-  } catch (err) {
-
+  } catch (e) {
     document.getElementById('outputBox').value =
-      'ERROR: Invalid Ruby hash or parsing issue:\n\n' + err;
+      "ERROR: " + e.message;
   }
 }
 
-// 2️⃣ Convert JSON → HTML Tables
+/* ---------------- TOKENISER ---------------- */
+
+function tokenize(str) {
+
+  let tokens = [];
+  let i = 0;
+
+  while (i < str.length) {
+
+    let c = str[i];
+
+    if (/\s/.test(c)) { i++; continue; }
+
+    if (str.substr(i, 2) === "=>") {
+      tokens.push({ type: "ARROW" });
+      i += 2;
+      continue;
+    }
+
+    if ("{},[]:".includes(c)) {
+      tokens.push({ type: c });
+      i++;
+      continue;
+    }
+
+    // string
+    if (c === '"') {
+
+      let j = i + 1;
+      let val = "";
+
+      while (j < str.length) {
+        let ch = str[j];
+        if (ch === '"') break;
+        if (ch === '\n' || ch === '\r') val += ' ';
+        else val += ch;
+        j++;
+      }
+
+      tokens.push({ type: "STRING", value: val });
+      i = j + 1;
+      continue;
+    }
+
+    // literal
+    let j = i;
+    let val = "";
+
+    while (j < str.length &&
+      !/\s/.test(str[j]) &&
+      !"{},[]:".includes(str[j])) {
+      val += str[j];
+      j++;
+    }
+
+    if (val === "nil") val = null;
+
+    tokens.push({ type: "LITERAL", value: val });
+    i = j;
+  }
+
+  return tokens;
+}
+
+/* ---------------- PARSER ---------------- */
+
+function parseValue(tokens, i) {
+
+  const t = tokens[i];
+
+  if (!t) throw new Error("Unexpected end");
+
+  if (t.type === "{") {
+
+    let obj = {};
+    i++;
+
+    while (tokens[i] && tokens[i].type !== "}") {
+
+      let key = tokens[i].value;
+      i++;
+
+      if (tokens[i] && tokens[i].type === "ARROW") i++;
+
+      let [val, ni] = parseValue(tokens, i);
+      obj[key] = val;
+      i = ni;
+
+      if (tokens[i] && tokens[i].type === ",") i++;
+    }
+
+    return [obj, i + 1];
+  }
+
+  if (t.type === "[") {
+
+    let arr = [];
+    i++;
+
+    while (tokens[i] && tokens[i].type !== "]") {
+
+      let [val, ni] = parseValue(tokens, i);
+      arr.push(val);
+      i = ni;
+
+      if (tokens[i] && tokens[i].type === ",") i++;
+    }
+
+    return [arr, i + 1];
+  }
+
+  if (t.type === "STRING") return [t.value, i + 1];
+
+  return [t.value, i + 1];
+}
+
+/* =========================================================
+   2. JSON → TABLES
+========================================================= */
+
 function convertJSONtoTables() {
 
-  let jsonText =
-    document.getElementById('outputBox').value;
-
-  if (!jsonText) {
-    alert('No JSON to convert!');
-    return;
-  }
-
   try {
 
-    let obj =
-      JSON.parse(jsonText);
+    const obj = JSON.parse(document.getElementById('outputBox').value);
+    document.getElementById('tableBox').innerHTML = jsonToTable(obj);
 
-    let html =
-      jsonToTable(obj);
-
-    document.getElementById('tableBox').innerHTML =
-      html;
-
-  } catch (err) {
-
-    document.getElementById('tableBox').innerHTML =
-      'ERROR: Invalid JSON:\n\n' + err;
+  } catch (e) {
+    document.getElementById('tableBox').innerHTML = "ERROR: " + e.message;
   }
 }
 
-// Recursive JSON → HTML table
 function jsonToTable(obj) {
 
   if (Array.isArray(obj)) {
+    return `<table>` +
+      obj.map(i => `<tr><td>${jsonToTable(i)}</td></tr>`).join('') +
+      `</table>`;
+  }
 
-    let rows =
-      obj.map(item =>
-        `<tr><td>${jsonToTable(item)}</td></tr>`
-      ).join('');
+  if (obj && typeof obj === 'object') {
 
-    return `<table>${rows}</table>`;
+    let rows = "";
 
-  } else if (
-    obj !== null &&
-    typeof obj === 'object'
-  ) {
-
-    let rows = '';
-
-    for (let key in obj) {
-
-      rows += `
-        <tr>
-          <th>${escapeHTML(key)}</th>
-          <td>${jsonToTable(obj[key])}</td>
-        </tr>
-      `;
+    for (let k in obj) {
+      rows += `<tr><th>${k}</th><td>${jsonToTable(obj[k])}</td></tr>`;
     }
 
     return `<table>${rows}</table>`;
-
-  } else {
-
-    return obj === null
-      ? 'null'
-      : escapeHTML(String(obj));
   }
+
+  return obj === null ? "null" : String(obj);
 }
 
-// 3️⃣ Get nested object at layer
-function getLayerObject(obj, targetLayer, currentLayer = 0) {
+/* =========================================================
+   3. LAYER EXTRACTOR
+========================================================= */
 
-  if (currentLayer >= targetLayer) {
-    return obj;
-  }
+function getLayerObject(obj, level, current = 0) {
+
+  if (current >= level) return obj;
 
   if (Array.isArray(obj)) {
-
-    return obj.flatMap(item =>
-      getLayerObject(
-        item,
-        targetLayer,
-        currentLayer + 1
-      )
+    return obj.flatMap(i =>
+      getLayerObject(i, level, current + 1)
     );
   }
 
-  if (
-    obj !== null &&
-    typeof obj === 'object'
-  ) {
+  if (obj && typeof obj === 'object') {
 
-    let results = [];
+    let out = [];
 
-    for (let key in obj) {
-
-      results.push(
-        getLayerObject(
-          obj[key],
-          targetLayer,
-          currentLayer + 1
-        )
-      );
+    for (let k in obj) {
+      out.push(getLayerObject(obj[k], level, current + 1));
     }
 
-    return results.flat();
+    return out.flat();
   }
 
   return [];
 }
 
-// 4️⃣ Flatten object
-function flattenObject(
-  obj,
-  prefix = '',
-  result = {}
-) {
+/* =========================================================
+   4. FLATTEN
+========================================================= */
 
-  for (let key in obj) {
+function flattenObject(obj, prefix = "", out = {}) {
 
-    let value = obj[key];
+  for (let k in obj) {
 
-    let newKey =
-      prefix
-        ? `${prefix}.${key}`
-        : key;
+    let v = obj[k];
+    let key = prefix ? `${prefix}.${k}` : k;
 
-    if (Array.isArray(value)) {
-
-      result[newKey] =
-        JSON.stringify(value);
-
-    } else if (
-      value !== null &&
-      typeof value === 'object'
-    ) {
-
-      flattenObject(
-        value,
-        newKey,
-        result
-      );
-
-    } else {
-
-      result[newKey] = value;
+    if (Array.isArray(v)) {
+      out[key] = JSON.stringify(v);
+    }
+    else if (v && typeof v === 'object') {
+      flattenObject(v, key, out);
+    }
+    else {
+      out[key] = v;
     }
   }
 
-  return result;
+  return out;
 }
 
-// 5️⃣ Convert JSON → CSV
+/* =========================================================
+   5. JSON → CSV (WITH LEVEL SUPPORT)
+========================================================= */
+
 function convertJSONtoCSV() {
-
-  let jsonText =
-    document.getElementById('outputBox').value;
-
-  if (!jsonText) {
-    alert('No JSON to convert!');
-    return;
-  }
 
   try {
 
-    let data =
-      JSON.parse(jsonText);
+    let data = JSON.parse(document.getElementById('outputBox').value);
+    let level = parseInt(document.getElementById('headerLayer').value);
 
-    let layer =
-      parseInt(
-        document.getElementById('headerLayer').value
-      );
-
-    // Get data from selected layer
-    if (layer > 0) {
-
-      data =
-        getLayerObject(data, layer);
-
-      // remove non-objects
-      data =
-        data.filter(item =>
-          item &&
-          typeof item === 'object' &&
-          !Array.isArray(item)
-        );
+    if (level > 0) {
+      data = getLayerObject(data, level);
+      data = data.filter(x => x && typeof x === 'object');
     }
 
-    // force array
-    if (!Array.isArray(data)) {
-      data = [data];
+    if (!Array.isArray(data)) data = [data];
+
+    let flat = data.map(flattenObject);
+
+    let headers = [...new Set(flat.flatMap(o => Object.keys(o)))];
+
+    let csv = [headers.join(',')];
+
+    for (let row of flat) {
+      csv.push(headers.map(h => {
+        let v = row[h] ?? "";
+        v = String(v).replace(/"/g, '""');
+        return (v.includes(',') || v.includes('\n'))
+          ? `"${v}"`
+          : v;
+      }).join(','));
     }
 
-    let flatRows =
-      data.map(row =>
-        flattenObject(row)
-      );
+    document.getElementById('csvBox').value = csv.join('\n');
 
-    let headers =
-      [...new Set(
-        flatRows.flatMap(row =>
-          Object.keys(row)
-        )
-      )];
-
-    let csv = [];
-
-    // Header row
-    csv.push(headers.join(','));
-
-    // Data rows
-    for (let row of flatRows) {
-
-      let values =
-        headers.map(header => {
-
-          let val = row[header];
-
-          if (
-            val === null ||
-            val === undefined
-          ) {
-            return '';
-          }
-
-          val = String(val);
-
-          val =
-            val.replace(/"/g, '""');
-
-          if (
-            val.includes(',') ||
-            val.includes('"') ||
-            val.includes('\n')
-          ) {
-            val = `"${val}"`;
-          }
-
-          return val;
-        });
-
-      csv.push(values.join(','));
-    }
-
-    document.getElementById('csvBox').value =
-      csv.join('\n');
-
-  } catch (err) {
-
-    document.getElementById('csvBox').value =
-      'ERROR: Invalid JSON:\n\n' + err;
+  } catch (e) {
+    document.getElementById('csvBox').value = "ERROR: " + e.message;
   }
 }
 
-// 6️⃣ Download CSV
+/* =========================================================
+   6. DOWNLOAD CSV
+========================================================= */
+
 function downloadCSV() {
 
-  let csvContent =
-    document.getElementById('csvBox').value;
+  let csv = document.getElementById('csvBox').value;
+  if (!csv) return alert("No CSV");
 
-  if (!csvContent) {
-    alert('No CSV data!');
-    return;
-  }
+  let blob = new Blob([csv], { type: "text/csv" });
+  let url = URL.createObjectURL(blob);
 
-  let blob =
-    new Blob(
-      [csvContent],
-      {
-        type: 'text/csv;charset=utf-8;'
-      }
-    );
-
-  let link =
-    document.createElement('a');
-
-  let url =
-    URL.createObjectURL(blob);
-
-  link.setAttribute('href', url);
-
-  link.setAttribute(
-    'download',
-    'output.csv'
-  );
-
-  document.body.appendChild(link);
-
-  link.click();
-
-  document.body.removeChild(link);
+  let a = document.createElement('a');
+  a.href = url;
+  a.download = "output.csv";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }
 
-// 7️⃣ Escape HTML
-function escapeHTML(str) {
-
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-}
-
-</script>
-
-<!-- Footer placeholder -->
-<div id="footer-container"></div>
-<script>
-  fetch('https://david-fear.github.io/components/footer.html')
-    .then(response => response.text())
-    .then(data => {
-      document.getElementById('footer-container').innerHTML = data;
-    })
-    .catch(error => {
-      console.error('Failed to load footer:', error);
-    });
 </script>
 
 </body>
