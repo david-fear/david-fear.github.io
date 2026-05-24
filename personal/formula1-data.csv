@@ -1,23 +1,23 @@
-driver,constructor,AUS,CHN-S,CHN,JPN,MIA-S,MIA,CAN-S
-Antonelli,Mercedes,18,4,25,25,3,25,6
-Russell,Mercedes,25,8,18,12,5,12,8
-Leclerc,Ferrari,15,7,12,15,6,4,4
-Norris,McLaren,10,5,0,10,8,18,7
-Hamilton,Ferrari,12,6,15,8,2,8,3
-Piastri,McLaren,0,3,0,18,7,15,5
-Verstappen,Red Bull,8,0,0,4,4,10,2
-Bearman,Haas,6,1,10,0,0,0,0
-Gasly,Alpine,1,0,8,6,1,0,0
-Lawson,Racing Bulls,0,2,6,2,0,0,0
-Colapinto,Alpine,0,0,1,0,0,6,0
-Lindblad,Racing Bulls,4,0,0,0,0,0,1
-Hadjar,Red Bull,0,0,4,0,0,0,0
-Bortoleto,Audi,2,0,2,0,0,0,0
-Sainz,Williams,0,0,0,0,0,2,0
-Ocon,Haas,0,0,0,1,0,0,0
-Albon,Williams,0,0,0,0,0,1,0
-Hulkenberg,Audi,0,0,0,0,0,0,0
-Bottas,Cadillac,0,0,0,0,0,0,0
-Perez,Cadillac,0,0,0,0,0,0,0
-Alonso,Aston Martin,0,0,0,0,0,0,0
-Stroll,Aston Martin,0,0,0,0,0,0,0
+driver,constructor,AUS,CHN-S,CHN,JPN,MIA-S,MIA,CAN-S,CAN
+Antonelli,Mercedes,18,4,25,25,3,25,6,25
+Russell,Mercedes,25,8,18,12,5,12,8,0
+Leclerc,Ferrari,15,7,12,15,6,4,4,12
+Norris,McLaren,10,5,0,10,8,18,7,0
+Hamilton,Ferrari,12,6,15,8,2,8,3,18
+Piastri,McLaren,0,3,0,18,7,15,5,0
+Verstappen,Red Bull,8,0,0,4,4,10,2,15
+Bearman,Haas,6,1,10,0,0,0,0,1
+Gasly,Alpine,1,0,8,6,1,0,0,4
+Lawson,Racing Bulls,0,2,6,2,0,0,0,6
+Colapinto,Alpine,0,0,1,0,0,6,0,8
+Lindblad,Racing Bulls,4,0,0,0,0,0,1,0
+Hadjar,Red Bull,0,0,4,0,0,0,0,10
+Bortoleto,Audi,2,0,2,0,0,0,0,0
+Sainz,Williams,0,0,0,0,0,2,0,2
+Ocon,Haas,0,0,0,1,0,0,0,0
+Albon,Williams,0,0,0,0,0,1,0,0
+Hulkenberg,Audi,0,0,0,0,0,0,0,0
+Bottas,Cadillac,0,0,0,0,0,0,0,0
+Perez,Cadillac,0,0,0,0,0,0,0,0
+Alonso,Aston Martin,0,0,0,0,0,0,0,0
+Stroll,Aston Martin,0,0,0,0,0,0,0,0
