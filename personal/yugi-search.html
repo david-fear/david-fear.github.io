@@ -474,7 +474,7 @@
           let link = titleEl ? titleEl.getAttribute('href') : fallback;
           if (link && !link.startsWith('http')) link = `https://${domain}${link}`;
           try { const u = new URL(link); u.searchParams.delete('searchid'); u.searchParams.delete('search_query'); link = u.toString(); } catch {}
-          const priceEl = card.querySelector('[data-product-price-without-tax], .price--main, .price');
+          const priceEl = card.querySelector('[data-product-price-with-tax], [data-product-price-without-tax], .price--withTax, .price--main, .price');
           const price = priceEl ? priceEl.textContent.trim() : '';
           const soldOut = !!card.querySelector('.button--soldOut, [data-button-state="soldOut"]');
           return { title, link, price, soldOut };
