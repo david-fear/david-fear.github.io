@@ -406,39 +406,43 @@
       }
     }
 
-    /* Query hobbymaster.co.nz via HTML scrape — card singles only (div.item.card-cart) */
+    /* Query hobbymaster.co.nz in-stock YGO singles via jqGrid JSON endpoint
+       cell: [0]=name, [1]=set, [8]=rarity, [9]=condition, [10]=price, [12]=qty, id=card ID
+       All rows returned by this endpoint are in-stock. */
     async function searchHobbymaster(store, query, limit, exact) {
       const domain = 'hobbymaster.co.nz';
-      const searchUrl = `https://${domain}/search?search=${encodeURIComponent(query)}`;
+      const fallback = `https://${domain}/search?search=${encodeURIComponent(query)}`;
+      const rows = Math.min(limit * 5, 100);
+      const apiUrl = `https://${domain}/cards/get-cards?lang=&game=3&foil=&_search=true&nd=${Date.now()}&rows=${rows}&page=1&sidx=price&sord=asc&searchField=name&searchString=${encodeURIComponent(query)}&searchOper=cn`;
       const ctrl = new AbortController();
       const tid = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
       try {
-        const proxied = PROXY + encodeURIComponent(searchUrl);
+        const proxied = PROXY + encodeURIComponent(apiUrl);
         const resp = await fetch(proxied, { signal: ctrl.signal });
         clearTimeout(tid);
         if (!resp.ok) throw new Error(resp.status);
-        const html = await resp.text();
-        const doc = new DOMParser().parseFromString(html, 'text/html');
-        const cards = [...doc.querySelectorAll('div.item.card-cart')];
-        if (!cards.length) return { ok: false, reason: 'empty', href: searchUrl };
+        const data = await resp.json();
+        const rawRows = data?.rows;
+        if (!rawRows?.length) return { ok: false, reason: 'empty', href: fallback, apiUrl };
         const matched = exact
-          ? cards.filter(c => matchesQuery({ title: c.dataset.name || '', handle: '' }, query))
-          : cards;
-        if (!matched.length) return { ok: false, reason: 'empty', href: searchUrl };
-        const items = matched.slice(0, limit).map(card => {
-          const title = card.dataset.name || '';
-          const linkEl = card.querySelector('.image a');
-          const link = linkEl ? `https://${domain}${linkEl.getAttribute('href')}` : searchUrl;
-          const priceEl = card.querySelector('span.price-new');
-          const price = priceEl ? priceEl.textContent.trim() : '';
-          const stockEl = card.querySelector('.stock');
-          const soldOut = !!stockEl && /out of stock/i.test(stockEl.textContent);
-          return { title, link, price, soldOut };
+          ? rawRows.filter(r => matchesQuery({ title: r.cell[0] || '', handle: '' }, query))
+          : rawRows;
+        if (!matched.length) return { ok: false, reason: 'empty', href: fallback, apiUrl };
+        const items = matched.slice(0, limit).map(r => {
+          const c = r.cell;
+          const name = c[0] || '';
+          const rarity = c[8] || '';
+          return {
+            title: rarity ? `${name} (${rarity})` : name,
+            link: `https://${domain}/cards/card/${r.id}`,
+            price: c[10] || '',
+            soldOut: false  // endpoint only returns in-stock items
+          };
         });
-        return { ok: true, items };
+        return { ok: true, items, apiUrl };
       } catch (e) {
         clearTimeout(tid);
-        return { ok: false, reason: e.name === 'AbortError' ? 'timeout' : 'unavailable', href: searchUrl };
+        return { ok: false, reason: e.name === 'AbortError' ? 'timeout' : 'unavailable', href: fallback, apiUrl };
       }
     }
 
