@@ -333,7 +333,7 @@
       { d: "hobbymaster.co.nz", link: q => `https://hobbymaster.co.nz/search?search=${encodeURIComponent(q)}` },
       { d: "gamersrevelationtcg.co.nz", link: q => `https://gamersrevelationtcg.co.nz/search.php?search_query=${encodeURIComponent(q)}` },
       { d: "cardtopia.co.nz", link: q => `https://www.cardtopia.co.nz/?s=${encodeURIComponent(q)}&post_type=product&type_aws=true` },
-      { d: "trademe.co.nz", scraper: searchTrademe },
+      { d: "trademe.co.nz", link: q => `https://www.trademe.co.nz/a/search?search_string=${encodeURIComponent(q)}` },
       { d: "vagabond.co.nz", link: q => `https://vagabond.co.nz/search.php?search_query=${encodeURIComponent(q)}&section=product` },
       { d: "iconix-comics-games.co.nz", link: q => `https://www.iconix-comics-games.co.nz/?q=${encodeURIComponent(q)}` },
     ];
@@ -406,62 +406,6 @@
       }
     }
 
-    /* Query TradeMe trading cards category via HTML scrape of __NEXT_DATA__ */
-    async function searchTrademe(store, query, limit) {
-      const searchUrl = `https://www.trademe.co.nz/a/marketplace/gaming/trading-cards/search?search_string=${encodeURIComponent(query)}`;
-      const fallback = searchUrl;
-      try {
-        const ctrl = new AbortController();
-        const tid = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
-        const proxied = PROXY + encodeURIComponent(searchUrl);
-        const response = await fetch(proxied, { signal: ctrl.signal });
-        clearTimeout(tid);
-        if (!response.ok) throw new Error(response.status);
-        const html = await response.text();
-
-        // TradeMe is a Next.js app — results are embedded in __NEXT_DATA__
-        const match = html.match(/<script id="__NEXT_DATA__" type="application\/json">([\s\S]*?)<\/script>/);
-        if (!match) throw new Error('no __NEXT_DATA__');
-        const nextData = JSON.parse(match[1]);
-
-        // Recursively locate the entities object (items keyed by listingId)
-        function findEntities(obj, depth) {
-          if (depth > 12 || !obj || typeof obj !== 'object' || Array.isArray(obj)) return null;
-          if (obj.entities && typeof obj.entities === 'object' && !Array.isArray(obj.entities)) {
-            const vals = Object.values(obj.entities);
-            if (vals.length > 0 && vals[0]?.item?.title) return obj.entities;
-          }
-          for (const val of Object.values(obj)) {
-            const found = findEntities(val, depth + 1);
-            if (found) return found;
-          }
-          return null;
-        }
-
-        const entities = findEntities(nextData, 0);
-        if (!entities) return { ok: false, reason: 'empty', href: fallback, apiUrl: searchUrl };
-
-        const items = Object.values(entities)
-          .filter(e => e?.item?.title)
-          .slice(0, limit)
-          .map(e => {
-            const item = e.item;
-            const price = item.buyNowPrice ? '$' + Number(item.buyNowPrice).toFixed(2) : '';
-            return {
-              title: item.title,
-              link: 'https://www.trademe.co.nz' + item.canonicalPath,
-              price: (price && item.isNew) ? '* ' + price : price,
-              soldOut: false
-            };
-          });
-
-        if (!items.length) return { ok: false, reason: 'empty', href: fallback, apiUrl: searchUrl };
-        return { ok: true, items, apiUrl: searchUrl };
-      } catch (e) {
-        return { ok: false, reason: e.name === 'AbortError' ? 'timeout' : 'unavailable', href: fallback, apiUrl: searchUrl };
-      }
-    }
-
     /* Build the HTML for one store card */
     function renderStore(store, result, query) {
       const domain = store.d;
@@ -494,10 +438,10 @@
       const q = document.getElementById('q').value.trim();
       if (!q) return;
 
-      const fetchStores = STORES.filter(s => !s.link);
+      const shopifyStores = STORES.filter(s => !s.link);
       const limit = Math.max(1, Math.min(20, parseInt(document.getElementById('limit').value) || 10));
       document.getElementById('query').innerHTML = (exact ? 'Exact search: ' : 'Fuzzy search: ') + '<b>' + esc(q) + '</b>';
-      document.getElementById('status').textContent = `Querying ${fetchStores.length} stores + ${STORES.length - fetchStores.length} link-only…`;
+      document.getElementById('status').textContent = `Querying ${shopifyStores.length} Shopify stores + ${STORES.length - shopifyStores.length} link-only…`;
 
       const resultsEl = document.getElementById('results');
       resultsEl.innerHTML = '';
@@ -519,7 +463,7 @@
       let done = 0;
       const promises = STORES.map((store, i) => {
         if (store.link) return Promise.resolve();
-        return (store.scraper ? store.scraper(store, q, limit) : searchStore(store, q, limit, exact)).then(result => {
+        return searchStore(store, q, limit, exact).then(result => {
           const fresh = document.createElement('div');
           fresh.className = 'store';
           fresh.innerHTML = renderStore(store, result, q)
@@ -527,7 +471,7 @@
           slots[i].replaceWith(fresh);
           slots[i] = fresh;
           done++;
-          document.getElementById('status').textContent = `${done} / ${fetchStores.length} done`;
+          document.getElementById('status').textContent = `${done} / ${shopifyStores.length} Shopify done`;
         });
       });
 
