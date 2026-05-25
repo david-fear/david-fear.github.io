@@ -412,8 +412,8 @@
     async function searchHobbymaster(store, query, limit, exact) {
       const domain = 'hobbymaster.co.nz';
       const fallback = `https://${domain}/search?search=${encodeURIComponent(query)}`;
-      const rows = Math.min(limit * 5, 100);
-      const apiUrl = `https://${domain}/cards/get-cards?lang=&game=3&foil=&_search=true&nd=${Date.now()}&rows=${rows}&page=1&sidx=price&sord=asc&searchField=name&searchString=${encodeURIComponent(query)}&searchOper=cn`;
+      const rows = 99999
+      const apiUrl = `https://${domain}/cards/get-cards?lang=&game=3&foil=&_search=false&nd=${Date.now()}&rows=${rows}&page=1&sidx=price&sord=asc&searchField=name&searchString=${encodeURIComponent(query)}&searchOper=cn`;
       const ctrl = new AbortController();
       const tid = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
       try {
