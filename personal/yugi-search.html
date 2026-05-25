@@ -331,7 +331,7 @@
       { d: "thegametree.co.nz" },
       // ── Link-only (non-Shopify — opens search page) ──────────
       { d: "hobbymaster.co.nz", scraper: searchHobbymaster },
-      { d: "gamersrevelationtcg.co.nz", link: q => `https://gamersrevelationtcg.co.nz/search.php?search_query=${encodeURIComponent(q)}` },
+      { d: "gamersrevelationtcg.co.nz", scraper: searchGamersRevelation },
       { d: "cardtopia.co.nz", link: q => `https://www.cardtopia.co.nz/?s=${encodeURIComponent(q)}&post_type=product&type_aws=true` },
       { d: "trademe.co.nz", link: q => `https://www.trademe.co.nz/a/marketplace/gaming/trading-cards/search?search_string=${encodeURIComponent(q)}` },
       { d: "vagabond.co.nz", link: q => `https://vagabond.co.nz/search.php?search_query=${encodeURIComponent(q)}&section=product` },
@@ -443,6 +443,46 @@
       } catch (e) {
         clearTimeout(tid);
         return { ok: false, reason: e.name === 'AbortError' ? 'timeout' : 'unavailable', href: fallback, apiUrl };
+      }
+    }
+
+    /* Query gamersrevelationtcg.co.nz via BigCommerce HTML scrape */
+    async function searchGamersRevelation(store, query, limit, exact) {
+      const domain = 'gamersrevelationtcg.co.nz';
+      const fallback = `https://${domain}/search.php?search_query=${encodeURIComponent(query)}`;
+      const ctrl = new AbortController();
+      const tid = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+      try {
+        const proxied = PROXY + encodeURIComponent(fallback);
+        const resp = await fetch(proxied, { signal: ctrl.signal });
+        clearTimeout(tid);
+        if (!resp.ok) throw new Error(resp.status);
+        const html = await resp.text();
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const cards = [...doc.querySelectorAll('article.card')];
+        if (!cards.length) return { ok: false, reason: 'empty', href: fallback };
+        const matched = exact
+          ? cards.filter(c => {
+              const a = c.querySelector('.card-title a, h4 a');
+              return a && matchesQuery({ title: a.textContent.trim(), handle: '' }, query);
+            })
+          : cards;
+        if (!matched.length) return { ok: false, reason: 'empty', href: fallback };
+        const items = matched.slice(0, limit).map(card => {
+          const titleEl = card.querySelector('.card-title a, h4 a');
+          const title = titleEl ? titleEl.textContent.trim() : '';
+          let link = titleEl ? titleEl.getAttribute('href') : fallback;
+          if (link && !link.startsWith('http')) link = `https://${domain}${link}`;
+          try { const u = new URL(link); u.searchParams.delete('searchid'); u.searchParams.delete('search_query'); link = u.toString(); } catch {}
+          const priceEl = card.querySelector('[data-product-price-without-tax], .price--main, .price');
+          const price = priceEl ? priceEl.textContent.trim() : '';
+          const soldOut = !!card.querySelector('.button--soldOut, [data-button-state="soldOut"]');
+          return { title, link, price, soldOut };
+        });
+        return { ok: true, items };
+      } catch (e) {
+        clearTimeout(tid);
+        return { ok: false, reason: e.name === 'AbortError' ? 'timeout' : 'unavailable', href: fallback };
       }
     }
 
