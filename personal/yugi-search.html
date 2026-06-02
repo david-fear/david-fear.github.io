@@ -333,7 +333,7 @@
       { d: "hobbymaster.co.nz", scraper: searchHobbymaster },
       { d: "gamersrevelationtcg.co.nz", scraper: searchGamersRevelation },
       { d: "www.cardtopia.co.nz" },
-      { d: "iconix-comics-games.co.nz", link: q => `https://www.iconix-comics-games.co.nz/?q=${encodeURIComponent(q)}` },
+      { d: "iconix-comics-games.co.nz", scraper: searchIconix },
     ];
 
     /* Stores that can't be live-scraped (Cloudflare-protected etc.) — shown as a link-only group */
@@ -490,6 +490,62 @@
       }
     }
 
+    /* Query iconix-comics-games.co.nz via eDIY platform HTML scrape.
+       Tries corsproxy.io first, falls back to allorigins.win if blocked.
+       Price: data-amt attribute is in units of 1/10000 NZD (80000 = $8.00).
+       Stock: span.preorder-date contains "N available now" when in stock. */
+    async function searchIconix(store, query, limit, exact) {
+      const domain = 'www.iconix-comics-games.co.nz';
+      const targetUrl = `https://${domain}/?q=${encodeURIComponent(query)}`;
+      const ctrl = new AbortController();
+      const tid = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+      const proxies = [
+        PROXY + encodeURIComponent(targetUrl),
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`,
+      ];
+      try {
+        let html = null;
+        for (const proxied of proxies) {
+          try {
+            const resp = await fetch(proxied, { signal: ctrl.signal });
+            if (!resp.ok) continue;
+            const text = await resp.text();
+            if (text.includes('product-item-box')) { html = text; break; }
+          } catch (e2) {
+            if (e2.name === 'AbortError') throw e2;
+          }
+        }
+        clearTimeout(tid);
+        if (!html) return { ok: false, reason: 'unavailable', href: targetUrl };
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const cards = [...doc.querySelectorAll('div.product-item-box')];
+        if (!cards.length) return { ok: false, reason: 'empty', href: targetUrl };
+        const matched = exact
+          ? cards.filter(c => {
+              const a = c.querySelector('a.plname');
+              return a && matchesQuery({ title: a.textContent.trim(), handle: '' }, query);
+            })
+          : cards;
+        if (!matched.length) return { ok: false, reason: 'empty', href: targetUrl };
+        const items = matched.slice(0, limit).map(card => {
+          const titleEl = card.querySelector('a.plname');
+          const title = titleEl ? titleEl.textContent.trim() : '';
+          let link = titleEl ? titleEl.getAttribute('href') : targetUrl;
+          if (link && !link.startsWith('http')) link = `https://${domain}${link}`;
+          const priceEl = card.querySelector('span.price[data-amt]');
+          const priceAmt = priceEl ? parseInt(priceEl.getAttribute('data-amt'), 10) : 0;
+          const price = priceAmt ? `$${(priceAmt / 10000).toFixed(2)}` : '';
+          const availEl = card.querySelector('span.preorder-date');
+          const soldOut = !availEl || !/available\s+now/i.test(availEl.textContent);
+          return { title, link, price, soldOut };
+        });
+        return { ok: true, items };
+      } catch (e) {
+        clearTimeout(tid);
+        return { ok: false, reason: e.name === 'AbortError' ? 'timeout' : 'unavailable', href: targetUrl };
+      }
+    }
+
     /* Build the HTML for one store card */
     function renderStore(store, result, query) {
       const domain = store.d;
@@ -525,7 +581,7 @@
       const fetchStores = STORES.filter(s => !s.link);
       const limit = Math.max(1, Math.min(20, parseInt(document.getElementById('limit').value) || 10));
       document.getElementById('query').innerHTML = (exact ? 'Exact search: ' : 'Fuzzy search: ') + '<b>' + esc(q) + '</b>';
-      document.getElementById('status').textContent = `Querying ${fetchStores.length} stores + ${STORES.length - fetchStores.length} link-only…`;
+      document.getElementById('status').textContent = `Querying ${fetchStores.length} stores…`;
 
       const resultsEl = document.getElementById('results');
       resultsEl.innerHTML = '';
