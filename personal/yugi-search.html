@@ -228,7 +228,7 @@
 
     .store-note {
       font-size: 9px;
-      color: #555;
+      color: #e0e0e0;
       font-style: italic;
       margin-left: 4px;
     }
@@ -486,14 +486,15 @@
       }
     }
 
-    /* Query vagabond.co.nz via BigCommerce HTML scrape (&section=product filters out blog posts) */
+    /* Query vagabond.co.nz via BigCommerce HTML scrape (&section=product filters out blog posts)
+       Uses allorigins.win instead of corsproxy.io — corsproxy is blocked by vagabond */
     async function searchVagabond(store, query, limit, exact) {
       const domain = 'vagabond.co.nz';
       const fallback = `https://${domain}/search.php?search_query=${encodeURIComponent(query)}&section=product`;
       const ctrl = new AbortController();
       const tid = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
       try {
-        const proxied = PROXY + encodeURIComponent(fallback);
+        const proxied = `https://api.allorigins.win/raw?url=${encodeURIComponent(fallback)}`;
         const resp = await fetch(proxied, { signal: ctrl.signal });
         clearTimeout(tid);
         if (!resp.ok) throw new Error(resp.status);
