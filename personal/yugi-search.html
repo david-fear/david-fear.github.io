@@ -487,12 +487,13 @@
     }
 
     /* Query vagabond.co.nz via BigCommerce HTML scrape (&section=product filters out blog posts)
-       Uses allorigins.win instead of corsproxy.io — corsproxy is blocked by vagabond */
+       Uses allorigins.win instead of corsproxy.io — corsproxy is blocked by vagabond.
+       Uses a longer timeout (15s) because allorigins.win is slower than corsproxy. */
     async function searchVagabond(store, query, limit, exact) {
       const domain = 'vagabond.co.nz';
       const fallback = `https://${domain}/search.php?search_query=${encodeURIComponent(query)}&section=product`;
       const ctrl = new AbortController();
-      const tid = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+      const tid = setTimeout(() => ctrl.abort(), 15000);
       try {
         const proxied = `https://api.allorigins.win/raw?url=${encodeURIComponent(fallback)}`;
         const resp = await fetch(proxied, { signal: ctrl.signal });
