@@ -499,7 +499,7 @@
         if (!resp.ok) throw new Error(resp.status);
         const html = await resp.text();
         const doc = new DOMParser().parseFromString(html, 'text/html');
-        const cards = [...doc.querySelectorAll('article.card')];
+        const cards = [...doc.querySelectorAll('article.product-item-container')];
         if (!cards.length) return { ok: false, reason: 'empty', href: fallback };
         const matched = exact
           ? cards.filter(c => {
