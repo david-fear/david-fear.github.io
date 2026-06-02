@@ -42,6 +42,14 @@
       border: 1px solid #777;
       border-radius: 6px;
 
+      filter: blur(0px);
+      opacity: 1;
+
+      transition: all 0.2s ease;
+    }
+
+    .btn-fuzzy:hover,
+    .btn-fuzzy:active {
       /* actual fuzzy look */
       filter: blur(0.8px);
       opacity: 0.85;
@@ -55,14 +63,6 @@
       text-shadow:
         0 0 1px rgba(0, 0, 0, 0.4),
         0 0 2px rgba(0, 0, 0, 0.25);
-
-      transition: all 0.2s ease;
-    }
-
-    .btn-fuzzy:hover,
-    .btn-fuzzy:active {
-      filter: blur(0px);
-      opacity: 1;
     }
 
 
@@ -605,6 +605,18 @@
         return div;
       });
 
+      /* Render the links-only group immediately — no async work needed */
+      if (LINK_STORES.length) {
+        const linkDiv = document.createElement('div');
+        linkDiv.className = 'store';
+        linkDiv.style.cssText = 'border-color:#3a3020; background:#1a1a10;';
+        linkDiv.innerHTML = `<div class="store-name" style="color:#888;">links only</div>` +
+          LINK_STORES.map(s =>
+            `<div class="item"><a href="${esc(s.url(q))}" target="_blank" rel="noopener">${esc(s.d)}</a></div>`
+          ).join('');
+        resultsEl.appendChild(linkDiv);
+      }
+
       let done = 0;
       const promises = STORES.map((store, i) => {
         if (store.link) return Promise.resolve();
@@ -621,18 +633,6 @@
       });
 
       await Promise.all(promises);
-
-      /* Render the links-only group at the end of results */
-      if (LINK_STORES.length) {
-        const linkDiv = document.createElement('div');
-        linkDiv.className = 'store';
-        linkDiv.style.cssText = 'border-color:#3a3020; background:#1a1a10;';
-        linkDiv.innerHTML = `<div class="store-name" style="color:#888;">links only</div>` +
-          LINK_STORES.map(s =>
-            `<div class="item"><a href="${esc(s.url(q))}" target="_blank" rel="noopener">${esc(s.d)}</a></div>`
-          ).join('');
-        resultsEl.appendChild(linkDiv);
-      }
 
       document.getElementById('status').textContent = `Done — ${STORES.length} stores searched`;
       document.getElementById('q').focus();
@@ -658,182 +658,6 @@
     });
 
   </script>
-
-  <hr /><br />
-  <details>
-    <summary style="cursor:pointer; font-size:11px; color:#888; user-select:none;">
-      ▶ Non-Shopify endpoint tester — click links below to see what each site returns (all use <code>DUPO-EN017</code>
-      as sample query)
-    </summary>
-
-    <style>
-      .probe-section {
-        margin: 12px 0;
-      }
-
-      .probe-site {
-        font-weight: bold;
-        font-size: 11px;
-        color: #aaa;
-        margin: 10px 0 4px;
-        border-bottom: 1px solid #2a2a2a;
-        padding-bottom: 2px;
-      }
-
-      .probe-note {
-        font-size: 10px;
-        color: #555;
-        margin-bottom: 4px;
-      }
-
-      .probe-links {
-        display: flex;
-        flex-direction: column;
-        gap: 3px;
-      }
-
-      .probe-links a {
-        font-size: 10px;
-        color: #4da3ff;
-        text-decoration: none;
-        word-break: break-all;
-      }
-
-      .probe-links a:hover {
-        text-decoration: underline;
-      }
-
-      .probe-tag {
-        display: inline-block;
-        font-size: 9px;
-        background: #222;
-        color: #777;
-        border: 1px solid #333;
-        border-radius: 2px;
-        padding: 0 3px;
-        margin-left: 4px;
-        vertical-align: middle;
-      }
-    </style>
-
-    <div class="probe-section">
-
-      <!-- ── hobbymaster.co.nz — BigCommerce ── -->
-      <div class="probe-site">hobbymaster.co.nz <span class="probe-tag">BigCommerce</span></div>
-      <div class="probe-note">BigCommerce Storefront API — no auth needed for store-facing endpoints</div>
-      <div class="probe-links">
-        <a href="https://hobbymaster.co.nz/api/storefront/products?keyword=DUPO-EN017&limit=10" target="_blank"
-          rel="noopener">/api/storefront/products?keyword=DUPO-EN017 <span class="probe-tag">JSON?</span></a>
-        <a href="https://hobbymaster.co.nz/api/storefront/search/results?search_query=DUPO-EN017" target="_blank"
-          rel="noopener">/api/storefront/search/results?search_query=DUPO-EN017 <span class="probe-tag">JSON?</span></a>
-        <a href="https://hobbymaster.co.nz/?search_query=DUPO-EN017&format=json" target="_blank"
-          rel="noopener">/?search_query=DUPO-EN017&amp;format=json <span class="probe-tag">BC legacy</span></a>
-        <a href="https://hobbymaster.co.nz/search.php?search_query=DUPO-EN017&format=json" target="_blank"
-          rel="noopener">/search.php?search_query=DUPO-EN017&amp;format=json <span class="probe-tag">BC
-            legacy</span></a>
-        <a href="https://hobbymaster.co.nz/search?search=DUPO-EN017" target="_blank"
-          rel="noopener">/search?search=DUPO-EN017 <span class="probe-tag">HTML fallback</span></a>
-        <a href="https://hobbymaster.co.nz/api/storefront/graphql" target="_blank"
-          rel="noopener">/api/storefront/graphql <span class="probe-tag">needs token</span></a>
-      </div>
-
-      <!-- ── gamersrevelationtcg.co.nz — OpenCart ── -->
-      <div class="probe-site">gamersrevelationtcg.co.nz <span class="probe-tag">OpenCart</span></div>
-      <div class="probe-note">OpenCart has limited public JSON; most endpoints require a session token</div>
-      <div class="probe-links">
-        <a href="https://gamersrevelationtcg.co.nz/index.php?route=product/search&search=DUPO-EN017&format=json"
-          target="_blank" rel="noopener">/index.php?route=product/search&amp;search=DUPO-EN017&amp;format=json <span
-            class="probe-tag">JSON?</span></a>
-        <a href="https://gamersrevelationtcg.co.nz/index.php?route=api/product/search&search=DUPO-EN017" target="_blank"
-          rel="noopener">/index.php?route=api/product/search&amp;search=DUPO-EN017 <span
-            class="probe-tag">JSON?</span></a>
-        <a href="https://gamersrevelationtcg.co.nz/index.php?route=extension/module/search&filter_name=DUPO-EN017&format=json"
-          target="_blank" rel="noopener">/index.php?route=extension/module/search&amp;filter_name=DUPO-EN017 <span
-            class="probe-tag">JSON?</span></a>
-        <a href="https://gamersrevelationtcg.co.nz/search.php?search_query=DUPO-EN017" target="_blank"
-          rel="noopener">/search.php?search_query=DUPO-EN017 <span class="probe-tag">HTML fallback</span></a>
-        <a href="https://gamersrevelationtcg.co.nz/index.php?route=product/search&search=DUPO-EN017" target="_blank"
-          rel="noopener">/index.php?route=product/search&amp;search=DUPO-EN017 <span class="probe-tag">HTML
-            fallback</span></a>
-      </div>
-
-      <!-- ── cardtopia.co.nz — WooCommerce ── -->
-      <div class="probe-site">cardtopia.co.nz <span class="probe-tag">WooCommerce</span></div>
-      <div class="probe-note">WooCommerce Store API (v1) is public — no auth needed</div>
-      <div class="probe-links">
-        <a href="https://www.cardtopia.co.nz/wp-json/wc/store/v1/products?search=DUPO-EN017&per_page=10" target="_blank"
-          rel="noopener">/wp-json/wc/store/v1/products?search=DUPO-EN017 <span class="probe-tag">✅ likely
-            works</span></a>
-        <a href="https://www.cardtopia.co.nz/wp-json/wc/store/v1/products?search=bond+between+teacher&per_page=10"
-          target="_blank" rel="noopener">/wp-json/wc/store/v1/products?search=bond+between+teacher <span
-            class="probe-tag">name search</span></a>
-        <a href="https://www.cardtopia.co.nz/wp-json/wp/v2/product?search=DUPO-EN017&per_page=10" target="_blank"
-          rel="noopener">/wp-json/wp/v2/product?search=DUPO-EN017 <span class="probe-tag">WP posts API</span></a>
-        <a href="https://www.cardtopia.co.nz/wp-json/wc/v3/products?search=DUPO-EN017" target="_blank"
-          rel="noopener">/wp-json/wc/v3/products?search=DUPO-EN017 <span class="probe-tag">needs auth</span></a>
-        <a href="https://www.cardtopia.co.nz/?s=DUPO-EN017&post_type=product" target="_blank"
-          rel="noopener">/?s=DUPO-EN017&amp;post_type=product <span class="probe-tag">HTML fallback</span></a>
-      </div>
-
-      <!-- ── vagabond.co.nz — OpenCart ── -->
-      <div class="probe-site">vagabond.co.nz <span class="probe-tag">OpenCart</span></div>
-      <div class="probe-note">Same situation as gamersrevelation — OpenCart public API is limited</div>
-      <div class="probe-links">
-        <a href="https://vagabond.co.nz/index.php?route=product/search&search=DUPO-EN017&format=json" target="_blank"
-          rel="noopener">/index.php?route=product/search&amp;search=DUPO-EN017&amp;format=json <span
-            class="probe-tag">JSON?</span></a>
-        <a href="https://vagabond.co.nz/index.php?route=api/product/search&search=DUPO-EN017" target="_blank"
-          rel="noopener">/index.php?route=api/product/search&amp;search=DUPO-EN017 <span
-            class="probe-tag">JSON?</span></a>
-        <a href="https://vagabond.co.nz/index.php?route=extension/module/search&filter_name=DUPO-EN017&format=json"
-          target="_blank" rel="noopener">/index.php?route=extension/module/search&amp;filter_name=DUPO-EN017 <span
-            class="probe-tag">JSON?</span></a>
-        <a href="https://vagabond.co.nz/search.php?search_query=DUPO-EN017&section=product" target="_blank"
-          rel="noopener">/search.php?search_query=DUPO-EN017&amp;section=product <span class="probe-tag">HTML
-            fallback</span></a>
-        <a href="https://vagabond.co.nz/index.php?route=product/search&search=DUPO-EN017" target="_blank"
-          rel="noopener">/index.php?route=product/search&amp;search=DUPO-EN017 <span class="probe-tag">HTML
-            fallback</span></a>
-      </div>
-
-      <!-- ── trademe.co.nz — Custom ── -->
-      <div class="probe-site">trademe.co.nz <span class="probe-tag">Custom / OAuth</span></div>
-      <div class="probe-note">TradeMe's public API requires OAuth — sandbox only without a key. These won't return JSON
-        without auth but the HTML search pages work.</div>
-      <div class="probe-links">
-        <a href="https://api.trademe.co.nz/v1/search/general.json?search_string=DUPO-EN017" target="_blank"
-          rel="noopener">api.trademe.co.nz/v1/search/general.json?search_string=DUPO-EN017 <span class="probe-tag">needs
-            OAuth</span></a>
-        <a href="https://api.trademe.co.nz/v1/search/general.json?search_string=yugioh+DUPO-EN017" target="_blank"
-          rel="noopener">…search_string=yugioh+DUPO-EN017 <span class="probe-tag">needs OAuth</span></a>
-        <a href="https://www.trademe.co.nz/a/search?search_string=DUPO-EN017&category=9068" target="_blank"
-          rel="noopener">/a/search?search_string=DUPO-EN017&amp;category=9068 (Trading Cards cat) <span
-            class="probe-tag">HTML</span></a>
-        <a href="https://www.trademe.co.nz/a/search?search_string=DUPO-EN017" target="_blank"
-          rel="noopener">/a/search?search_string=DUPO-EN017 <span class="probe-tag">HTML fallback</span></a>
-      </div>
-
-      <!-- ── iconix-comics-games.co.nz — WooCommerce? ── -->
-      <div class="probe-site">iconix-comics-games.co.nz <span class="probe-tag">WooCommerce?</span></div>
-      <div class="probe-note">Likely WooCommerce — same endpoints as cardtopia worth trying first</div>
-      <div class="probe-links">
-        <a href="https://www.iconix-comics-games.co.nz/wp-json/wc/store/v1/products?search=DUPO-EN017&per_page=10"
-          target="_blank" rel="noopener">/wp-json/wc/store/v1/products?search=DUPO-EN017 <span class="probe-tag">✅ try
-            first</span></a>
-        <a href="https://www.iconix-comics-games.co.nz/wp-json/wp/v2/product?search=DUPO-EN017&per_page=10"
-          target="_blank" rel="noopener">/wp-json/wp/v2/product?search=DUPO-EN017 <span class="probe-tag">WP posts
-            API</span></a>
-        <a href="https://www.iconix-comics-games.co.nz/wp-json/wc/store/v1/products?search=bond+between+teacher&per_page=10"
-          target="_blank" rel="noopener">/wp-json/wc/store/v1/products?search=bond+between+teacher <span
-            class="probe-tag">name search</span></a>
-        <a href="https://www.iconix-comics-games.co.nz/wp-json/wc/v3/products?search=DUPO-EN017" target="_blank"
-          rel="noopener">/wp-json/wc/v3/products?search=DUPO-EN017 <span class="probe-tag">needs auth</span></a>
-        <a href="https://www.iconix-comics-games.co.nz/?q=DUPO-EN017" target="_blank" rel="noopener">/?q=DUPO-EN017
-          <span class="probe-tag">HTML fallback</span></a>
-      </div>
-
-    </div>
-  </details>
 
   <!-- Footer placeholder -->
   <div id="footer-container"></div>
