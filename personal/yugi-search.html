@@ -334,7 +334,7 @@
       { d: "gamersrevelationtcg.co.nz", scraper: searchGamersRevelation },
       { d: "www.cardtopia.co.nz" },
       { d: "trademe.co.nz", link: q => `https://www.trademe.co.nz/a/marketplace/gaming/trading-cards/search?search_string=${encodeURIComponent(q)}` },
-      { d: "vagabond.co.nz", link: q => `https://vagabond.co.nz/search.php?search_query=${encodeURIComponent(q)}&section=product` },
+      { d: "vagabond.co.nz", scraper: searchVagabond },
       { d: "iconix-comics-games.co.nz", link: q => `https://www.iconix-comics-games.co.nz/?q=${encodeURIComponent(q)}` },
     ];
 
@@ -475,6 +475,46 @@
           if (link && !link.startsWith('http')) link = `https://${domain}${link}`;
           try { const u = new URL(link); u.searchParams.delete('searchid'); u.searchParams.delete('search_query'); link = u.toString(); } catch {}
           const priceEl = card.querySelector('[data-product-price-with-tax], [data-product-price-without-tax], .price--withTax, .price--main, .price');
+          const price = priceEl ? priceEl.textContent.trim() : '';
+          const soldOut = !!card.querySelector('.button--soldOut, [data-button-state="soldOut"]');
+          return { title, link, price, soldOut };
+        });
+        return { ok: true, items };
+      } catch (e) {
+        clearTimeout(tid);
+        return { ok: false, reason: e.name === 'AbortError' ? 'timeout' : 'unavailable', href: fallback };
+      }
+    }
+
+    /* Query vagabond.co.nz via BigCommerce HTML scrape (&section=product filters out blog posts) */
+    async function searchVagabond(store, query, limit, exact) {
+      const domain = 'vagabond.co.nz';
+      const fallback = `https://${domain}/search.php?search_query=${encodeURIComponent(query)}&section=product`;
+      const ctrl = new AbortController();
+      const tid = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+      try {
+        const proxied = PROXY + encodeURIComponent(fallback);
+        const resp = await fetch(proxied, { signal: ctrl.signal });
+        clearTimeout(tid);
+        if (!resp.ok) throw new Error(resp.status);
+        const html = await resp.text();
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const cards = [...doc.querySelectorAll('article.card')];
+        if (!cards.length) return { ok: false, reason: 'empty', href: fallback };
+        const matched = exact
+          ? cards.filter(c => {
+              const a = c.querySelector('.card-title a, h4 a');
+              return a && matchesQuery({ title: a.textContent.trim(), handle: '' }, query);
+            })
+          : cards;
+        if (!matched.length) return { ok: false, reason: 'empty', href: fallback };
+        const items = matched.slice(0, limit).map(card => {
+          const titleEl = card.querySelector('.card-title a, h4 a');
+          const title = titleEl ? titleEl.textContent.trim() : '';
+          let link = titleEl ? titleEl.getAttribute('href') : fallback;
+          if (link && !link.startsWith('http')) link = `https://${domain}${link}`;
+          try { const u = new URL(link); u.searchParams.delete('searchid'); u.searchParams.delete('search_query'); link = u.toString(); } catch {}
+          const priceEl = card.querySelector('[data-product-price-with-tax], [data-product-price-without-tax], .price--withTax, .price--main, .price--sale, .price');
           const price = priceEl ? priceEl.textContent.trim() : '';
           const soldOut = !!card.querySelector('.button--soldOut, [data-button-state="soldOut"]');
           return { title, link, price, soldOut };
