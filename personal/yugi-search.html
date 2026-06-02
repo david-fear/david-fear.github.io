@@ -286,6 +286,9 @@
           <div class="search-row" style="margin-top:4px;">
             <button onclick="search(true)">Exact Search</button>
             <button class="btn-fuzzy" onclick="search(false)">Fuzzy Search</button>
+            <label style="font-size:11px; color:#888; cursor:pointer; user-select:none; margin-left:2px;">
+              <input type="checkbox" id="same-tab-toggle"> same tab
+            </label>
           </div>
           <div class="search-row" style="margin-top:6px; font-size:11px; color:#888;">
             e.g.
@@ -313,6 +316,8 @@
   <div class="stores" id="results"></div>
 
   <script>
+
+    let linkTarget = location.hash === '#sametab' ? '_self' : '_blank';
 
     const STORES = [
       // ── Shopify (live API results) ───────────────────────────
@@ -568,13 +573,13 @@
             : r.price
               ? `<span class="price">${esc(r.price)}</span>`
               : `<span class="no-price">—</span>`;
-          return `<div class="item"><a href="${esc(r.link)}" target="_blank" rel="noopener">${esc(r.title)}</a>${badge}</div>`;
+          return `<div class="item"><a href="${esc(r.link)}" target="${linkTarget}" rel="noopener">${esc(r.title)}</a>${badge}</div>`;
         }).join('');
       } else if (result.reason === 'link') {
-        inner = `<div class="muted"><a href="${esc(result.href)}" target="_blank" rel="noopener">[not implemented yet - open site search →]</a></div>`;
+        inner = `<div class="muted"><a href="${esc(result.href)}" target="${linkTarget}" rel="noopener">[not implemented yet - open site search →]</a></div>`;
       } else {
         const label = result.reason === 'empty' ? 'no results' : result.reason;
-        inner = `<div class="muted">${label} → <a href="${esc(result.href)}" target="_blank" rel="noopener">open site</a></div>`;
+        inner = `<div class="muted">${label} → <a href="${esc(result.href)}" target="${linkTarget}" rel="noopener">open site</a></div>`;
       }
       return `<div class="store"><div class="store-name">${esc(domain)}${jsonLink}</div>${inner}</div>`;
     }
@@ -612,7 +617,7 @@
         linkDiv.style.cssText = 'border-color:#3a3020; background:#1a1a10;';
         linkDiv.innerHTML = `<div class="store-name" style="color:#888;">links only</div>` +
           LINK_STORES.map(s =>
-            `<div class="item"><a href="${esc(s.url(q))}" target="_blank" rel="noopener">${esc(s.d)}</a></div>`
+            `<div class="item"><a href="${esc(s.url(q))}" target="${linkTarget}" rel="noopener">${esc(s.d)}</a></div>`
           ).join('');
         resultsEl.appendChild(linkDiv);
       }
@@ -656,6 +661,17 @@
         document.getElementById('q').focus();
       }
     });
+
+    // Initialise same-tab toggle from URL hash; persist choice in hash
+    (function () {
+      const cb = document.getElementById('same-tab-toggle');
+      cb.checked = linkTarget === '_self';
+      cb.addEventListener('change', () => {
+        linkTarget = cb.checked ? '_self' : '_blank';
+        location.hash = cb.checked ? 'sametab' : 'newtab';
+        document.querySelectorAll('#results a:not(.json-link)').forEach(a => { a.target = linkTarget; });
+      });
+    })();
 
   </script>
 
