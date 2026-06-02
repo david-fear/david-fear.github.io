@@ -294,7 +294,9 @@
             <a href="#" onclick="document.getElementById('q').value='structure deck'; search(true); return false;">structure deck</a>,
             <a href="#" onclick="document.getElementById('q').value='red eyes ghost'; search(true); return false;">red eyes ghost</a>,
             <a href="#" onclick="document.getElementById('q').value='GFP2 ghost rare'; search(true); return false;">GFP2 ghost rare</a>,
-            <a href="#" onclick="document.getElementById('q').value='chocolate magician gold'; search(true); return false;">Chocolate Magician Gold</a>
+            <a href="#" onclick="document.getElementById('q').value='chocolate magician gold'; search(true); return false;">Chocolate Magician Gold</a>,
+            <a href="#" onclick="document.getElementById('q').value='game mat'; search(true); return false;">Game Mat</a>,
+            <a href="#" onclick="document.getElementById('q').value='dragonshield'; search(true); return false;">Dragonshield</a>
           </div>
         </div>
         <div class="legend">
@@ -395,6 +397,7 @@
             return {
               ok: true,
               apiUrl,
+              href: fallback,
               items: matched.map(p => ({
                 title: p.title + (domain === 'cardspotnz.com' && p.type ? ` (${p.type})` : ''),
                 link: `https://${domain}/products/${p.handle}`,
@@ -443,7 +446,7 @@
             soldOut: false  // endpoint only returns in-stock items
           };
         });
-        return { ok: true, items, apiUrl };
+        return { ok: true, items, apiUrl, href: fallback };
       } catch (e) {
         clearTimeout(tid);
         return { ok: false, reason: e.name === 'AbortError' ? 'timeout' : 'unavailable', href: fallback, apiUrl };
@@ -483,7 +486,7 @@
           const soldOut = !!card.querySelector('.button--soldOut, [data-button-state="soldOut"]');
           return { title, link, price, soldOut };
         });
-        return { ok: true, items };
+        return { ok: true, items, href: fallback };
       } catch (e) {
         clearTimeout(tid);
         return { ok: false, reason: e.name === 'AbortError' ? 'timeout' : 'unavailable', href: fallback };
@@ -539,7 +542,7 @@
           const soldOut = !availEl || !/available\s+now/i.test(availEl.textContent);
           return { title, link, price, soldOut };
         });
-        return { ok: true, items };
+        return { ok: true, items, href: targetUrl };
       } catch (e) {
         clearTimeout(tid);
         return { ok: false, reason: e.name === 'AbortError' ? 'timeout' : 'unavailable', href: targetUrl };
@@ -552,9 +555,11 @@
       const noteHtml = store.note
         ? ` <span class="store-note">${esc(store.note)}</span>`
         : '';
-      const jsonLink = result.apiUrl
-        ? ` <a class="json-link" href="${esc(result.apiUrl)}" target="_blank" rel="noopener">[view JSON]</a>${noteHtml}`
-        : '';
+      const viewHref = result.apiUrl || result.href || '';
+      const viewLabel = result.apiUrl ? 'view JSON' : 'view website';
+      const jsonLink = viewHref
+        ? ` <a class="json-link" href="${esc(viewHref)}" target="_blank" rel="noopener">[${viewLabel}]</a>${noteHtml}`
+        : noteHtml;
       let inner = '';
       if (result.ok) {
         inner = result.items.map(r => {
