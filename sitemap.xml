@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Home -->
+  <url>
+    <loc>https://david-fear.github.io/</loc>
+    <lastmod>2026-06-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Tools -->
+  <url>
+    <loc>https://david-fear.github.io/tools/zendesk-toc-builder.html</loc>
+    <lastmod>2026-06-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://david-fear.github.io/tools/diff.html</loc>
+    <lastmod>2026-06-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://david-fear.github.io/tools/html-collapsibletext.html</loc>
+    <lastmod>2026-06-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://david-fear.github.io/tools/har-analyzer.html</loc>
+    <lastmod>2026-06-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://david-fear.github.io/tools/tcpdump-analyzer.html</loc>
+    <lastmod>2026-06-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://david-fear.github.io/tools/rubytojsontotable.html</loc>
+    <lastmod>2026-06-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://david-fear.github.io/tools/whatsmyip.html</loc>
+    <lastmod>2026-06-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://david-fear.github.io/tools/csvtocurlgenerator.html</loc>
+    <lastmod>2026-06-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://david-fear.github.io/tools/qr-generator.html</loc>
+    <lastmod>2026-06-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Personal -->
+  <url>
+    <loc>https://david-fear.github.io/personal/yugi-search.html</loc>
+    <lastmod>2026-06-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://david-fear.github.io/personal/formula1-links.html</loc>
+    <lastmod>2026-06-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://david-fear.github.io/personal/formula1-2025.html</loc>
+    <lastmod>2026-06-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://david-fear.github.io/personal/cattoy.html</loc>
+    <lastmod>2026-06-02</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://david-fear.github.io/personal/timestables.html</loc>
+    <lastmod>2026-06-02</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://david-fear.github.io/personal/headstone-engraving-generator.html</loc>
+    <lastmod>2026-06-02</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://david-fear.github.io/personal/takechargecancer.html</loc>
+    <lastmod>2026-06-02</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- Mixed Reality -->
+  <url>
+    <loc>https://david-fear.github.io/mixed-reality/mixedrealitydemo.html</loc>
+    <lastmod>2026-06-02</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://david-fear.github.io/mixed-reality/mixedrealityyugiohcard.html</loc>
+    <lastmod>2026-06-02</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://david-fear.github.io/mixed-reality/mixedrealityyugiohdmg3d.html</loc>
+    <lastmod>2026-06-02</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- Templates -->
+  <url>
+    <loc>https://david-fear.github.io/templates/template.html</loc>
+    <lastmod>2026-06-02</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.1</priority>
+  </url>
+
+</urlset>
