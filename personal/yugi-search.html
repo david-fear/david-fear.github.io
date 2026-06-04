@@ -355,30 +355,30 @@
     const STORES = [
       // ── Shopify (live API results) ───────────────────────────
       { d: "cardspotnz.com", note: " ** card name search only **" },
+      { d: "www.shuffleandcutgames.co.nz" },
       { d: "tcgcollectornz.com" },
       { d: "tcgculture.com" },
-      { d: "cardmerchant.co.nz" },
-      { d: "cardmerchanthamilton.co.nz" },
-      { d: "www.cardmerchanttakapuna.co.nz" },
-      { d: "cardmerchantchristchurch.co.nz" },
-      { d: "cardmerchantnelson.co.nz" },
-      { d: "www.cardmerchantwhangarei.co.nz" },
-      { d: "cardmerchantponsonby.co.nz" },
       { d: "cardbard.co.nz" },
       { d: "spellboundgames.co.nz" },
-      { d: "otakumart.co.nz" },
       { d: "valkyrie-games-nz.myshopify.com" },
-      { d: "cardmasters.co.nz" },
-      { d: "thegametree.co.nz" },
+      { d: "www.baydragon.co.nz", scraper: searchBayDragon },
+      { d: "otakumart.co.nz" },
       { d: "goblingames.nz" },
-      { d: "www.shuffleandcutgames.co.nz" },
-      // ── Link-only (non-Shopify — opens search page) ──────────
       { d: "hobbymaster.co.nz", scraper: searchHobbymaster },
       { d: "gamersrevelationtcg.co.nz", scraper: searchGamersRevelation },
       { d: "www.cardtopia.co.nz" },
       { d: "iconix-comics-games.co.nz", scraper: searchIconix },
-      { d: "www.baydragon.co.nz", scraper: searchBayDragon },
       { d: "cgstore.co.nz", scraper: searchCGStore },
+      { d: "cardmasters.co.nz" },
+      { d: "cardmerchant.co.nz" },
+      { d: "cardmerchanthamilton.co.nz" },
+      { d: "www.cardmerchanttakapuna.co.nz" },
+      { d: "cardmerchantnelson.co.nz" },
+      { d: "www.cardmerchantwhangarei.co.nz" },
+      { d: "cardmerchantchristchurch.co.nz" },
+      { d: "cardmerchantponsonby.co.nz" },
+      { d: "thegametree.co.nz" },
+      // ── Link-only (non-Shopify — opens search page) ──────────
     ];
 
     /* Stores that can't be live-scraped (Cloudflare-protected etc.) — shown as a link-only group */
