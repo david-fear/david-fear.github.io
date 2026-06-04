@@ -98,11 +98,11 @@ button, a.button {
   border-radius: 6px;
   text-decoration: none;
   font-weight: 600;
-  transition: opacity 0.2s;
+  transition: opacity 0.1s;
 }
 
 button, a.button:hover {
-  opacity: 0.8;
+  opacity: 0.9;
 }
 
 /* Navigation lists */

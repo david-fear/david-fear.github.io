@@ -18,7 +18,6 @@
   <style>
     .search-header {
       display: block;
-      text-align: center;
     }
 
     .search-row {
@@ -26,74 +25,35 @@
       flex-wrap: wrap;
       gap: 4px;
       align-items: center;
-      justify-content: center;
     }
 
-    .search-controls {
-      display: grid;
-      grid-template-columns: auto auto auto;
-      gap: 4px 12px;
-      align-items: center;
-      justify-content: center;
-      margin-top: 4px;
+    .btn-fuzzy {
+      background: #f0f0f0;
+      color: #555;
+      border: 1px solid #777;
+      border-radius: 6px;
+
+      filter: blur(0px);
+      opacity: 1;
+
+      transition: all 0.2s ease;
     }
 
-    .ctrl-col {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 100%;
-    }
+    .btn-fuzzy:hover,
+    .btn-fuzzy:active {
+      /* actual fuzzy look */
+      filter: blur(0.8px);
+      opacity: 0.85;
 
-    .search-controls button {
-      padding: 10px 12px;
-      font-size: 12px;
-      white-space: nowrap;
-      background: var(--primary);
-      color: #fff;
-    }
+      /* soft glow */
+      box-shadow:
+        0 0 4px rgba(0, 0, 0, 0.25),
+        0 0 8px rgba(255, 255, 255, 0.6);
 
-    .search-examples {
-      margin-top: 8px;
-      font-size: 11px;
-      color: #aaa;
-      text-align: left;
-      padding-left: 8px;
-    }
-
-    .search-examples summary {
-      cursor: pointer;
-      color: #d0d0d0;
-      font-weight: bold;
-      user-select: none;
-      letter-spacing: 0.3px;
-      text-align: center;
-    }
-
-    .search-examples a {
-      color: #var(--primary);
-    }
-
-    .search-examples div {
-      border-left: 2px solid #d0d0d0;
-      border-right: 2px solid #d0d0d0;
-      margin-top: 5px;
-      line-height: 1.9;
-      text-align: center;
-      width: 100%;
-    }
-
-    .btn-fuzzy span {
-      display: inline-block;
-      transition: filter 0.2s ease, text-shadow 0.2s ease;
-    }
-
-    .btn-fuzzy:hover span,
-    .btn-fuzzy:active span {
-      filter: blur(0.7px);
+      /* slightly messy text */
       text-shadow:
-        0 0 2px rgba(255, 255, 255, 0.7),
-        0 0 4px rgba(255, 255, 255, 0.4);
+        0 0 1px rgba(0, 0, 0, 0.4),
+        0 0 2px rgba(0, 0, 0, 0.25);
     }
 
 
@@ -105,7 +65,6 @@
       gap: 14px;
       margin-top: 8px;
       white-space: nowrap;
-      justify-content: center;
     }
 
     .legend-dot {
@@ -312,28 +271,24 @@
             autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" autofocus />
           <input id="limit" type="number" min="1" max="50" value="10" style="width:50px;" title="Results per site" />
         </div>
-        <div class="search-controls">
-          <div class="ctrl-col"><button onclick="search(true)">Exact Search</button></div>
-          <div class="ctrl-col"><button class="btn-fuzzy" onclick="search(false)"><span>Fuzzy Search</span></button></div>
-          <div class="ctrl-col">
-            <label style="font-size:13px; color:#888; cursor:pointer; user-select:none; display:inline-flex; align-items:center; gap:7px;">
-              <input type="checkbox" id="same-tab-toggle" style="width:16px; height:16px; cursor:pointer; accent-color:#888;"> open in same tab
-            </label>
-          </div>
+        <div class="search-row" style="margin-top:4px;">
+          <button onclick="search(true)">Exact Search</button>
+          <button class="btn-fuzzy" onclick="search(false)">Fuzzy Search</button>
+          <label style="font-size:11px; color:#888; cursor:pointer; user-select:none; margin-left:6px; padding:4px 8px; display:inline-flex; align-items:center; gap:6px;">
+            <input type="checkbox" id="same-tab-toggle" style="width:18px; height:18px; cursor:pointer; accent-color:#888;"> open in same tab
+          </label>
         </div>
-        <details class="search-examples">
-          <summary>Search Examples</summary>
-          <div>
-            <a href="#" onclick="document.getElementById('q').value='DUPO-EN017'; search(true); return false;">DUPO-EN017</a> ,
-            <a href="#" onclick="document.getElementById('q').value='ash blossom quarter'; search(true); return false;">ash blossom quarter</a> ,
-            <a href="#" onclick="document.getElementById('q').value='structure deck'; search(true); return false;">structure deck</a> ,
-            <a href="#" onclick="document.getElementById('q').value='red eyes ghost'; search(true); return false;">red eyes ghost</a> ,
-            <a href="#" onclick="document.getElementById('q').value='GFP2 ghost rare'; search(true); return false;">GFP2 ghost rare</a> ,
-            <a href="#" onclick="document.getElementById('q').value='chocolate magician gold'; search(true); return false;">Chocolate Magician Gold</a> ,
-            <a href="#" onclick="document.getElementById('q').value='game mat'; search(true); return false;">Game Mat</a> ,
-            <a href="#" onclick="document.getElementById('q').value='dragonshield'; search(true); return false;">Dragonshield</a>
-          </div>
-        </details>
+        <div class="search-row" style="margin-top:6px; font-size:11px; color:#888;">
+          e.g.
+          <a href="#" onclick="document.getElementById('q').value='DUPO-EN017'; search(true); return false;">DUPO-EN017</a>,
+          <a href="#" onclick="document.getElementById('q').value='ash blossom quarter'; search(true); return false;">ash blossom quarter</a>,
+          <a href="#" onclick="document.getElementById('q').value='structure deck'; search(true); return false;">structure deck</a>,
+          <a href="#" onclick="document.getElementById('q').value='red eyes ghost'; search(true); return false;">red eyes ghost</a>,
+          <a href="#" onclick="document.getElementById('q').value='GFP2 ghost rare'; search(true); return false;">GFP2 ghost rare</a>,
+          <a href="#" onclick="document.getElementById('q').value='chocolate magician gold'; search(true); return false;">Chocolate Magician Gold</a>,
+          <a href="#" onclick="document.getElementById('q').value='game mat'; search(true); return false;">Game Mat</a>,
+          <a href="#" onclick="document.getElementById('q').value='dragonshield'; search(true); return false;">Dragonshield</a>
+        </div>
         <div class="legend">
           <span><span class="legend-dot" style="background:#7dff7d"></span>In stock</span>
           <span><span class="legend-dot" style="background:#ff4444"></span>Sold out</span>
