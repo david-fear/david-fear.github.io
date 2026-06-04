@@ -15,6 +15,7 @@
   <meta property="og:type" content="website" />
   <link rel="stylesheet" href="https://david-fear.github.io/stylesheet.css" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" />
+  <script data-goatcounter="https://davidthegoat.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
   <style>
     .search-header {
       display: block;
@@ -313,8 +314,8 @@
           <input id="limit" type="number" min="1" max="50" value="10" style="width:50px;" title="Results per site" />
         </div>
         <div class="search-controls">
-          <div class="ctrl-col"><button onclick="search(true)">Exact Search</button></div>
-          <div class="ctrl-col"><button class="btn-fuzzy" onclick="search(false)"><span>Fuzzy Search</span></button></div>
+          <div class="ctrl-col"><button onclick="search(true);window.goatcounter&&goatcounter.count({path:'search-exact',event:true})">Exact Search</button></div>
+          <div class="ctrl-col"><button class="btn-fuzzy" onclick="search(false);window.goatcounter&&goatcounter.count({path:'search-fuzzy',event:true})"><span>Fuzzy Search</span></button></div>
           <div class="ctrl-col">
             <label style="font-size:13px; color:#888; cursor:pointer; user-select:none; display:inline-flex; align-items:center; gap:7px;">
               <input type="checkbox" id="same-tab-toggle" style="width:16px; height:16px; cursor:pointer; accent-color:#888;"> open in same tab
