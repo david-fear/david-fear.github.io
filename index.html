@@ -81,6 +81,7 @@
     <h2>TV Family Watch</h2>
     <div class="button-grid">
       <button onclick="window.location.href='https://skygo.co.nz/'">Sky Go</button>
+      <button id="tvnz-btn" onclick="window.location.href='https://www.tvnz.co.nz/app/login'">TVNZ+</button>
       <button onclick="window.location.href='https://famelack.com/'">Famelack.com</button>
       <button onclick="window.location.href='https://channelsurfer.tv'">ChannelSurfer.tv</button>
       <button onclick="window.location.href='https://tubitv.com/'">TubiTV.com</button>
@@ -131,6 +132,12 @@
       .catch(error => {
         console.error('Failed to load footer:', error);
       });
+  </script>
+
+  <script>
+    window.addEventListener('load', () => {
+      document.getElementById('tvnz-btn').focus();
+    });
   </script>
 
 </body>
