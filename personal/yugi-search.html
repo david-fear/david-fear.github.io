@@ -72,7 +72,7 @@
     }
 
     .search-examples a {
-      color: #var(--primary);
+      color: var(--primary);
     }
 
     .search-examples div {
@@ -264,7 +264,6 @@
       margin-left: 6px;
     }
 
-    .json-link:hover {}
   </style>
 </head>
 
@@ -716,6 +715,7 @@
 
       const resultsEl = document.getElementById('results');
       resultsEl.innerHTML = '';
+  let linkGroupNode = null;
 
       /* Render all slots — link-only stores populate immediately, Shopify show placeholder */
       const slots = STORES.map(store => {
@@ -741,6 +741,7 @@
             `<div class="item"><a href="${esc(s.url(q))}" target="${linkTarget}" rel="noopener">${esc(s.d)}</a></div>`
           ).join('');
         resultsEl.appendChild(linkDiv);
+        linkGroupNode = linkDiv;
       }
 
       let done = 0;
@@ -749,6 +750,8 @@
         return (store.scraper ? store.scraper(store, q, limit, exact) : searchStore(store, q, limit, exact)).then(result => {
           const fresh = document.createElement('div');
           fresh.className = 'store';
+          fresh.dataset.hasResults = result.ok ? 'true' : 'false';
+          fresh.dataset.storeDomain = store.d;
           fresh.innerHTML = renderStore(store, result, q)
             .replace(/^<div class="store">/, '').replace(/<\/div>$/, '');
           slots[i].replaceWith(fresh);
@@ -759,6 +762,27 @@
       });
 
       await Promise.all(promises);
+
+      const ordered = slots
+        .map((node, index) => ({
+          node,
+          index,
+          hasResults: node.dataset.hasResults === 'true',
+          domain: node.dataset.storeDomain || STORES[index].d
+        }))
+        .sort((a, b) => {
+          if (a.hasResults !== b.hasResults) return a.hasResults ? -1 : 1;
+          if (!a.hasResults && !b.hasResults) {
+            const aCardSpot = a.domain === 'cardspotnz.com';
+            const bCardSpot = b.domain === 'cardspotnz.com';
+            if (aCardSpot !== bCardSpot) return aCardSpot ? -1 : 1;
+          }
+          return a.index - b.index;
+        });
+
+      if (linkGroupNode) linkGroupNode.remove();
+      ordered.forEach(entry => resultsEl.appendChild(entry.node));
+      if (linkGroupNode) resultsEl.appendChild(linkGroupNode);
 
       document.getElementById('status').textContent = `Done — ${STORES.length} stores searched`;
       document.getElementById('q').focus();
