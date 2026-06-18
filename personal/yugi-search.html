@@ -764,9 +764,15 @@
             node,
             index,
             state: node.dataset.resultState || 'pending',
-            domain: node.dataset.storeDomain || STORES[index].d
+            domain: node.dataset.storeDomain || STORES[index].d,
+            hasInStock: node.dataset.resultState === 'hit' && node.querySelector('.price') !== null
           }))
           .sort((a, b) => {
+            // Prioritize in-stock hits at the very top
+            if (a.state === 'hit' && b.state === 'hit') {
+              if (a.hasInStock !== b.hasInStock) return a.hasInStock ? -1 : 1;
+            }
+            
             const rankDiff = (stateRank[a.state] ?? 1) - (stateRank[b.state] ?? 1);
             if (rankDiff !== 0) return rankDiff;
             if (a.state === 'miss' && b.state === 'miss') {
