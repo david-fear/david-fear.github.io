@@ -390,6 +390,7 @@
     ];
 
     const TIMEOUT_MS = 6000;
+    const ENABLE_ALLORIGINS_FALLBACK = false;
 
     /* Escape user/API text before inserting into HTML */
     function esc(s) {
@@ -410,6 +411,15 @@
     }
 
     const PROXY = 'https://corsproxy.io/?';
+
+    /* Remove external asset tags from fetched HTML so parser never follows vendor CSS/JS/image URLs. */
+    function stripExternalAssets(html) {
+      return String(html || '')
+        .replace(/<link\b[^>]*>/gi, '')
+        .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '')
+        .replace(/<img\b[^>]*>/gi, '')
+        .replace(/<iframe\b[^>]*>[\s\S]*?<\/iframe>/gi, '');
+    }
 
     /* Return true if every token in the query appears in the product title or handle */
     function matchesQuery(product, query) {
@@ -509,7 +519,7 @@
         const resp = await fetch(proxied, { signal: ctrl.signal });
         clearTimeout(tid);
         if (!resp.ok) throw new Error(resp.status);
-        const html = await resp.text();
+        const html = stripExternalAssets(await resp.text());
         const doc = new DOMParser().parseFromString(html, 'text/html');
         const cards = [...doc.querySelectorAll('article.card')];
         if (!cards.length) return { ok: false, reason: 'empty', href: fallback };
@@ -547,10 +557,10 @@
       const targetUrl = `https://${domain}/?q=${encodeURIComponent(query)}`;
       const ctrl = new AbortController();
       const tid = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
-      const proxies = [
-        PROXY + encodeURIComponent(targetUrl),
-        `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`,
-      ];
+      const proxies = [PROXY + encodeURIComponent(targetUrl)];
+      if (ENABLE_ALLORIGINS_FALLBACK) {
+        proxies.push(`https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`);
+      }
       try {
         let html = null;
         for (const proxied of proxies) {
@@ -565,7 +575,7 @@
         }
         clearTimeout(tid);
         if (!html) return { ok: false, reason: 'unavailable', href: targetUrl };
-        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const doc = new DOMParser().parseFromString(stripExternalAssets(html), 'text/html');
         const cards = [...doc.querySelectorAll('div.product-item-box')];
         if (!cards.length) return { ok: false, reason: 'empty', href: targetUrl };
         const matched = exact
@@ -642,7 +652,7 @@
         const resp = await fetch(proxied, { signal: ctrl.signal });
         clearTimeout(tid);
         if (!resp.ok) throw new Error(resp.status);
-        const html = await resp.text();
+        const html = stripExternalAssets(await resp.text());
         const doc = new DOMParser().parseFromString(html, 'text/html');
         const cards = [...doc.querySelectorAll('article.card')];
         if (!cards.length) return { ok: false, reason: 'empty', href: fallback };
@@ -767,8 +777,13 @@
           });
 
         if (linkGroupNode) linkGroupNode.remove();
-        ordered.forEach(entry => resultsEl.appendChild(entry.node));
+        
+        const hitStores = ordered.filter(e => e.state === 'hit');
+        const notHitStores = ordered.filter(e => e.state !== 'hit');
+        
+        hitStores.forEach(entry => resultsEl.appendChild(entry.node));
         if (linkGroupNode) resultsEl.appendChild(linkGroupNode);
+        notHitStores.forEach(entry => resultsEl.appendChild(entry.node));
       }
 
       let done = 0;
