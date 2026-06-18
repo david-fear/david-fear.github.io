@@ -715,12 +715,14 @@
 
       const resultsEl = document.getElementById('results');
       resultsEl.innerHTML = '';
-  let linkGroupNode = null;
+      let linkGroupNode = null;
 
       /* Render all slots — link-only stores populate immediately, Shopify show placeholder */
       const slots = STORES.map(store => {
         const div = document.createElement('div');
         div.className = 'store';
+        div.dataset.resultState = 'pending';
+        div.dataset.storeDomain = store.d;
         if (store.link) {
           div.innerHTML = renderStore(store, { ok: false, reason: 'link', href: store.link(q) }, q)
             .replace(/^<div class="store">/, '').replace(/<\/div>$/, '');
@@ -744,13 +746,38 @@
         linkGroupNode = linkDiv;
       }
 
+      function reorderStoreCards() {
+        const stateRank = { hit: 0, pending: 1, miss: 2 };
+        const ordered = slots
+          .map((node, index) => ({
+            node,
+            index,
+            state: node.dataset.resultState || 'pending',
+            domain: node.dataset.storeDomain || STORES[index].d
+          }))
+          .sort((a, b) => {
+            const rankDiff = (stateRank[a.state] ?? 1) - (stateRank[b.state] ?? 1);
+            if (rankDiff !== 0) return rankDiff;
+            if (a.state === 'miss' && b.state === 'miss') {
+              const aCardSpot = a.domain === 'cardspotnz.com';
+              const bCardSpot = b.domain === 'cardspotnz.com';
+              if (aCardSpot !== bCardSpot) return aCardSpot ? -1 : 1;
+            }
+            return a.index - b.index;
+          });
+
+        if (linkGroupNode) linkGroupNode.remove();
+        ordered.forEach(entry => resultsEl.appendChild(entry.node));
+        if (linkGroupNode) resultsEl.appendChild(linkGroupNode);
+      }
+
       let done = 0;
       const promises = STORES.map((store, i) => {
         if (store.link) return Promise.resolve();
         return (store.scraper ? store.scraper(store, q, limit, exact) : searchStore(store, q, limit, exact)).then(result => {
           const fresh = document.createElement('div');
           fresh.className = 'store';
-          fresh.dataset.hasResults = result.ok ? 'true' : 'false';
+          fresh.dataset.resultState = result.ok ? 'hit' : 'miss';
           fresh.dataset.storeDomain = store.d;
           fresh.innerHTML = renderStore(store, result, q)
             .replace(/^<div class="store">/, '').replace(/<\/div>$/, '');
@@ -758,31 +785,12 @@
           slots[i] = fresh;
           done++;
           document.getElementById('status').textContent = `${done} / ${fetchStores.length} done`;
+          reorderStoreCards();
         });
       });
 
       await Promise.all(promises);
-
-      const ordered = slots
-        .map((node, index) => ({
-          node,
-          index,
-          hasResults: node.dataset.hasResults === 'true',
-          domain: node.dataset.storeDomain || STORES[index].d
-        }))
-        .sort((a, b) => {
-          if (a.hasResults !== b.hasResults) return a.hasResults ? -1 : 1;
-          if (!a.hasResults && !b.hasResults) {
-            const aCardSpot = a.domain === 'cardspotnz.com';
-            const bCardSpot = b.domain === 'cardspotnz.com';
-            if (aCardSpot !== bCardSpot) return aCardSpot ? -1 : 1;
-          }
-          return a.index - b.index;
-        });
-
-      if (linkGroupNode) linkGroupNode.remove();
-      ordered.forEach(entry => resultsEl.appendChild(entry.node));
-      if (linkGroupNode) resultsEl.appendChild(linkGroupNode);
+      reorderStoreCards();
 
       document.getElementById('status').textContent = `Done — ${STORES.length} stores searched`;
       document.getElementById('q').focus();
