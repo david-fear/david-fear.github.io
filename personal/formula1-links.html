@@ -9,6 +9,77 @@
 
   <link rel="stylesheet" href="https://david-fear.github.io/stylesheet.css" />
   <style>
+    .race-countdown {
+      max-width: 720px;
+      margin: 0 auto 16px;
+      border: 1px solid #2d2d2d;
+      border-radius: 12px;
+      padding: 14px;
+      background: linear-gradient(180deg, #171717, #0f0f0f);
+      color: #f4f4f4;
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+      text-align: center;
+    }
+
+    .race-countdown .meta {
+      margin: 0 0 10px;
+      font-size: 0.7rem;
+      opacity: 0.9;
+    }
+
+    .countdown-controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 12px;
+      flex-wrap: wrap;
+    }
+
+    .countdown-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(72px, 1fr));
+      gap: 8px;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    .countdown-cell {
+      background: #1f1f1f;
+      border: 1px solid #343434;
+      border-radius: 10px;
+      text-align: center;
+      padding: 8px 6px;
+    }
+
+    .countdown-value {
+      display: block;
+      font-size: 1.45rem;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+
+    .countdown-label {
+      display: block;
+      font-size: 0.72rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #bbbbbb;
+    }
+
+    .countdown-status {
+      margin-top: 8px;
+      min-height: 1.2em;
+      font-size: 0.85rem;
+      color: #d5d5d5;
+    }
+
+    @media (max-width: 520px) {
+      .countdown-grid {
+        grid-template-columns: repeat(2, minmax(80px, 1fr));
+      }
+    }
+
     .iframe-wrapper {
       width: 512px;
       height: 260px;
@@ -115,10 +186,37 @@
 
     <!-- Existing sections -->
     <section>
-      <h2 class="mid">Next Race</h2>
-      <div id="race-info" class="iframe-wrapper">
-        <iframe src="https://www.f1timer.com/" width="600" height="300" frameborder="0" scrolling="no" loading="lazy">
-        </iframe>
+      <div id="next-race-countdown" class="race-countdown" aria-live="polite">
+        <h2 id="countdown-race-name" class="mid">Loading next race...</h2>
+        <p id="countdown-race-meta" class="meta"></p>
+        <div class="countdown-controls" role="group" aria-label="Select F1 session type">
+          <button type="button" data-session="fp1" aria-pressed="false">FP1</button>
+          <button type="button" data-session="fp2" aria-pressed="false">FP2</button>
+          <button type="button" data-session="fp3" aria-pressed="false">FP3</button>
+          <button type="button" data-session="sprintQualifying" aria-pressed="false">Sprint Quali</button>
+          <button type="button" data-session="sprint" aria-pressed="false">Sprint</button>
+          <button type="button" data-session="qualifying" aria-pressed="false">Quali</button>
+          <button type="button" data-session="gp" aria-pressed="true">Race</button>
+        </div>
+        <div class="countdown-grid">
+          <div class="countdown-cell">
+            <span id="cd-days" class="countdown-value">--</span>
+            <span class="countdown-label">Days</span>
+          </div>
+          <div class="countdown-cell">
+            <span id="cd-hours" class="countdown-value">--</span>
+            <span class="countdown-label">Hours</span>
+          </div>
+          <div class="countdown-cell">
+            <span id="cd-minutes" class="countdown-value">--</span>
+            <span class="countdown-label">Minutes</span>
+          </div>
+          <div class="countdown-cell">
+            <span id="cd-seconds" class="countdown-value">--</span>
+            <span class="countdown-label">Seconds</span>
+          </div>
+        </div>
+        <div id="countdown-status" class="countdown-status"></div>
       </div>
     </section>
 
@@ -200,6 +298,257 @@
     </section>
 
   </main>
+
+  <script>
+    (function () {
+      const scheduleUrl = 'https://raw.githubusercontent.com/sportstimes/f1/main/_db/f1/2026.json';
+      const raceNameEl = document.getElementById('countdown-race-name');
+      const raceMetaEl = document.getElementById('countdown-race-meta');
+      const statusEl = document.getElementById('countdown-status');
+      const sessionButtons = Array.from(document.querySelectorAll('[data-session]'));
+      const daysEl = document.getElementById('cd-days');
+      const hoursEl = document.getElementById('cd-hours');
+      const minutesEl = document.getElementById('cd-minutes');
+      const secondsEl = document.getElementById('cd-seconds');
+
+      let intervalId = null;
+      let scheduleRaces = [];
+      let selectedSession = 'gp';
+
+      const sessionLabels = {
+        fp1: 'FP1',
+        fp2: 'FP2',
+        fp3: 'FP3',
+        sprintQualifying: 'Sprint Qualifying',
+        sprint: 'Sprint',
+        qualifying: 'Qualifying',
+        gp: 'Race'
+      };
+
+      function pad2(value) {
+        return String(value).padStart(2, '0');
+      }
+
+      function setCountdownValues(days, hours, minutes, seconds) {
+        daysEl.textContent = String(days);
+        hoursEl.textContent = pad2(hours);
+        minutesEl.textContent = pad2(minutes);
+        secondsEl.textContent = pad2(seconds);
+      }
+
+      function formatLocalDateTime(date) {
+        const datePart = new Intl.DateTimeFormat(undefined, {
+          weekday: 'short',
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        }).format(date);
+
+        const timePart = new Intl.DateTimeFormat(undefined, {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+          timeZoneName: 'short'
+        }).format(date);
+
+        return `${datePart} ${timePart}`;
+      }
+
+      function getBrowserTimezone() {
+        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        return tz || 'Local browser timezone';
+      }
+
+      function setActiveSessionButton(sessionKey) {
+        sessionButtons.forEach(button => {
+          if (button.style.display === 'none') {
+            button.setAttribute('aria-pressed', 'false');
+            button.disabled = true;
+            return;
+          }
+
+          const active = button.getAttribute('data-session') === sessionKey;
+          button.setAttribute('aria-pressed', String(active));
+          button.disabled = active;
+        });
+      }
+
+      function getFirstVisibleSessionKey() {
+        const firstVisible = sessionButtons.find(button => button.style.display !== 'none');
+        return firstVisible ? firstVisible.getAttribute('data-session') : null;
+      }
+
+      function updateVisibleSessionButtons(nextRace) {
+        const sessions = nextRace && nextRace.sessions ? nextRace.sessions : {};
+
+        sessionButtons.forEach(button => {
+          const sessionKey = button.getAttribute('data-session');
+          const visible = !!sessions[sessionKey];
+          button.style.display = visible ? '' : 'none';
+        });
+
+        const selectedButton = sessionButtons.find(button => button.getAttribute('data-session') === selectedSession);
+        const selectedIsVisible = selectedButton && selectedButton.style.display !== 'none';
+
+        if (!selectedIsVisible) {
+          selectedSession = sessions.gp ? 'gp' : getFirstVisibleSessionKey();
+        }
+      }
+
+      function findNextRace(races) {
+        const nowMs = Date.now();
+        return races
+          .filter(r => r && r.sessions && r.sessions.gp)
+          .map(r => ({
+            race: r,
+            gpDate: new Date(r.sessions.gp)
+          }))
+          .filter(item => !Number.isNaN(item.gpDate.getTime()) && item.gpDate.getTime() > nowMs)
+          .sort((a, b) => a.gpDate - b.gpDate)[0] || null;
+      }
+
+      function resolveSessionForRace(nextRace, sessionKey) {
+        const nowMs = Date.now();
+        const sessions = nextRace && nextRace.sessions ? nextRace.sessions : {};
+
+        if (!sessions[sessionKey]) {
+          return { found: false, reason: 'missing' };
+        }
+
+        const sessionDate = new Date(sessions[sessionKey]);
+        if (Number.isNaN(sessionDate.getTime())) {
+          return { found: false, reason: 'invalid' };
+        }
+
+        if (sessionDate.getTime() <= nowMs) {
+          return { found: false, reason: 'past', sessionDate: sessionDate };
+        }
+
+        return { found: true, sessionKey: sessionKey, sessionDate: sessionDate };
+      }
+
+      function startCountdown(nextItem) {
+        if (intervalId) {
+          clearInterval(intervalId);
+        }
+
+        function tick() {
+          const now = Date.now();
+          const diff = nextItem.sessionDate.getTime() - now;
+          const browserTimezone = getBrowserTimezone();
+          const sessionName = sessionLabels[nextItem.sessionKey] || nextItem.sessionKey;
+
+          if (diff <= 0) {
+            setCountdownValues(0, 0, 0, 0);
+            statusEl.textContent = `${nextItem.race.name} ${sessionName} is live or has started. Timezone: ${browserTimezone}`;
+            clearInterval(intervalId);
+            return;
+          }
+
+          const totalSeconds = Math.floor(diff / 1000);
+          const days = Math.floor(totalSeconds / 86400);
+          const hours = Math.floor((totalSeconds % 86400) / 3600);
+          const minutes = Math.floor((totalSeconds % 3600) / 60);
+          const seconds = totalSeconds % 60;
+
+          setCountdownValues(days, hours, minutes, seconds);
+          statusEl.textContent = `Timezone: ${browserTimezone}`;
+        }
+
+        tick();
+        intervalId = setInterval(tick, 1000);
+      }
+
+      function renderForSelection(requestedSession) {
+        selectedSession = requestedSession;
+        const nextRaceItem = findNextRace(scheduleRaces);
+
+        if (!nextRaceItem) {
+          raceNameEl.textContent = 'No upcoming race found';
+          raceMetaEl.textContent = '';
+          setCountdownValues(0, 0, 0, 0);
+          statusEl.textContent = `The schedule may be complete or unavailable. Timezone: ${getBrowserTimezone()}`;
+          if (intervalId) {
+            clearInterval(intervalId);
+          }
+          return;
+        }
+
+        const nextRace = nextRaceItem.race;
+        updateVisibleSessionButtons(nextRace);
+
+        if (!selectedSession) {
+          raceNameEl.textContent = `${nextRace.name} Grand Prix`;
+          raceMetaEl.textContent = `Round ${nextRace.round} | ${nextRace.location} | Timezone: ${getBrowserTimezone()}`;
+          setCountdownValues(0, 0, 0, 0);
+          statusEl.textContent = 'No session buttons are available for this race.';
+          if (intervalId) {
+            clearInterval(intervalId);
+          }
+          return;
+        }
+
+        const sessionName = sessionLabels[selectedSession] || selectedSession;
+        setActiveSessionButton(selectedSession);
+
+        const resolved = resolveSessionForRace(nextRace, selectedSession);
+
+        if (!resolved.found) {
+          raceNameEl.textContent = `${nextRace.name} Grand Prix`;
+          raceMetaEl.textContent = `Round ${nextRace.round} | ${nextRace.location} | Timezone: ${getBrowserTimezone()}`;
+          setCountdownValues(0, 0, 0, 0);
+
+          if (resolved.reason === 'missing') {
+            statusEl.textContent = `No ${sessionName} session exists for the next race.`;
+          } else if (resolved.reason === 'past') {
+            statusEl.textContent = `${sessionName} for the next race has already started or finished.`;
+          } else {
+            statusEl.textContent = `No upcoming ${sessionName} session found on the next race object.`;
+          }
+
+          if (intervalId) {
+            clearInterval(intervalId);
+          }
+          return;
+        }
+
+        raceNameEl.textContent = `Next: ${nextRace.name} Grand Prix`;
+        raceMetaEl.textContent = `Session: ${sessionLabels[resolved.sessionKey] || resolved.sessionKey} | Round ${nextRace.round} | ${nextRace.location} | ${formatLocalDateTime(resolved.sessionDate)} `;
+        startCountdown({
+          race: nextRace,
+          sessionKey: resolved.sessionKey,
+          sessionDate: resolved.sessionDate
+        });
+      }
+
+      fetch(scheduleUrl)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`Schedule request failed: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(schedule => {
+          scheduleRaces = Array.isArray(schedule && schedule.races) ? schedule.races : [];
+          renderForSelection(selectedSession);
+
+          sessionButtons.forEach(button => {
+            button.addEventListener('click', function () {
+              selectedSession = button.getAttribute('data-session') || 'gp';
+              setActiveSessionButton(selectedSession);
+              renderForSelection(selectedSession);
+            });
+          });
+        })
+        .catch(error => {
+          raceNameEl.textContent = 'Unable to load next race countdown';
+          raceMetaEl.textContent = '';
+          setCountdownValues(0, 0, 0, 0);
+          statusEl.textContent = 'Could not fetch schedule data right now.';
+          console.error(error);
+        });
+    })();
+  </script>
 
   <!-- F1 Points Table & Chart Script -->
   <script>
