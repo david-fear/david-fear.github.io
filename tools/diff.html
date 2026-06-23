@@ -208,7 +208,10 @@ function runSidePureLineByLine(){
     Array.from({ length: len }, (_, i) => {
       const l = left[i] ?? "";
       const r = right[i] ?? "";
-      const rowClass = l.trimStart() === r.trimStart() ? "" : "chg";
+      const lTrimmed = l.trimStart();
+      const rTrimmed = r.trimStart();
+      const isDifferent = lTrimmed !== rTrimmed;
+      const rowClass = isDifferent ? "chg" : "same";
       return `
         <div class="cell ${rowClass}">${escapeHtml(l)}</div>
         <div class="cell ${rowClass}">${escapeHtml(r)}</div>
