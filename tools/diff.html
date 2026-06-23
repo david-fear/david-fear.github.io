@@ -51,6 +51,8 @@ textarea {
   white-space:pre;
   font-family: monospace;
 }
+
+.chg  { background:#4d3f1a; color:#ffe8a3; }
 </style>
 </head>
 
@@ -103,6 +105,7 @@ textarea {
 <button onclick="runUnified(true)">Unified (changes)</button>
 <button onclick="runSide()">Side</button>
 <button onclick="runSide(true)">Side (changes)</button>
+<button onclick="runSidePureLineByLine()">Side (line by line)</button>
 </center>
 
 
@@ -192,6 +195,25 @@ function runSide(changesOnly=false){
           <div class="cell ${r.type==='add'?'add':''}">${escapeHtml(r.r||"")}</div>
         `;
       }).join("")+
+    `</div>`;
+}
+
+function runSidePureLineByLine(){
+  const left = document.getElementById("left").value.replace(/\r\n/g, "\n").split("\n");
+  const right = document.getElementById("right").value.replace(/\r\n/g, "\n").split("\n");
+  const len = Math.max(left.length, right.length);
+
+  output.innerHTML =
+    `<div class="side">`+
+    Array.from({ length: len }, (_, i) => {
+      const l = left[i] ?? "";
+      const r = right[i] ?? "";
+      const rowClass = l.trimStart() === r.trimStart() ? "" : "chg";
+      return `
+        <div class="cell ${rowClass}">${escapeHtml(l)}</div>
+        <div class="cell ${rowClass}">${escapeHtml(r)}</div>
+      `;
+    }).join("")+
     `</div>`;
 }
 </script>
