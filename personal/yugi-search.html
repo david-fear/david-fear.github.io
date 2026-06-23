@@ -500,7 +500,7 @@
 
     /* Search TCGPlayer for exact card match */
     async function searchTCGPlayer(query) {
-      const searchUrl = `https://tcgplayer.com/search/yugioh/product?q=${encodeURIComponent(query)}`;
+      const searchUrl = `https://tcgplayer.com/search/all/product?q=${encodeURIComponent(query)}&view=grid`;
       const pricingDiv = document.getElementById('tcgplayer-pricing');
       
       try {
@@ -514,72 +514,84 @@
         const html = stripExternalAssets(await resp.text());
         const doc = new DOMParser().parseFromString(html, 'text/html');
         
-        /* Look for product cards — TCGPlayer uses various selectors */
-        const cards = [...doc.querySelectorAll('[data-product-id], article.product-item, .product-card, [class*="product"][class*="item"]')]
-          .slice(0, 3);  /* Get top 3 results for matching */
+        /* Look for product cards — try multiple strategies */
+        let cards = [];
+        
+        /* Strategy 1: Look for common product card containers */
+        cards = [...doc.querySelectorAll('a[href*="/product/"], [role="link"][href*="/product/"]')]
+          .map(link => {
+            let container = link;
+            for (let i = 0; i < 5; i++) {
+              container = container.parentElement;
+              if (!container) break;
+              const text = container.textContent;
+              if (text.includes('$') && text.length < 500) {
+                return container;
+              }
+            }
+            return link;
+          })
+          .filter(c => c && c.textContent.includes('$'))
+          .slice(0, 5);
+        
+        /* Strategy 2: Look for any container with product-like content */
+        if (!cards.length) {
+          cards = [...doc.querySelectorAll('div, article')]
+            .filter(el => {
+              const text = el.textContent;
+              return text.includes('$') && /\\$\\d+\\.\\d{2}/.test(text) && text.length < 300 && text.length > 20;
+            })
+            .slice(0, 5);
+        }
         
         if (!cards.length) {
+          console.log('No cards found on TCGPlayer');
           pricingDiv.classList.remove('show');
           return null;
         }
         
+        console.log('Found', cards.length, 'potential cards on TCGPlayer');
+        
         /* Try to find exact match */
         for (const card of cards) {
-          const nameEl = card.querySelector('h2, h3, [class*="name"], a[href*="/product/"]');
-          if (!nameEl) continue;
-          
-          const cardName = nameEl.textContent.trim().toLowerCase();
+          const cardText = card.textContent.toLowerCase();
           const queryLower = query.toLowerCase();
           
-          /* Check if this is a close match */
-          if (cardName.includes(queryLower) || queryLower.split(/\s+/).every(t => cardName.includes(t))) {
-            /* Target market price specifically (not "listings from") */
-            let priceText = '';
-            const allText = card.textContent.toLowerCase();
+          /* Loose matching - just check if all query terms appear */
+          const queryTerms = queryLower.split(/[\\s\\-]+/).filter(Boolean);
+          const matches = queryTerms.every(term => cardText.includes(term));
+          
+          if (matches) {
+            console.log('Found matching card:', cardText.substring(0, 100));
             
-            /* Look for market price container/label */
-            const marketPriceContainer = card.querySelector('[class*="market"], [class*="price"]');
-            if (marketPriceContainer) {
-              /* Find price within or near market price label */
-              const priceInContainer = marketPriceContainer.querySelector('[class*="price"], [data-price], span');
-              const siblings = marketPriceContainer.parentElement?.querySelectorAll('span, div');
-              if (siblings) {
-                for (let el of siblings) {
-                  if (el.textContent.includes('$') && /\$\d+/.test(el.textContent)) {
-                    priceText = el.textContent.trim();
-                    break;
-                  }
-                }
-              }
-              if (!priceText && priceInContainer) {
-                priceText = priceInContainer.textContent.trim();
-              }
+            /* Extract price - look for $ followed by digits */
+            const priceMatch = cardText.match(/\\$([\\d,]+\\.\\d{2})/);
+            const priceText = priceMatch ? `$${priceMatch[1]}` : '';
+            
+            /* Extract card name - usually first 50-100 chars before price */
+            const priceIdx = cardText.indexOf('$');
+            const nameText = priceIdx > 0 ? cardText.substring(0, priceIdx).trim() : cardText.substring(0, 100).trim();
+            
+            /* Try to get product URL */
+            let cardUrl = searchUrl;
+            const productLink = card.querySelector('a[href*="/product/"]');
+            if (productLink) {
+              cardUrl = productLink.getAttribute('href');
+              if (!cardUrl.startsWith('http')) cardUrl = `https://tcgplayer.com${cardUrl}`;
             }
             
-            /* Fallback: search all price-like elements and prefer market over listings */
-            if (!priceText) {
-              const priceEls = [...card.querySelectorAll('div, span')].filter(el => {
-                const text = el.textContent.toLowerCase();
-                return text.includes('$') && /\\$\\d+\\.\\d{2}/.test(text);
-              });
-              if (priceEls.length > 0) {
-                /* Prefer later elements as TCGPlayer shows market price after listings from */
-                priceText = priceEls[priceEls.length - 1].textContent.trim();
-              }
-            }
-            
-            const rarity = card.querySelector('[class*="rarity"]')?.textContent.trim() || '';
-            const cardUrl = card.querySelector('a[href*="/product/"]')?.getAttribute('href') || searchUrl;
+            console.log('Extracted - Name:', nameText.substring(0, 50), 'Price:', priceText);
             
             return {
-              name: nameEl.textContent.trim(),
-              rarity: rarity,
+              name: nameText,
+              rarity: '',
               priceUSD: priceText,
-              url: cardUrl.startsWith('http') ? cardUrl : `https://tcgplayer.com${cardUrl}`
+              url: cardUrl
             };
           }
         }
         
+        console.log('No exact match found in cards');
         pricingDiv.classList.remove('show');
         return null;
       } catch (e) {
