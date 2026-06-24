@@ -265,98 +265,6 @@
       margin-left: 6px;
     }
 
-    .tcgplayer-pricing {
-      display: none;
-      background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
-      border: 1px solid #3a3a3a;
-      border-radius: 4px;
-      padding: 10px 12px;
-      margin: 8px auto;
-      max-width: 500px;
-      font-size: 12px;
-    }
-
-    .tcgplayer-pricing.show {
-      display: block;
-    }
-
-    .tcgplayer-header {
-      font-weight: bold;
-      color: #6699ff;
-      font-size: 13px;
-      margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .tcgplayer-exact {
-      background: #264d00;
-      color: #7dff7d;
-      padding: 2px 6px;
-      border-radius: 2px;
-      font-size: 10px;
-      font-weight: bold;
-    }
-
-    .tcgplayer-details {
-      color: #ccc;
-      margin-bottom: 4px;
-      line-height: 1.4;
-    }
-
-    .tcgplayer-details .card-name {
-      font-weight: bold;
-      color: #fff;
-    }
-
-    .tcgplayer-details .card-rarity {
-      color: #aaa;
-      font-size: 11px;
-    }
-
-    .tcgplayer-pricing-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: 3px 0;
-      padding: 3px 0;
-      border-bottom: 1px dashed #3a3a3a;
-    }
-
-    .tcgplayer-pricing-row:last-child {
-      border-bottom: none;
-    }
-
-    .tcgplayer-label {
-      color: #aaa;
-    }
-
-    .tcgplayer-value {
-      color: #7dff7d;
-      font-weight: bold;
-    }
-
-    .tcgplayer-note {
-      font-size: 10px;
-      color: #888;
-      font-style: italic;
-      margin-top: 6px;
-    }
-
-    .tcgplayer-note a {
-      color: #6699ff;
-      text-decoration: none;
-    }
-
-    .tcgplayer-note a:hover {
-      text-decoration: underline;
-    }
-
-    .tcgplayer-error {
-      color: #ff9999;
-    }
-
   </style>
 </head>
 
@@ -439,7 +347,6 @@
 
   <div id="query"></div>
   <div id="status"></div>
-  <div id="tcgplayer-pricing" class="tcgplayer-pricing"></div>
   <div class="stores" id="results"></div>
 
   <script>
@@ -478,6 +385,8 @@
     /* Stores that can't be live-scraped (Cloudflare-protected etc.) — shown as a link-only group */
     const LINK_STORES = [
       { d: 'vagabond.co.nz',  url: q => `https://vagabond.co.nz/search.php?search_query=${encodeURIComponent(q)}&section=product` },
+      { d: 'collectr.com (USD — international market price)', url: q => `https://app.getcollectr.com/?query=${encodeURIComponent(q)}` },
+      { d: 'tcgplayer.com (USD — international market price)', url: q => `https://www.tcgplayer.com/search/all/product?q=${encodeURIComponent(q)}&view=grid` },
       { d: 'trademe.co.nz',  url: q => `https://www.trademe.co.nz/a/marketplace/gaming/trading-cards/search?search_string=${encodeURIComponent(q)}` },
       { d: 'www.hobbylords.co.nz', url: q => `https://www.hobbylords.co.nz/shop/shop-all/search?product_keyword=${encodeURIComponent(q)}&p=1` },
       { d: 'novagames.co.nz', url: q => `https://novagames.co.nz/search?type=product&options[prefix]=last&q=${encodeURIComponent(q)}` },
@@ -485,191 +394,6 @@
 
     const TIMEOUT_MS = 6000;
     const ENABLE_ALLORIGINS_FALLBACK = false;
-
-    /* Fetch exchange rate from free API */
-    async function getExchangeRate() {
-      try {
-        const resp = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
-        const data = await resp.json();
-        return data.rates.NZD || null;
-      } catch (e) {
-        console.error('Failed to fetch exchange rate:', e);
-        return null;
-      }
-    }
-
-    /* Search TCGPlayer for exact card match */
-    async function searchTCGPlayer(query) {
-      const searchUrl = `https://tcgplayer.com/search/all/product?q=${encodeURIComponent(query)}&view=grid`;
-      const pricingDiv = document.getElementById('tcgplayer-pricing');
-      
-      try {
-        const ctrl = new AbortController();
-        const tid = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
-        const proxied = PROXY + encodeURIComponent(searchUrl);
-        const resp = await fetch(proxied, { signal: ctrl.signal });
-        clearTimeout(tid);
-        
-        if (!resp.ok) throw new Error(resp.status);
-        const html = stripExternalAssets(await resp.text());
-        const doc = new DOMParser().parseFromString(html, 'text/html');
-        
-        /* Look for product cards — try multiple strategies */
-        let cards = [];
-        
-        /* Strategy 1: Look for common product card containers */
-        cards = [...doc.querySelectorAll('a[href*="/product/"], [role="link"][href*="/product/"]')]
-          .map(link => {
-            let container = link;
-            for (let i = 0; i < 5; i++) {
-              container = container.parentElement;
-              if (!container) break;
-              const text = container.textContent;
-              if (text.includes('$') && text.length < 500) {
-                return container;
-              }
-            }
-            return link;
-          })
-          .filter(c => c && c.textContent.includes('$'))
-          .slice(0, 5);
-        
-        /* Strategy 2: Look for any container with product-like content */
-        if (!cards.length) {
-          cards = [...doc.querySelectorAll('div, article')]
-            .filter(el => {
-              const text = el.textContent;
-              return text.includes('$') && /\\$\\d+\\.\\d{2}/.test(text) && text.length < 300 && text.length > 20;
-            })
-            .slice(0, 5);
-        }
-        
-        if (!cards.length) {
-          console.log('No cards found on TCGPlayer');
-          pricingDiv.classList.remove('show');
-          return null;
-        }
-        
-        console.log('Found', cards.length, 'potential cards on TCGPlayer');
-        
-        /* Try to find exact match */
-        for (const card of cards) {
-          const cardText = card.textContent.toLowerCase();
-          const queryLower = query.toLowerCase();
-          
-          /* Loose matching - just check if all query terms appear */
-          const queryTerms = queryLower.split(/[\\s\\-]+/).filter(Boolean);
-          const matches = queryTerms.every(term => cardText.includes(term));
-          
-          if (matches) {
-            console.log('Found matching card:', cardText.substring(0, 100));
-            
-            /* Extract price - look for $ followed by digits */
-            const priceMatch = cardText.match(/\\$([\\d,]+\\.\\d{2})/);
-            const priceText = priceMatch ? `$${priceMatch[1]}` : '';
-            
-            /* Extract card name - usually first 50-100 chars before price */
-            const priceIdx = cardText.indexOf('$');
-            const nameText = priceIdx > 0 ? cardText.substring(0, priceIdx).trim() : cardText.substring(0, 100).trim();
-            
-            /* Try to get product URL */
-            let cardUrl = searchUrl;
-            const productLink = card.querySelector('a[href*="/product/"]');
-            if (productLink) {
-              cardUrl = productLink.getAttribute('href');
-              if (!cardUrl.startsWith('http')) cardUrl = `https://tcgplayer.com${cardUrl}`;
-            }
-            
-            console.log('Extracted - Name:', nameText.substring(0, 50), 'Price:', priceText);
-            
-            return {
-              name: nameText,
-              rarity: '',
-              priceUSD: priceText,
-              url: cardUrl
-            };
-          }
-        }
-        
-        console.log('No exact match found in cards');
-        pricingDiv.classList.remove('show');
-        return null;
-      } catch (e) {
-        console.error('TCGPlayer search error:', e);
-        pricingDiv.classList.remove('show');
-        return null;
-      }
-    }
-
-    /* Display TCGPlayer pricing with NZD conversion */
-    async function displayTCGPlayerPricing(query) {
-      const pricingDiv = document.getElementById('tcgplayer-pricing');
-      pricingDiv.classList.remove('show');
-      pricingDiv.innerHTML = '';
-      
-      /* Only search if query looks like a card (not too short) */
-      if (!query || query.length < 3) return;
-      
-      pricingDiv.innerHTML = '<div style="color:#aaa; font-size:11px;">Checking TCGPlayer…</div>';
-      pricingDiv.classList.add('show');
-      
-      const [cardData, rate] = await Promise.all([
-        searchTCGPlayer(query),
-        getExchangeRate()
-      ]);
-      
-      if (!cardData) {
-        pricingDiv.classList.remove('show');
-        return;
-      }
-      
-      /* Parse price from string like "$12.34" */
-      const priceMatch = cardData.priceUSD.match(/\$(\d+\.\d{2})/);
-      const priceUSD = priceMatch ? parseFloat(priceMatch[1]) : null;
-      
-      if (!priceUSD || !rate) {
-        pricingDiv.innerHTML = `
-          <div class="tcgplayer-header">
-            <span class="tcgplayer-exact">EXACT MATCH</span>
-            <strong>${esc(cardData.name)}</strong>
-          </div>
-          <div class="tcgplayer-details">
-            ${cardData.rarity ? `<div class="card-rarity">${esc(cardData.rarity)}</div>` : ''}
-            <div class="tcgplayer-note">Unable to fetch pricing or exchange rate. <a href="${esc(cardData.url)}" target="_blank" rel="noopener">View on TCGPlayer →</a></div>
-          </div>
-        `;
-        pricingDiv.classList.add('show');
-        return;
-      }
-      
-      const priceNZD = (priceUSD * rate).toFixed(2);
-      
-      pricingDiv.innerHTML = `
-        <div class="tcgplayer-header">
-          <span class="tcgplayer-exact">EXACT MATCH</span>
-          <strong>${esc(cardData.name)}</strong>
-        </div>
-        <div class="tcgplayer-details">
-          ${cardData.rarity ? `<div class="card-rarity">${esc(cardData.rarity)}</div>` : ''}
-          <div class="tcgplayer-pricing-row">
-            <span class="tcgplayer-label">TCGPlayer (USD):</span>
-            <span class="tcgplayer-value">$${priceUSD.toFixed(2)}</span>
-          </div>
-          <div class="tcgplayer-pricing-row">
-            <span class="tcgplayer-label">Exchange rate:</span>
-            <span class="tcgplayer-value">1 USD = $${rate.toFixed(2)} NZD</span>
-          </div>
-          <div class="tcgplayer-pricing-row" style="border-bottom: 1px solid #3a3a3a; margin-top: 4px;">
-            <span class="tcgplayer-label" style="font-weight:bold; color:#ccc;">Est. NZD:</span>
-            <span class="tcgplayer-value" style="font-size:14px;">$${priceNZD}</span>
-          </div>
-          <div class="tcgplayer-note">
-            Note: TCG prices fluctuate. <a href="${esc(cardData.url)}" target="_blank" rel="noopener">Verify on TCGPlayer →</a>
-          </div>
-        </div>
-      `;
-      pricingDiv.classList.add('show');
-    }
 
     /* Escape user/API text before inserting into HTML */
     function esc(s) {
@@ -999,11 +723,9 @@
 
       const fetchStores = STORES.filter(s => !s.link);
       const limit = Math.max(1, Math.min(20, parseInt(document.getElementById('limit').value) || 10));
-      document.getElementById('query').innerHTML = (exact ? 'Exact search: ' : 'Fuzzy search: ') + '<b>' + esc(q) + '</b>';
+      const queryEl = document.getElementById('query');
+      queryEl.innerHTML = (exact ? 'Exact search: ' : 'Fuzzy search: ') + '<b>' + esc(q) + '</b>';
       document.getElementById('status').textContent = `Querying ${fetchStores.length} stores…`;
-
-      /* Start TCGPlayer search in parallel (but don't wait for it) */
-      displayTCGPlayerPricing(q);
 
       const resultsEl = document.getElementById('results');
       resultsEl.innerHTML = '';
@@ -1025,14 +747,15 @@
         return div;
       });
 
-      /* Render the links-only group immediately — no async work needed */
+      /* Render the links-only group immediately; fetch live USD→NZD rate in parallel */
       if (LINK_STORES.length) {
         const linkDiv = document.createElement('div');
         linkDiv.className = 'store';
-        linkDiv.style.cssText = 'border-color:#3a3020; background:#1a1a10;';
-        linkDiv.innerHTML = `<div class="store-name" style="color:#888;">links only (due to unattainable APIs)</div>` +
+        linkDiv.style.cssText = 'border-color:#665500; background:#1e1800; box-shadow: 0 0 6px rgba(200,160,0,0.12);';
+        linkDiv.innerHTML =
+          `<div class="store-name" style="color:#c8a400; border-bottom-color:#443800;">external links &amp; reference prices</div>` +
           LINK_STORES.map(s =>
-            `<div class="item"><a href="${esc(s.url(q))}" target="${linkTarget}" rel="noopener">${esc(s.d)}</a></div>`
+            `<div class="item"><a href="${esc(s.url(q))}" target="${linkTarget}" rel="noopener" style="color:#e8c84a;">${esc(s.d)}</a></div>`
           ).join('');
         resultsEl.appendChild(linkDiv);
         linkGroupNode = linkDiv;
@@ -1095,7 +818,8 @@
       await Promise.all(promises);
       reorderStoreCards();
 
-      document.getElementById('status').textContent = `Done — ${STORES.length} stores searched`;
+      queryEl.innerHTML += ` - ${STORES.length} stores searched`;
+      document.getElementById('status').textContent = '';
       document.getElementById('q').focus();
     }
 
