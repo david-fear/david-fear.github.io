@@ -384,9 +384,9 @@
 
     /* Stores that can't be live-scraped (Cloudflare-protected etc.) — shown as a link-only group */
     const LINK_STORES = [
-      { d: 'vagabond.co.nz',  url: q => `https://vagabond.co.nz/search.php?search_query=${encodeURIComponent(q)}&section=product` },
-      { d: 'collectr.com (USD — international market price)', url: q => `https://app.getcollectr.com/?query=${encodeURIComponent(q)}` },
       { d: 'tcgplayer.com (USD — international market price)', url: q => `https://www.tcgplayer.com/search/all/product?q=${encodeURIComponent(q)}&view=grid` },
+      { d: 'collectr.com (USD — international market price)', url: q => `https://app.getcollectr.com/?query=${encodeURIComponent(q)}` },
+      { d: 'vagabond.co.nz',  url: q => `https://vagabond.co.nz/search.php?search_query=${encodeURIComponent(q)}&section=product` },
       { d: 'trademe.co.nz',  url: q => `https://www.trademe.co.nz/a/marketplace/gaming/trading-cards/search?search_string=${encodeURIComponent(q)}` },
       { d: 'www.hobbylords.co.nz', url: q => `https://www.hobbylords.co.nz/shop/shop-all/search?product_keyword=${encodeURIComponent(q)}&p=1` },
       { d: 'novagames.co.nz', url: q => `https://novagames.co.nz/search?type=product&options[prefix]=last&q=${encodeURIComponent(q)}` },
@@ -751,11 +751,11 @@
       if (LINK_STORES.length) {
         const linkDiv = document.createElement('div');
         linkDiv.className = 'store';
-        linkDiv.style.cssText = 'border-color:#665500; background:#1e1800; box-shadow: 0 0 6px rgba(200,160,0,0.12);';
+        linkDiv.style.cssText = 'border-color:#6a6a6a; background:#242424; box-shadow: 0 0 18px rgba(255,255,255,0.18), 0 0 34px rgba(255,255,255,0.08), inset 0 0 0 1px rgba(255,255,255,0.08);';
         linkDiv.innerHTML =
-          `<div class="store-name" style="color:#c8a400; border-bottom-color:#443800;">external links &amp; reference prices</div>` +
+          `<div class="store-name" style="color:#f1f1f1; border-bottom-color:#4a4a4a; text-shadow:0 0 8px rgba(255,255,255,0.18);">external links &amp; reference prices</div>` +
           LINK_STORES.map(s =>
-            `<div class="item"><a href="${esc(s.url(q))}" target="${linkTarget}" rel="noopener" style="color:#e8c84a;">${esc(s.d)}</a></div>`
+            `<div class="item" style="font-size:12px;"><a href="${esc(s.url(q))}" target="${linkTarget}" rel="noopener" style="color:#f0f0f0; text-shadow:0 0 6px rgba(255,255,255,0.12);">${esc(s.d)}</a></div>`
           ).join('');
         resultsEl.appendChild(linkDiv);
         linkGroupNode = linkDiv;
