@@ -753,7 +753,7 @@
         linkDiv.className = 'store';
         linkDiv.style.cssText = 'border-color:#6a6a6a; background:#242424; box-shadow: 0 0 18px rgba(255,255,255,0.18), 0 0 34px rgba(255,255,255,0.08), inset 0 0 0 1px rgba(255,255,255,0.08);';
         linkDiv.innerHTML =
-          `<div class="store-name" style="color:#f1f1f1; border-bottom-color:#4a4a4a; text-shadow:0 0 8px rgba(255,255,255,0.18);">external links &amp; reference prices</div>` +
+          `<div class="store-name" style="color:#f1f1f1; border-bottom-color:#4a4a4a; text-shadow:0 0 8px rgba(255,255,255,0.18);">external links &amp; reference prices (unattainable APIs)</div>` +
           LINK_STORES.map(s =>
             `<div class="item" style="font-size:12px;"><a href="${esc(s.url(q))}" target="${linkTarget}" rel="noopener" style="color:#f0f0f0; text-shadow:0 0 6px rgba(255,255,255,0.12);">${esc(s.d)}</a></div>`
           ).join('');
