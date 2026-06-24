@@ -384,6 +384,7 @@
 
     /* Stores that can't be live-scraped (Cloudflare-protected etc.) — shown as a link-only group */
     const LINK_STORES = [
+      { d: 'mtgsingles.co.nz (direct card code lookup)', url: q => `https://www.mtgsingles.co.nz/card/${encodeURIComponent(q)}` },
       { d: 'tcgplayer.com (USD — international market price)', url: q => `https://www.tcgplayer.com/search/all/product?q=${encodeURIComponent(q)}&view=grid` },
       { d: 'collectr.com (USD — international market price)', url: q => `https://app.getcollectr.com/?query=${encodeURIComponent(q)}` },
       { d: 'vagabond.co.nz',  url: q => `https://vagabond.co.nz/search.php?search_query=${encodeURIComponent(q)}&section=product` },
