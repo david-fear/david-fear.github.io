@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kids Task List</title>
+
+<link rel="stylesheet" href="https://david-fear.github.io/stylesheet.css" />
+
+<style>
+  header { padding: 0.4rem 0.5rem !important; }
+  section { padding: 0.75rem !important; margin: 0.4rem 0 !important; }
+  .time-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 0.5rem 0 0.5rem;
+  }
+
+  .time-btn {
+    flex: 1 1 100px;
+    max-width: 160px;
+    font-size: 1rem;
+    padding: 0.55rem 1rem;
+    border: 2px solid var(--primary);
+    border-radius: 8px;
+    background: var(--card-bg);
+    color: var(--text);
+    cursor: pointer;
+    font-weight: 700;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+  }
+
+  .time-btn.active {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+  }
+
+  .time-btn:focus {
+    outline: 3px solid var(--primary-light);
+    outline-offset: 2px;
+  }
+
+  .task-panel {
+    display: none;
+  }
+
+  .task-panel.visible {
+    display: block;
+  }
+
+  .task-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .task-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.45rem 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+    border-radius: 6px;
+  }
+
+  .task-list li:last-child {
+    border-bottom: none;
+  }
+
+  .task-list li:hover {
+    background: rgba(77, 184, 255, 0.08);
+  }
+
+  .task-list li.done {
+    opacity: 0.45;
+    text-decoration: line-through;
+  }
+
+  .task-check {
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 2px solid var(--primary);
+    border-radius: 5px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    background: var(--bg);
+    transition: background 0.15s, border-color 0.15s;
+  }
+
+  .task-list li.done .task-check {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+  }
+
+  .task-emoji {
+    font-size: 1.1rem;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .progress-bar-wrap {
+    background: var(--bg);
+    border-radius: 99px;
+    height: 10px;
+    margin: 0.5rem 0 0.25rem;
+    overflow: hidden;
+    border: 2px solid var(--primary);
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 99px;
+    transition: width 0.35s ease;
+    width: 0%;
+  }
+
+  .progress-label {
+    text-align: center;
+    font-size: 0.8rem;
+    opacity: 0.7;
+    margin-bottom: 0.3rem;
+  }
+
+  .all-done-msg {
+    display: none;
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--primary);
+    padding: 0.4rem 0 0.2rem;
+    animation: popIn 0.4s ease;
+  }
+
+  @keyframes popIn {
+    0%   { transform: scale(0.7); opacity: 0; }
+    80%  { transform: scale(1.08); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .reset-btn {
+    display: block;
+    margin: 0.5rem auto 0;
+    background: transparent;
+    border: 2px solid var(--primary);
+    color: var(--primary);
+    font-size: 0.8rem;
+    padding: 0.3rem 0.9rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  .reset-btn:hover {
+    background: var(--primary);
+    color: #fff;
+  }
+</style>
+
+</head>
+
+<body>
+
+<!-- Dynamic sidebar menu START - right after BODY tag -->
+<div id="menu-container"></div>
+<script>
+  fetch('https://david-fear.github.io/components/menu.html')
+    .then(response => response.text())
+    .then(data => {
+      const container = document.getElementById('menu-container');
+      container.innerHTML = data;
+
+      const toggle = document.getElementById('menu-toggle');
+      const menu = document.getElementById('menu-nav');
+
+      toggle.addEventListener('click', () => {
+        const expanded = toggle.getAttribute('aria-expanded') === 'true';
+        toggle.setAttribute('aria-expanded', String(!expanded));
+        if (menu.hasAttribute('hidden')) {
+          menu.removeAttribute('hidden');
+        } else {
+          menu.setAttribute('hidden', '');
+        }
+      });
+
+      toggle.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggle.click();
+        }
+      });
+    })
+    .catch(e => console.error('Failed to load menu:', e));
+</script>
+<!-- Dynamic sidebar menu END -->
+
+  <header>
+    <h1 style="font-size:1.4rem;">Kids Task List</h1>
+    <p style="font-size:0.85rem;">Pick morning or night below.</p>
+  </header>
+
+  <main>
+    <section>
+      <div class="time-buttons">
+        <button class="time-btn" id="btn-morning" onclick="selectTime('morning')">🌅 Morning</button>
+        <button class="time-btn" id="btn-night"   onclick="selectTime('night')">🌙 Night</button>
+      </div>
+
+      <!-- Morning tasks -->
+      <div class="task-panel" id="panel-morning">
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" id="progress-morning"></div>
+        </div>
+        <p class="progress-label" id="label-morning">0 of 8 done</p>
+        <ul class="task-list" id="list-morning">
+          <li onclick="toggleTask(this, 'morning')"><span class="task-check"></span><span class="task-emoji">👕</span> Dressed</li>
+          <li onclick="toggleTask(this, 'morning')"><span class="task-check"></span><span class="task-emoji">🥣</span> Breakfast</li>
+          <li onclick="toggleTask(this, 'morning')"><span class="task-check"></span><span class="task-emoji">🪥</span> Teeth</li>
+          <li onclick="toggleTask(this, 'morning')"><span class="task-check"></span><span class="task-emoji">💇</span> Hair</li>
+          <li onclick="toggleTask(this, 'morning')"><span class="task-check"></span><span class="task-emoji">🧼</span> Wash Face</li>
+          <li onclick="toggleTask(this, 'morning')"><span class="task-check"></span><span class="task-emoji">🛏️</span> Tidy Room</li>
+          <li onclick="toggleTask(this, 'morning')"><span class="task-check"></span><span class="task-emoji">⭐</span> Brilliant</li>
+          <li onclick="toggleTask(this, 'morning')"><span class="task-check"></span><span class="task-emoji">👟</span> Shoes / Boots</li>
+        </ul>
+        <p class="all-done-msg" id="alldonemsg-morning">🎉 Amazing! All done! 🎉</p>
+        <button class="reset-btn" onclick="resetList('morning')">Reset</button>
+      </div>
+
+      <!-- Night tasks -->
+      <div class="task-panel" id="panel-night">
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" id="progress-night"></div>
+        </div>
+        <p class="progress-label" id="label-night">0 of 4 done</p>
+        <ul class="task-list" id="list-night">
+          <li onclick="toggleTask(this, 'night')"><span class="task-check"></span><span class="task-emoji">🪥</span> Teeth</li>
+          <li onclick="toggleTask(this, 'night')"><span class="task-check"></span><span class="task-emoji">🚽</span> Toilet</li>
+          <li onclick="toggleTask(this, 'night')"><span class="task-check"></span><span class="task-emoji">🧼</span> Face</li>
+          <li onclick="toggleTask(this, 'night')"><span class="task-check"></span><span class="task-emoji">⭐</span> Brilliant</li>
+        </ul>
+        <p class="all-done-msg" id="alldonemsg-night">🌟 Sleep tight! All done! 🌟</p>
+        <button class="reset-btn" onclick="resetList('night')">Reset</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer placeholder -->
+  <div id="footer-container"></div>
+  <script>
+    fetch('https://david-fear.github.io/components/footer.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('footer-container').innerHTML = data;
+      })
+      .catch(error => {
+        console.error('Failed to load footer:', error);
+      });
+  </script>
+
+  <script>
+    function selectTime(which) {
+      const panels = ['morning', 'night'];
+      panels.forEach(p => {
+        document.getElementById('panel-' + p).classList.toggle('visible', p === which);
+        document.getElementById('btn-' + p).classList.toggle('active', p === which);
+      });
+    }
+
+    function toggleTask(li, listId) {
+      li.classList.toggle('done');
+      const check = li.querySelector('.task-check');
+      check.textContent = li.classList.contains('done') ? '✓' : '';
+      updateProgress(listId);
+    }
+
+    function updateProgress(listId) {
+      const list = document.getElementById('list-' + listId);
+      const items = list.querySelectorAll('li');
+      const done  = list.querySelectorAll('li.done').length;
+      const total = items.length;
+      const pct   = total ? Math.round((done / total) * 100) : 0;
+
+      document.getElementById('progress-' + listId).style.width = pct + '%';
+      document.getElementById('label-'    + listId).textContent  = done + ' of ' + total + ' done';
+
+      const msg = document.getElementById('alldonemsg-' + listId);
+      msg.style.display = (done === total) ? 'block' : 'none';
+    }
+
+    function resetList(listId) {
+      const list = document.getElementById('list-' + listId);
+      list.querySelectorAll('li').forEach(li => {
+        li.classList.remove('done');
+        li.querySelector('.task-check').textContent = '';
+      });
+      updateProgress(listId);
+    }
+  </script>
+
+</body>
+</html>
