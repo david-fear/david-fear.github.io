@@ -120,7 +120,10 @@
         <label>Max: <input type="number" id="max" value="10" min="1"></label>
         <label>Question time (s): <input type="number" id="questionTime" value="5" min="1" step="0.5"></label>
         <label>Answer time (s): <input type="number" id="answerTime" value="3" min="0.5" step="0.5"></label>
-        <button onclick="startQuiz()">Start</button>
+        <div style="display:flex; gap:0.75rem; justify-content:center;">
+          <button onclick="startQuiz()">Start</button>
+          <button onclick="stopQuiz()" style="background:var(--accent, #c0392b);">Stop</button>
+        </div>
       </div>
 
       <div class="question" id="question">Press Start</div>
@@ -148,17 +151,29 @@
 
   <script>
     let count = 0;
+    let running = false;
 
     function randomBetween(min, max) {
       return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
     function startQuiz() {
+      running = true;
       count = 0;
       nextQuestion();
     }
 
+    function stopQuiz() {
+      running = false;
+      document.getElementById("question").innerText = "Stopped";
+      const timerBar = document.getElementById("timerBar");
+      timerBar.style.transition = "none";
+      timerBar.style.width = "0%";
+    }
+
     function nextQuestion() {
+      if (!running) return;
+
       const min = parseInt(document.getElementById("min").value);
       const max = parseInt(document.getElementById("max").value);
 
