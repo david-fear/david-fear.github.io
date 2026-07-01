@@ -40,9 +40,9 @@
     }
 
     .question {
-      font-size: clamp(3rem, 10vw, 7rem);
+      font-size: clamp(4.5rem, 15vw, 10rem);
       text-align: center;
-      margin-top: 2rem;
+      margin-top: 0.5rem;
       font-weight: 600;
     }
 
@@ -127,10 +127,10 @@
       </div>
 
       <div class="trainer-controls">
-        <label>Min: <input type="number" id="min" value="3" min="1"></label>
-        <label>Max: <input type="number" id="max" value="10" min="1"></label>
-        <label>Question time (s): <input type="number" id="questionTime" value="5" min="1" step="0.5"></label>
-        <label>Answer time (s): <input type="number" id="answerTime" value="3" min="0.5" step="0.5"></label>
+        <label>Min: <input type="number" id="min" value="3" min="1" onfocus="this.select()"></label>
+        <label>Max: <input type="number" id="max" value="12" min="1" onfocus="this.select()"></label>
+        <label>Question time (s): <input type="number" id="questionTime" value="5" min="1" step="0.5" onfocus="this.select()"></label>
+        <label>Answer time (s): <input type="number" id="answerTime" value="3" min="0.5" step="0.5" onfocus="this.select()"></label>
       </div>
     </section>
 
@@ -152,20 +152,28 @@
 
   <script>
     let count = 0;
-    let running = false;
+    let t1 = null;
+    let t2 = null;
+
+    function clearTimers() {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      t1 = null;
+      t2 = null;
+    }
 
     function randomBetween(min, max) {
       return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
     function startQuiz() {
-      running = true;
+      clearTimers();
       count = 0;
       nextQuestion();
     }
 
     function stopQuiz() {
-      running = false;
+      clearTimers();
       document.getElementById("question").innerText = "Stopped";
       const timerBar = document.getElementById("timerBar");
       timerBar.style.transition = "none";
@@ -173,8 +181,6 @@
     }
 
     function nextQuestion() {
-      if (!running) return;
-
       const min = parseInt(document.getElementById("min").value);
       const max = parseInt(document.getElementById("max").value);
 
@@ -202,14 +208,13 @@
       timerBar.style.transition = "width " + (questionTime / 1000) + "s linear";
       timerBar.style.width = "0%";
 
-      setTimeout(function () {
-
+      t1 = setTimeout(function () {
         questionDiv.innerHTML = x + " × " + y + " = <span class='answer-highlight'>" + answer + "</span>";
 
         timerBar.style.transition = "none";
         timerBar.style.width = "0%";
 
-        setTimeout(function () {
+        t2 = setTimeout(function () {
           count++;
           nextQuestion();
         }, answerTime);
