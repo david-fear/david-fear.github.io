@@ -44,7 +44,7 @@
     }
 
     .question {
-      font-size: 4rem;
+      font-size: 3rem;
       text-align: center;
       margin: 0.4rem 0;
       font-weight: 600;
@@ -131,12 +131,15 @@
         <div class="timer-bar" id="timerBar"></div>
       </div>
 
-      <div class="trainer-controls">
-        <label>Min: <input type="number" id="min" value="3" min="1" inputmode="numeric" onfocus="this.select()"></label>
-        <label>Max: <input type="number" id="max" value="12" min="1" inputmode="numeric" onfocus="this.select()"></label>
-        <label>Question time (s): <input type="number" id="questionTime" value="5" min="1" step="0.5" inputmode="decimal" onfocus="this.select()"></label>
-        <label>Answer time (s): <input type="number" id="answerTime" value="3" min="0.5" step="0.5" inputmode="decimal" onfocus="this.select()"></label>
-      </div>
+      <details style="text-align:center; margin-top:0.75rem;">
+        <summary style="cursor:pointer; font-size:clamp(0.85rem, 2.5vw, 1.2rem); list-style:none; display:inline-block;">&#9881; Controls</summary>
+        <div class="trainer-controls">
+          <label>Min: <input type="number" id="min" value="3" min="1" inputmode="numeric" onfocus="this.select()"></label>
+          <label>Max: <input type="number" id="max" value="12" min="1" inputmode="numeric" onfocus="this.select()"></label>
+          <label>Question time (s): <input type="number" id="questionTime" value="5" min="1" step="0.5" inputmode="decimal" onfocus="this.select()"></label>
+          <label>Answer time (s): <input type="number" id="answerTime" value="3" min="0.5" step="0.5" inputmode="decimal" onfocus="this.select()"></label>
+        </div>
+      </details>
     </section>
 
   </main>
