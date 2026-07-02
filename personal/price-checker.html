@@ -16,36 +16,23 @@
       font-family: monospace;
     }
 
-    .support-info {
-      margin: 0 0 18px;
-      border: 1px solid #2a2a2a;
-      background: #141414;
-      padding: 10px 14px;
-    }
+    .support-info { margin-top: 10px; }
 
     .support-info summary {
       cursor: pointer;
-      font-weight: bold;
-      font-size: 14px;
-      color: #ccc;
       user-select: none;
-      padding: 2px 0;
+      font-size: 13px;
     }
 
-    .support-info summary:hover { color: #fff; }
-
     .support-content {
-      margin-top: 12px;
+      margin-top: 8px;
       font-size: 13px;
-      color: #bbb;
       line-height: 1.7;
     }
 
-    .support-content h4 {
-      margin: 14px 0 4px;
-      color: #eee;
-      font-size: 13px;
-    }
+    .support-content h4 { margin: 12px 0 2px; font-size: 13px; }
+
+    .support-content ol, .support-content ul { margin: 4px 0 4px 18px; }
 
     .support-content code {
       background: #1e1e1e;
@@ -56,12 +43,6 @@
       word-break: break-all;
       color: #7dff7d;
     }
-
-    .support-content ol, .support-content ul {
-      margin: 4px 0 4px 18px;
-    }
-
-    .support-content a { color: var(--primary, #00aaff); }
 
     /* ── Add form ── */
     .add-form {
@@ -322,25 +303,27 @@
       <summary>Supported sites &amp; how to add items</summary>
       <div class="support-content">
 
-        <h4>🛒 The Warehouse — <code>thewarehouse.co.nz</code></h4>
-        <p>Paste any product URL. Price is read from the page's Schema.org product data (JSON-LD).</p>
-        <p><strong>Example:</strong><br>
-          <code>https://www.thewarehouse.co.nz/p/gamenote-wired-gaming-mouse-black/R3016083.html</code>
-        </p>
-        <p>Current price: <strong>$24.00</strong> (on special at time of writing)</p>
-
-        <h4>🌐 Other NZ retailers</h4>
-        <p>Any site that embeds <a href="https://schema.org/Product" target="_blank">Schema.org product JSON-LD</a> in its HTML should work. Tested / expected sites:</p>
+        <h4>✅ Confirmed working</h4>
         <ul>
-          <li><strong>Woolworths NZ</strong> — <code>woolworths.co.nz</code></li>
+          <li><strong>The Warehouse</strong> — <code>thewarehouse.co.nz</code></li>
+          <li><strong>JB Hi-Fi</strong> — <code>jbhifi.co.nz</code></li>
+        </ul>
+
+        <h4>🌐 Likely to work <em style="font-weight:normal;font-size:11px;">(JSON-LD present, untested)</em></h4>
+        <ul>
           <li><strong>Mitre 10</strong> — <code>mitre10.co.nz</code></li>
           <li><strong>PB Tech</strong> — <code>pbtech.co.nz</code></li>
-          <li><strong>JB Hi-Fi</strong> — <code>jbhifi.co.nz</code></li>
           <li><strong>Briscoes</strong> — <code>briscoes.co.nz</code></li>
           <li><strong>Noel Leeming</strong> — <code>noelleeming.co.nz</code></li>
           <li><strong>Harvey Norman</strong> — <code>harveynorman.co.nz</code></li>
+          <li><strong>Woolworths NZ</strong> — <code>woolworths.co.nz</code></li>
         </ul>
-        <p>Sites with heavy bot protection (Cloudflare) may return an error — try again or check the browser console.</p>
+
+        <h4>❌ Known not to work</h4>
+        <ul>
+          <li><strong>Mighty Ape</strong> — blocked by Cloudflare (HTTP 403 via proxy)</li>
+          <li><strong>Pak'nSave</strong> — SPA, price not in static HTML</li>
+        </ul>
 
         <h4>ℹ️ Storage note</h4>
         <p>Price history is stored in your browser's <strong>localStorage</strong> (not cookies — cookies are limited to 4 KB; localStorage supports several MB). Data stays on your device and is never sent anywhere.</p>
