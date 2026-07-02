@@ -113,7 +113,7 @@
 
     .top-actions span {
       font-size: 12px;
-      color: #666;
+      color: #aaa;
     }
 
     /* ── Item grid ── */
@@ -316,25 +316,6 @@
         </p>
         <p>Current price: <strong>$24.00</strong> (on special at time of writing)</p>
 
-        <h4>🥦 Pak'nSave — <code>paknsave.co.nz</code></h4>
-        <p>Uses their live <strong>decorateProducts API</strong>. You need to supply your store's UUID once — it is saved per item.</p>
-        <p><strong>How to find your Store ID:</strong></p>
-        <ol>
-          <li>Open any Pak'nSave product page in Chrome / Edge</li>
-          <li>Press <kbd>F12</kbd> → <strong>Network</strong> tab → reload the page</li>
-          <li>Filter by <code>decorateProducts</code></li>
-          <li>Copy the UUID from the request URL:<br>
-            <code>…/store/<em style="color:#ffd700">xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</em>/decorateProducts</code>
-          </li>
-        </ol>
-        <p><strong>Example URL:</strong><br>
-          <code>https://www.paknsave.co.nz/shop/product/5283751_ea_000pns?name=sunsilk-detox-for-men-shampoo</code>
-        </p>
-        <p><strong>Example Store ID (Napier Pak'nSave):</strong><br>
-          <code>49037947-e450-49bf-ba1f-a94551c79a72</code>
-        </p>
-        <p><em>Price is returned as integer cents — 799 = $7.99</em></p>
-
         <h4>🌐 Other NZ retailers</h4>
         <p>Any site that embeds <a href="https://schema.org/Product" target="_blank">Schema.org product JSON-LD</a> in its HTML should work. Tested / expected sites:</p>
         <ul>
@@ -365,15 +346,11 @@
     <div class="add-form">
       <label class="url-label">
         Product URL
-        <input id="add-url" type="url" placeholder="https://www.thewarehouse.co.nz/p/…" oninput="onUrlChange(this)" autocomplete="off" />
+        <input id="add-url" type="url" placeholder="https://www.thewarehouse.co.nz/p/…" autocomplete="off" />
       </label>
       <label class="name-label">
         Custom name <span style="color:#555">(optional)</span>
         <input id="add-name" type="text" placeholder="e.g. Gaming Mouse" autocomplete="off" />
-      </label>
-      <label id="storeid-row" class="storeid-label">
-        <span id="storeid-store-label">Store ID (UUID)</span>
-        <input id="add-storeid" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" autocomplete="off" />
       </label>
       <button onclick="addItem()">+ Add &amp; Fetch</button>
     </div>
@@ -383,8 +360,8 @@
   <!-- ── Item list ── -->
   <section>
     <div class="top-actions">
-      <button onclick="refreshAll()">↻ Refresh All (new prices today)</button>
-      <button onclick="refreshForce()" style="font-size:12px; background:#252525;">↻ Force Refresh All</button>
+      <button onclick="refreshAll()">↻ Fetch today's prices</button>
+      <button onclick="refreshForce()" style="font-size:12px; background:#252525;">↻ Re-check all now</button>
       <span id="refresh-status"></span>
     </div>
     <div class="items-grid" id="items-grid">
@@ -419,7 +396,6 @@
      Storage : localStorage key "pricetracker_v1"
      CORS    : corsproxy.io
      Prices  : JSON-LD → Next.js __NEXT_DATA__ → meta tags → CSS selectors
-               Pak'nSave: POST decorateProducts API (price in cents ÷ 100)
   ───────────────────────────────────────────────────────────────────────── */
 
   const PROXY      = 'https://corsproxy.io/?';
@@ -459,9 +435,7 @@
     try {
       const h = new URL(url).hostname.toLowerCase().replace(/^www\./, '');
       if (h.includes('thewarehouse.co.nz'))                       return 'The Warehouse';
-      if (h.includes('paknsave.co.nz'))                           return "Pak'nSave";
       if (h.includes('woolworths.co.nz') || h.includes('countdown.co.nz')) return 'Woolworths NZ';
-      if (h.includes('newworld.co.nz'))                           return 'New World';
       if (h.includes('mitre10.co.nz'))                            return 'Mitre 10';
       if (h.includes('pbtech.co.nz'))                             return 'PB Tech';
       if (h.includes('jbhifi.co.nz'))                             return 'JB Hi-Fi';
@@ -471,10 +445,6 @@
       if (h.includes('rebelsport.co.nz'))                         return 'Rebel Sport';
       return new URL(url).hostname.replace(/^www\./, '');
     } catch { return 'Unknown'; }
-  }
-
-  function needsStoreId(store) {
-    return ["Pak'nSave", 'New World'].includes(store);
   }
 
   // ── Price extraction from HTML (JSON-LD → __NEXT_DATA__ → meta → selectors) ─
@@ -572,51 +542,6 @@
     return { price: price ?? null, name: name ?? null };
   }
 
-  // ── Pak'nSave API ──────────────────────────────────────────────────────────
-
-  async function fetchPakNSavePrice(item) {
-    if (!item.storeId) throw new Error("Pak'nSave Store ID is required. See Supported sites for how to find it.");
-
-    // Transform URL slug to product ID:  5283751_ea_000pns → 5283751-EA-000
-    const urlPath = new URL(item.url).pathname;
-    const rawSlug = urlPath.split('/').pop().split('?')[0];
-    const productId = rawSlug
-      .replace(/pns$|nw$|fg$/i, '')   // remove store suffix (pns = Pak'nSave, nw = New World, fg = Four Square)
-      .replace(/_/g, '-')
-      .toUpperCase()
-      .replace(/-+$/, '');
-
-    const apiUrl = `https://api-prod.paknsave.co.nz/v1/edge/store/${encodeURIComponent(item.storeId)}/decorateProducts`;
-    const proxied = PROXY + encodeURIComponent(apiUrl);
-
-    const ctrl = new AbortController();
-    const tid  = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
-
-    let resp;
-    try {
-      resp = await fetch(proxied, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ productIds: [productId] }),
-        signal: ctrl.signal
-      });
-    } finally { clearTimeout(tid); }
-
-    if (!resp.ok) throw new Error(`API HTTP ${resp.status}`);
-    const data    = await resp.json();
-    const product = data.products?.[0];
-    if (!product) throw new Error(`Product ${productId} not found (check Store ID and URL)`);
-
-    const price = (product.singlePrice?.price ?? product.price?.price ?? null);
-    if (price == null) throw new Error('Price field missing in API response');
-
-    const nameParts = [product.brand, product.name, product.displayName].filter(Boolean);
-    return {
-      price: price / 100,
-      name:  nameParts.join(' ') || product.productId
-    };
-  }
-
   // ── Generic HTML fetch ─────────────────────────────────────────────────────
 
   async function fetchHTMLPrice(item) {
@@ -636,10 +561,6 @@
   // ── Main fetch dispatcher ──────────────────────────────────────────────────
 
   async function fetchCurrentPrice(item) {
-    const store = item.store || detectStore(item.url);
-    if (store === "Pak'nSave" || store === 'New World') {
-      return await fetchPakNSavePrice(item);
-    }
     return await fetchHTMLPrice(item);
   }
 
@@ -705,7 +626,7 @@
       const rows = [...history].reverse().slice(0, 8).map(h =>
         `<tr><td>${esc(h.date)}</td><td style="color:#7dff7d">$${parseFloat(h.price).toFixed(2)}</td></tr>`
       ).join('');
-      histHtml = `<details style="margin-top:4px;"><summary style="font-size:11px;color:#555;cursor:pointer;">${history.length} price record${history.length !== 1 ? 's' : ''}</summary>
+      histHtml = `<details style="margin-top:4px;"><summary style="font-size:11px;color:#bbb;cursor:pointer;font-weight:bold;">${history.length} price record${history.length !== 1 ? 's' : ''}</summary>
         <table class="hist-table"><thead><tr><th>Date</th><th>Price</th></tr></thead><tbody>${rows}</tbody></table>
       </details>`;
     }
@@ -731,7 +652,7 @@
         ${latest ? `<span>Last recorded: ${esc(latest.date)}</span>` : ''}
         ${item.error ? `<span class="error-badge" title="${esc(item.error)}">⚠ ${esc(item.error)}</span>` : ''}
       </div>
-      ${history.length >= 2 ? `<canvas id="${canvasId}" class="price-chart"></canvas>` : ''}
+      ${history.length >= 2 ? `<canvas id="${canvasId}" class="price-chart"></canvas>` : history.length === 1 ? `<div style="font-size:10px;color:#444;margin-top:4px;font-style:italic;">Graph appears once a second day's price is recorded.</div>` : ''}
       ${histHtml}
     `;
     return div;
@@ -846,42 +767,63 @@
   }
 
   async function refreshAll() {
-    const data = loadData();
-    const status = document.getElementById('refresh-status');
-    if (!data.items.length) return;
-    const todayStr = today();
-    const pending = data.items.filter(i => !(i.history || []).find(h => h.date === todayStr));
+    const data       = loadData();
+    const status     = document.getElementById('refresh-status');
+    if (!data.items.length) { status.textContent = ''; return; }
+
+    const todayStr   = today();
+    const pending    = data.items.filter(i => !(i.history || []).find(h => h.date === todayStr));
+    const alreadyDone = data.items.length - pending.length;
+
     if (!pending.length) {
-      status.textContent = 'All items already have today\'s price.';
+      status.textContent = `✓ All ${data.items.length} item${data.items.length !== 1 ? 's' : ''} already checked today.`;
       return;
     }
-    status.textContent = `Fetching ${pending.length} item(s)…`;
+
+    status.textContent = `Checking ${pending.length} item${pending.length !== 1 ? 's' : ''} not yet fetched today…`;
+    let fetched = 0;
+    let errors  = 0;
     for (const item of pending) {
       await refreshItem(item.id, false);
+      const fresh = loadData().items.find(i => i.id === item.id);
+      if (fresh?.error) errors++;
+      else fetched++;
     }
-    status.textContent = 'Done.';
-    setTimeout(() => { status.textContent = ''; }, 3000);
+
+    const parts = [];
+    if (fetched)      parts.push(`${fetched} price${fetched !== 1 ? 's' : ''} fetched`);
+    if (alreadyDone)  parts.push(`${alreadyDone} already up to date`);
+    if (errors)       parts.push(`${errors} error${errors !== 1 ? 's' : ''}`);
+    status.textContent = `✓ ${parts.join(' · ')}`;
+    setTimeout(() => { status.textContent = ''; }, 8000);
   }
 
   async function refreshForce() {
-    const data = loadData();
+    const data   = loadData();
     const status = document.getElementById('refresh-status');
     if (!data.items.length) return;
-    status.textContent = `Force-refreshing ${data.items.length} item(s)…`;
+    status.textContent = `Re-checking all ${data.items.length} item${data.items.length !== 1 ? 's' : ''}…`;
+    let fetched = 0;
+    let errors  = 0;
     for (const item of data.items) {
       await refreshItem(item.id, true);
+      const fresh = loadData().items.find(i => i.id === item.id);
+      if (fresh?.error) errors++;
+      else fetched++;
     }
-    status.textContent = 'Done.';
-    setTimeout(() => { status.textContent = ''; }, 3000);
+    const parts = [];
+    if (fetched) parts.push(`${fetched} updated`);
+    if (errors)  parts.push(`${errors} error${errors !== 1 ? 's' : ''}`);
+    status.textContent = `✓ ${parts.join(' · ')}`;
+    setTimeout(() => { status.textContent = ''; }, 8000);
   }
 
   // ── Add item ────────────────────────────────────────────────────────────────
 
   async function addItem() {
-    const urlInput     = document.getElementById('add-url');
-    const nameInput    = document.getElementById('add-name');
-    const storeIdInput = document.getElementById('add-storeid');
-    const statusEl     = document.getElementById('add-status');
+    const urlInput  = document.getElementById('add-url');
+    const nameInput = document.getElementById('add-name');
+    const statusEl  = document.getElementById('add-status');
 
     const url = urlInput.value.trim();
     if (!url) { statusEl.textContent = 'Please enter a URL.'; return; }
@@ -897,13 +839,7 @@
     }
 
     const store    = detectStore(url);
-    const storeId  = storeIdInput?.value.trim() || '';
     const custName = nameInput.value.trim();
-
-    if (needsStoreId(store) && !storeId) {
-      statusEl.textContent = `${store} requires a Store ID — see 'Supported sites' above for how to find it.`;
-      return;
-    }
 
     const data = loadData();
     if (data.items.some(i => i.url === url)) {
@@ -917,7 +853,6 @@
       name:       custName || '',
       customName: !!custName,
       store,
-      storeId:    storeId || null,
       history:    [],
       status:     null,
       error:      null
@@ -928,26 +863,10 @@
 
     urlInput.value  = '';
     nameInput.value = '';
-    if (storeIdInput) storeIdInput.value = '';
-    document.getElementById('storeid-row').style.display = 'none';
     statusEl.textContent = '';
 
     render();
     await refreshItem(newItem.id, true);
-  }
-
-  // ── URL input → show/hide Store ID field ────────────────────────────────────
-
-  function onUrlChange(input) {
-    const store     = detectStore(input.value);
-    const row       = document.getElementById('storeid-row');
-    const label     = document.getElementById('storeid-store-label');
-    if (needsStoreId(store)) {
-      row.style.display = '';
-      label.textContent  = `${store} Store ID (UUID):`;
-    } else {
-      row.style.display = 'none';
-    }
   }
 
   // Allow Enter key to submit from the URL field
