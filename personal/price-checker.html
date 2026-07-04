@@ -564,8 +564,9 @@
         return parseHTMLForProduct(text);
       }
       lastError = new Error(`HTTP ${resp.status}`);
-      // 413 = proxy size limit, 403 = proxy IP blocked — both worth retrying
-      if (resp.status !== 413 && resp.status !== 403) break;
+      // Retry on proxy-specific failures: size limits, IP blocks, server/gateway errors
+      const retryable = resp.status === 403 || resp.status === 413 || resp.status === 429 || resp.status >= 500;
+      if (!retryable) break;
     }
     throw lastError;
   }
