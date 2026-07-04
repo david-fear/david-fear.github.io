@@ -308,9 +308,7 @@
           <li><strong>The Warehouse</strong> — <code>thewarehouse.co.nz</code></li>
           <li><strong>JB Hi-Fi</strong> — <code>jbhifi.co.nz</code></li>
           <li><strong>Mitre 10</strong> — <code>mitre10.co.nz</code> <em style="font-size:11px;font-weight:normal;">(uses fallback proxy)</em></li>
-          <li><strong>PB Tech</strong> — <code>pbtech.co.nz</code> <em style="font-size:11px;font-weight:normal;">(uses fallback proxy)</em></li>
           <li><strong>Briscoes</strong> — <code>briscoes.co.nz</code></li>
-          <li><strong>Noel Leeming</strong> — <code>noelleeming.co.nz</code> <em style="font-size:11px;font-weight:normal;">(uses fallback proxy)</em></li>
         </ul>
 
         <h4>🌐 Likely to work <em style="font-weight:normal;font-size:11px;">(JSON-LD present, untested)</em></h4>
@@ -321,6 +319,9 @@
 
         <h4>❌ Known not to work</h4>
         <ul>
+          <li><strong>PB Tech</strong> — WAF blocks all CORS proxies</li>
+          <li><strong>Noel Leeming</strong> — WAF blocks all CORS proxies</li>
+          <li><strong>Kmart</strong> — Akamai CDN blocks all CORS proxies</li>
           <li><strong>Mighty Ape</strong> — blocked by Cloudflare (HTTP 403 via proxy)</li>
           <li><strong>Pak'nSave</strong> — SPA, price not in static HTML</li>
         </ul>
@@ -438,6 +439,7 @@
       if (h.includes('harveynorman.co.nz'))                       return 'Harvey Norman';
       if (h.includes('briscoes.co.nz'))                           return 'Briscoes';
       if (h.includes('noelleeming.co.nz'))                        return 'Noel Leeming';
+      if (h.includes('kmart.co.nz'))                              return 'Kmart';
       if (h.includes('rebelsport.co.nz'))                         return 'Rebel Sport';
       return new URL(url).hostname.replace(/^www\./, '');
     } catch { return 'Unknown'; }
