@@ -313,7 +313,6 @@
 
         <h4>🌐 Likely to work <em style="font-weight:normal;font-size:11px;">(JSON-LD present, untested)</em></h4>
         <ul>
-          <li><strong>Harvey Norman</strong> — <code>harveynorman.co.nz</code></li>
           <li><strong>Woolworths NZ</strong> — <code>woolworths.co.nz</code></li>
         </ul>
 
@@ -322,6 +321,7 @@
           <li><strong>PB Tech</strong> — WAF blocks all CORS proxies</li>
           <li><strong>Noel Leeming</strong> — WAF blocks all CORS proxies</li>
           <li><strong>Kmart</strong> — Akamai CDN blocks all CORS proxies</li>
+          <li><strong>Harvey Norman</strong> — Imperva/Incapsula bot challenge page</li>
           <li><strong>Mighty Ape</strong> — blocked by Cloudflare (HTTP 403 via proxy)</li>
           <li><strong>Pak'nSave</strong> — SPA, price not in static HTML</li>
         </ul>
@@ -562,6 +562,11 @@
         if (text.trimStart().startsWith('{') && text.includes('size limit')) {
           lastError = new Error('Response too large for proxy');
           continue;  // try next proxy
+        }
+        // Imperva/Incapsula or similar bot-challenge page
+        if (text.includes('_Incapsula_Resource') || text.includes('challenge-platform')) {
+          lastError = new Error('Bot protection challenge — site blocks proxies');
+          break;  // no point trying other proxies
         }
         return parseHTMLForProduct(text);
       }
