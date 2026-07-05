@@ -552,7 +552,7 @@
 
   <!-- F1 Points Table & Chart Script -->
   <script>
-    const csvURL = 'https://david-fear.github.io/personal/formula1-data.csv';
+    const csvURL = 'https://david-fear.github.io/personal/formula1-data.csv?v=' + new Date().toISOString().slice(0, 10);
 
     /* Helper: 3-letter driver code from surname */
     function driverCode(name) {
@@ -790,7 +790,7 @@
   <!-- Constructor Chart & Table Script -->
   <script>
   (function() {
-    const csvURL = 'https://david-fear.github.io/personal/formula1-data.csv';
+    const csvURL = 'https://david-fear.github.io/personal/formula1-data.csv?v=' + new Date().toISOString().slice(0, 10);
 
     const teamColors = {
       'Mercedes':     '#00D2BE',
