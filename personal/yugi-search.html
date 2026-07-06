@@ -393,6 +393,11 @@
       { d: 'novagames.co.nz', url: q => `https://novagames.co.nz/search?type=product&options[prefix]=last&q=${encodeURIComponent(q)}` },
     ];
 
+    /* Stores that are coming soon — shown as a preview section */
+    const COMING_SOON_STORES = [
+      { d: 'rawr.cards', url: 'https://www.rawr.cards/' },
+    ];
+
     const TIMEOUT_MS = 6000;
     const ENABLE_ALLORIGINS_FALLBACK = false;
 
@@ -760,6 +765,19 @@
           ).join('');
         resultsEl.appendChild(linkDiv);
         linkGroupNode = linkDiv;
+      }
+
+      /* Render coming-soon group */
+      if (COMING_SOON_STORES.length) {
+        const csDiv = document.createElement('div');
+        csDiv.className = 'store';
+        csDiv.style.cssText = 'border-color:#665500; background:#1e1a00; box-shadow: 0 0 18px rgba(255,200,0,0.1), inset 0 0 0 1px rgba(255,200,0,0.08);';
+        csDiv.innerHTML =
+          `<div class="store-name" style="color:#ffcc00; border-bottom-color:#443800; text-shadow:0 0 8px rgba(255,200,0,0.3);">🔜 coming soon</div>` +
+          COMING_SOON_STORES.map(s =>
+            `<div class="item" style="font-size:12px;"><a href="${esc(s.url)}" target="${linkTarget}" rel="noopener" style="color:#ffe066; text-shadow:0 0 6px rgba(255,200,0,0.2);">${esc(s.d)}</a></div>`
+          ).join('');
+        resultsEl.appendChild(csDiv);
       }
 
       function reorderStoreCards() {
