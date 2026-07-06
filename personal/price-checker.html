@@ -563,11 +563,6 @@
           lastError = new Error('Response too large for proxy');
           continue;  // try next proxy
         }
-        // Imperva/Incapsula or similar bot-challenge page
-        if (text.includes('_Incapsula_Resource') || text.includes('challenge-platform')) {
-          lastError = new Error('Bot protection challenge — site blocks proxies');
-          break;  // no point trying other proxies
-        }
         return parseHTMLForProduct(text);
       }
       lastError = new Error(`HTTP ${resp.status}`);
