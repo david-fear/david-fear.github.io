@@ -322,6 +322,7 @@
           <li><strong>Noel Leeming</strong> — WAF blocks all CORS proxies</li>
           <li><strong>Kmart</strong> — Akamai CDN blocks all CORS proxies</li>
           <li><strong>Harvey Norman</strong> — Imperva/Incapsula bot challenge page</li>
+          <li><strong>Bunnings</strong> — Cloudflare bot protection blocks all proxies</li>
           <li><strong>Mighty Ape</strong> — blocked by Cloudflare (HTTP 403 via proxy)</li>
           <li><strong>Pak'nSave</strong> — SPA, price not in static HTML</li>
         </ul>
@@ -440,6 +441,7 @@
       if (h.includes('briscoes.co.nz'))                           return 'Briscoes';
       if (h.includes('noelleeming.co.nz'))                        return 'Noel Leeming';
       if (h.includes('kmart.co.nz'))                              return 'Kmart';
+      if (h.includes('bunnings.co.nz'))                          return 'Bunnings';
       if (h.includes('rebelsport.co.nz'))                         return 'Rebel Sport';
       return new URL(url).hostname.replace(/^www\./, '');
     } catch { return 'Unknown'; }
