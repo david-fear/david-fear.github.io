@@ -546,28 +546,28 @@
     for (const buildUrl of proxies) {
       const ctrl = new AbortController();
       const tid  = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
-      let resp;
       try {
-        resp = await fetch(buildUrl(item.url), { signal: ctrl.signal });
+        const resp = await fetch(buildUrl(item.url), { signal: ctrl.signal });
+        if (resp.ok) {
+          const text = await resp.text();  // timeout still active while reading body
+          clearTimeout(tid);
+          // corsproxy.io returns 200 with a JSON error body when response exceeds 1 MB
+          if (text.trimStart().startsWith('{') && text.includes('size limit')) {
+            lastError = new Error('Response too large for proxy');
+            continue;  // try next proxy
+          }
+          return parseHTMLForProduct(text);
+        }
+        clearTimeout(tid);
+        lastError = new Error(`HTTP ${resp.status}`);
+        // Retry on proxy-specific failures: size limits, IP blocks, server/gateway errors
+        const retryable = resp.status === 403 || resp.status === 413 || resp.status === 429 || resp.status >= 500;
+        if (!retryable) break;
       } catch (e) {
+        clearTimeout(tid);
         lastError = e;
         continue;  // network / timeout — try next proxy
-      } finally {
-        clearTimeout(tid);
       }
-      if (resp.ok) {
-        const text = await resp.text();
-        // corsproxy.io returns 200 with a JSON error body when response exceeds 1 MB
-        if (text.trimStart().startsWith('{') && text.includes('size limit')) {
-          lastError = new Error('Response too large for proxy');
-          continue;  // try next proxy
-        }
-        return parseHTMLForProduct(text);
-      }
-      lastError = new Error(`HTTP ${resp.status}`);
-      // Retry on proxy-specific failures: size limits, IP blocks, server/gateway errors
-      const retryable = resp.status === 403 || resp.status === 413 || resp.status === 429 || resp.status >= 500;
-      if (!retryable) break;
     }
     throw lastError;
   }
@@ -575,10 +575,9 @@
   // ── Main fetch dispatcher ──────────────────────────────────────────────────
 
   async function fetchCurrentPrice(item) {
-    // Mitre 10 works reliably via corsproxy.io; allorigins/codetabs return 403
-    // or hang — so use only corsproxy.io (same as the yugioh pages).
+    // Mitre 10 pages exceed corsproxy.io's 1 MB limit — skip straight to allorigins/codetabs.
     if ((item.store || '').includes('Mitre 10')) {
-      return await fetchHTMLPrice(item, [PROXIES[0]]);
+      return await fetchHTMLPrice(item, [PROXIES[1], PROXIES[2]]);
     }
     return await fetchHTMLPrice(item);
   }
