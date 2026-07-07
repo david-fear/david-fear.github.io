@@ -299,46 +299,42 @@
       <button onclick="addItem()">+ Add &amp; Fetch</button>
     </div>
     <div id="add-status" style="font-size:12px; color:#888; min-height:16px;"></div>
-    <details class="support-info" style="margin-top:10px; margin-bottom:0;">
-      <summary>Supported sites &amp; how to add items</summary>
+    <p style="font-size:12px; color:#888; margin:8px 0 6px;">
+      <a href="https://www.thewarehouse.co.nz" target="_blank">The Warehouse</a>
+      &bull;
+      <a href="https://www.jbhifi.co.nz" target="_blank">JB Hi-Fi</a>
+      &bull;
+      <a href="https://www.mitre10.co.nz" target="_blank">Mitre 10</a>
+      &bull;
+      <a href="https://www.briscoes.co.nz" target="_blank">Briscoes</a>
+      &bull;
+      <a href="https://www.woolworths.co.nz" target="_blank">Woolworths NZ</a> <em>(untested)</em>
+    </p>
+    <details class="support-info" style="margin-top:6px; margin-bottom:0;">
+      <summary>How it works &amp; known limitations</summary>
       <div class="support-content">
-
-        <h4>✅ Confirmed working</h4>
-        <ul>
-          <li><strong>The Warehouse</strong> — <code>thewarehouse.co.nz</code></li>
-          <li><strong>JB Hi-Fi</strong> — <code>jbhifi.co.nz</code></li>
-          <li><strong>Mitre 10</strong> — <code>mitre10.co.nz</code> <em style="font-size:11px;font-weight:normal;">(uses fallback proxy)</em></li>
-          <li><strong>Briscoes</strong> — <code>briscoes.co.nz</code></li>
-        </ul>
-
-        <h4>🌐 Likely to work <em style="font-weight:normal;font-size:11px;">(JSON-LD present, untested)</em></h4>
-        <ul>
-          <li><strong>Woolworths NZ</strong> — <code>woolworths.co.nz</code></li>
-        </ul>
 
         <h4>❌ Known not to work</h4>
         <ul>
           <li><strong>PB Tech</strong> — WAF blocks all CORS proxies</li>
           <li><strong>Noel Leeming</strong> — WAF blocks all CORS proxies</li>
           <li><strong>Kmart</strong> — Akamai CDN blocks all CORS proxies</li>
-          <li><strong>Harvey Norman</strong> — Imperva/Incapsula bot challenge page</li>
-          <li><strong>Bunnings</strong> — Cloudflare bot protection blocks all proxies</li>
-          <li><strong>Mighty Ape</strong> — blocked by Cloudflare (HTTP 403 via proxy)</li>
-          <li><strong>Pak'nSave</strong> — SPA, price not in static HTML</li>
+          <li><strong>Harvey Norman</strong> — Imperva/Incapsula bot challenge</li>
+          <li><strong>Bunnings</strong> — Cloudflare bot protection</li>
+          <li><strong>Mighty Ape</strong> — Cloudflare (HTTP 403 via proxy)</li>
+          <li><strong>Pak'nSave</strong> — SPA; price not in static HTML</li>
         </ul>
 
-        <h4>ℹ️ Storage note</h4>
-        <p>Price history is stored in your browser's <strong>localStorage</strong> (not cookies — cookies are limited to 4 KB; localStorage supports several MB). Data stays on your device and is never sent anywhere.</p>
-        <p>One price entry is recorded per item per day. Prices are only updated when you load this page.</p>
+        <h4>ℹ️ Storage</h4>
+        <p>History is stored in <strong>localStorage</strong> — it stays on your device and is never sent anywhere. One entry is recorded per item per day, updated on page load.</p>
 
-        <h4>⚠️ Legality / fair use</h4>
-        <p>This is a personal price-tracking tool for your own shopping. Fetching uses the public CORS proxy <a href="https://corsproxy.io" target="_blank">corsproxy.io</a>. Retail sites' Terms of Service may restrict automated access — use reasonably and for personal use only.</p>
+        <h4>⚠️ Fair use</h4>
+        <p>Personal use only. Fetching is done via the public CORS proxy <a href="https://corsproxy.io" target="_blank">corsproxy.io</a>. Retail sites' Terms of Service may restrict automated access — use responsibly.</p>
 
-        <h4>🗑️ Deleting your data</h4>
-        <p>Use the <strong>✕</strong> button on any item card to remove that item and all its price history.</p>
-        <p>To wipe <em>everything</em> at once, delete the localStorage key directly in your browser:</p>
+        <h4>🗑️ Deleting data</h4>
+        <p>Use the <strong>✕</strong> button on a card to remove that item. To wipe everything at once:</p>
         <ol>
-          <li>Press <kbd>F12</kbd> → <strong>Application</strong> tab <em>(Chrome / Edge)</em> or <strong>Storage</strong> tab <em>(Firefox)</em></li>
+          <li>Press <kbd>F12</kbd> → <strong>Application</strong> tab <em>(Chrome/Edge)</em> or <strong>Storage</strong> tab <em>(Firefox)</em></li>
           <li>Expand <strong>Local Storage</strong> → click <code>https://david-fear.github.io</code></li>
           <li>Find the key <code>pricetracker_v1</code> and press <kbd>Delete</kbd></li>
         </ol>
