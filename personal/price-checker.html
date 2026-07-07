@@ -304,9 +304,6 @@
       &bull;
       <a href="https://www.jbhifi.co.nz" target="_blank">JB Hi-Fi</a>
       &bull;
-      <a href="https://www.mitre10.co.nz" target="_blank">Mitre 10</a>
-      &bull;
-
       <a href="https://www.briscoes.co.nz" target="_blank">Briscoes</a>
       &bull;
       <a href="https://www.woolworths.co.nz" target="_blank">Woolworths NZ</a> <em>(untested)</em>
@@ -317,6 +314,7 @@
 
         <h4>❌ Known not to work</h4>
         <ul>
+          <li><strong>Mitre 10</strong> — Cloudflare blocks all CORS proxy IPs</li>
           <li><strong>PB Tech</strong> — WAF blocks all CORS proxies</li>
           <li><strong>Noel Leeming</strong> — WAF blocks all CORS proxies</li>
           <li><strong>Kmart</strong> — Akamai CDN blocks all CORS proxies</li>
@@ -575,10 +573,6 @@
   // ── Main fetch dispatcher ──────────────────────────────────────────────────
 
   async function fetchCurrentPrice(item) {
-    // Mitre 10 pages exceed corsproxy.io's 1 MB limit — skip straight to allorigins/codetabs.
-    if ((item.store || '').includes('Mitre 10')) {
-      return await fetchHTMLPrice(item, [PROXIES[1], PROXIES[2]]);
-    }
     return await fetchHTMLPrice(item);
   }
 
