@@ -204,7 +204,7 @@
     /* ── Chart ── */
     .price-chart {
       width: 100% !important;
-      height: 160px !important;
+      height: 220px !important;
       margin-top: 6px;
     }
 
@@ -251,7 +251,7 @@
       font-weight: bold;
     }
 
-    .group-chart { height: 180px !important; }
+    .group-chart { height: 250px !important; }
 
     /* ── History table ── */
     .hist-table {
@@ -274,6 +274,59 @@
     .hist-table tr:hover td { color: #bbb; }
 
     .muted { color: #555; font-style: italic; font-size: 13px; }
+
+    /* ── Group dropdown ── */
+    #group-dropdown {
+      position: fixed;
+      z-index: 2000;
+      background: #1e1e1e;
+      border: 1px solid #444;
+      padding: 10px 12px;
+      min-width: 230px;
+      max-width: 290px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.7);
+      font-size: 12px;
+      color: #ccc;
+    }
+
+    #group-dropdown .dd-section {
+      font-size: 10px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 8px 0 4px;
+    }
+
+    #group-dropdown .dd-btn {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: #252525;
+      border: 1px solid #333;
+      color: #ccc;
+      padding: 5px 8px;
+      margin-bottom: 3px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    #group-dropdown .dd-btn:hover { background: #333; color: #fff; }
+    #group-dropdown .dd-btn.group-btn { color: #ffcc66; }
+
+    #group-dropdown .dd-row {
+      display: flex;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    #group-dropdown .dd-row input {
+      flex: 1;
+      background: #111;
+      border: 1px solid #333;
+      color: #eee;
+      padding: 4px 6px;
+      font-size: 12px;
+    }
 
     /* ── Disclaimer ── */
     .disclaimer {
@@ -454,6 +507,28 @@
 
   function uid() {
     return 'item_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+  }
+
+  function nameFromUrl(url) {
+    try {
+      const path = decodeURIComponent(new URL(url).pathname);
+      const segments = path.split('/')
+        .map(s => s.replace(/\.[a-z]{2,4}$/i, ''))  // strip extensions
+        .filter(s => s.length > 1);
+      // Work backwards to find the first segment that looks like a product slug
+      for (let i = segments.length - 1; i >= 0; i--) {
+        const s = segments[i];
+        if (/^\d+$/.test(s)) continue;                   // pure digits (IDs)
+        if (/^[A-Z0-9]{5,}$/.test(s) && /\d/.test(s)) continue;  // product codes e.g. BBM876, R640869
+        if (s.length < 3) continue;
+        return s.replace(/[-_]/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim()
+                .replace(/\b\w/g, c => c.toUpperCase())
+                .slice(0, 55);
+      }
+      return '';
+    } catch { return ''; }
   }
 
   // ── Storage ────────────────────────────────────────────────────────────────
@@ -722,7 +797,9 @@
         <span class="store-badge">${esc(item.store)}</span>
         <div class="card-actions">
           <button onclick="refreshItem('${esc(item.id)}')" title="Refresh now">↻</button>
-          <button onclick="renameItem('${esc(item.id)}')" title="Rename">✎ Rename</button>          <button onclick="groupItem('${esc(item.id)}'" title="Add to group" style="font-size:12px;">↦ Group</button>          <button class="btn-remove" onclick="removeItem('${esc(item.id)}')" title="Remove">✕</button>
+          <button onclick="renameItem('${esc(item.id)}')" title="Rename">✎ Rename</button>
+          <button onclick="groupItem(event,'${esc(item.id)}')" title="Add to group" style="font-size:12px;">↦ Group</button>
+          <button class="btn-remove" onclick="removeItem('${esc(item.id)}')" title="Remove">✕</button>
         </div>
       </div>
       <div class="card-name">
@@ -781,13 +858,13 @@
         },
         scales: {
           x: {
-            ticks: { color: '#666', font: { size: 9 }, maxRotation: 45 },
+            ticks: { color: '#666', font: { size: 11 }, maxRotation: 40 },
             grid:  { color: '#222' }
           },
           y: {
             min: minVal - pad,
             max: maxVal + pad,
-            ticks: { color: '#666', font: { size: 9 }, callback: v => `$${v.toFixed(2)}` },
+            ticks: { color: '#666', font: { size: 11 }, callback: v => `$${v.toFixed(2)}` },
             grid: { color: '#222' }
           }
         }
@@ -933,11 +1010,11 @@
           tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: $${ctx.parsed.y.toFixed(2)}` } }
         },
         scales: {
-          x: { ticks: { color: '#666', font: { size: 9 }, maxRotation: 45 }, grid: { color: '#222' } },
+          x: { ticks: { color: '#666', font: { size: 11 }, maxRotation: 40 }, grid: { color: '#222' } },
           y: {
             min: minVal - pad,
             max: maxVal + pad,
-            ticks: { color: '#666', font: { size: 9 }, callback: v => `$${v.toFixed(2)}` },
+            ticks: { color: '#666', font: { size: 11 }, callback: v => `$${v.toFixed(2)}` },
             grid: { color: '#222' }
           }
         }
@@ -947,33 +1024,121 @@
 
   // ── Group actions ─────────────────────────────────────────────────────────
 
-  function groupItem(id) {
+  function groupItem(e, id) {
+    // Close any already-open dropdown
+    closeGroupDropdown();
+
     const data = loadData();
     const item = data.items.find(i => i.id === id);
     if (!item) return;
     if (!data.groups) data.groups = [];
 
-    const existing = data.groups;
-    const msg = existing.length
-      ? `Assign "${item.name || item.store}" to a group:\n\n` +
-        existing.map((g, i) => `${i + 1}. ${g.name}`).join('\n') +
-        '\n\nEnter a number to use an existing group, or type a new group name:'
-      : `Enter a name for the new group:`;
+    const existing  = data.groups;
+    const ungrouped = data.items.filter(i => i.id !== id && !i.groupId);
+    const label     = esc((item.name || item.store).slice(0, 30)) + ((item.name || item.store).length > 30 ? '…' : '');
 
-    const input = prompt(msg);
-    if (input === null) return;
-    const trimmed = input.trim();
-    if (!trimmed) return;
+    let html = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <strong style="font-size:13px;">Group &ldquo;${label}&rdquo;</strong>
+        <button onclick="closeGroupDropdown()" style="background:none;border:none;color:#888;font-size:16px;cursor:pointer;padding:0 4px;line-height:1;">✕</button>
+      </div>`;
 
-    let group;
-    const num = parseInt(trimmed, 10);
-    if (!isNaN(num) && num >= 1 && num <= existing.length) {
-      group = existing[num - 1];
-    } else {
-      group = { id: 'group_' + Date.now() + '_' + Math.random().toString(36).slice(2, 5), name: trimmed };
-      data.groups.push(group);
+    if (existing.length) {
+      html += `<div class="dd-section">Add to existing group</div>`;
+      existing.forEach(g => {
+        html += `<button class="dd-btn group-btn" onclick="assignToGroup('${esc(id)}','${esc(g.id)}');">⊞ ${esc(g.name)}</button>`;
+      });
     }
 
+    if (ungrouped.length) {
+      html += `<div class="dd-section">Group with another item</div>`;
+      ungrouped.slice(0, 6).forEach(other => {
+        const otherLabel = (other.name || other.url).slice(0, 36);
+        const ellipsis   = (other.name || other.url).length > 36 ? '…' : '';
+        html += `<button class="dd-btn" onclick="groupTwoItems('${esc(id)}','${esc(other.id)}');"><span style="color:#888;font-size:10px;">${esc(other.store)}</span> ${esc(otherLabel)}${ellipsis}</button>`;
+      });
+    }
+
+    html += `
+      <div class="dd-section" style="margin-top:${existing.length || ungrouped.length ? 8 : 0}px;border-top:${existing.length || ungrouped.length ? '1px solid #333' : 'none'};padding-top:${existing.length || ungrouped.length ? 8 : 0}px;">New group name</div>
+      <div class="dd-row">
+        <input id="group-name-input" type="text" placeholder="e.g. Headphones…" />
+        <button onclick="createGroupWithName('${esc(id)}')" style="padding:4px 10px;">OK</button>
+      </div>`;
+
+    const dd = document.createElement('div');
+    dd.id = 'group-dropdown';
+    dd.innerHTML = html;
+    document.body.appendChild(dd);
+
+    // Position below the clicked button
+    const rect = e.target.getBoundingClientRect();
+    let top  = rect.bottom + window.scrollY + 4;
+    let left = rect.left  + window.scrollX;
+    const ddW = 290;
+    if (left + ddW > window.innerWidth - 8) left = window.innerWidth - ddW - 8;
+    dd.style.top  = top  + 'px';
+    dd.style.left = left + 'px';
+
+    document.getElementById('group-name-input').focus();
+
+    // Close on outside click
+    setTimeout(() => document.addEventListener('click', _groupDropdownOutsideClick), 0);
+  }
+
+  function _groupDropdownOutsideClick(e) {
+    const dd = document.getElementById('group-dropdown');
+    if (dd && !dd.contains(e.target)) closeGroupDropdown();
+  }
+
+  function closeGroupDropdown() {
+    const dd = document.getElementById('group-dropdown');
+    if (dd) dd.remove();
+    document.removeEventListener('click', _groupDropdownOutsideClick);
+  }
+
+  function assignToGroup(itemId, groupId) {
+    closeGroupDropdown();
+    const data = loadData();
+    const item = data.items.find(i => i.id === itemId);
+    if (!item) return;
+    item.groupId = groupId;
+    saveData(data);
+    render();
+  }
+
+  function groupTwoItems(itemId1, itemId2) {
+    closeGroupDropdown();
+    const data  = loadData();
+    const item1 = data.items.find(i => i.id === itemId1);
+    const item2 = data.items.find(i => i.id === itemId2);
+    if (!item1 || !item2) return;
+    if (!data.groups) data.groups = [];
+    const group = {
+      id:   'group_' + Date.now() + '_' + Math.random().toString(36).slice(2, 5),
+      name: `${item1.store} vs ${item2.store}`
+    };
+    data.groups.push(group);
+    item1.groupId = group.id;
+    item2.groupId = group.id;
+    saveData(data);
+    render();
+  }
+
+  function createGroupWithName(itemId) {
+    const input = document.getElementById('group-name-input');
+    const name  = input ? input.value.trim() : '';
+    if (!name) { if (input) input.focus(); return; }
+    closeGroupDropdown();
+    const data = loadData();
+    const item = data.items.find(i => i.id === itemId);
+    if (!item) return;
+    if (!data.groups) data.groups = [];
+    const group = {
+      id:   'group_' + Date.now() + '_' + Math.random().toString(36).slice(2, 5),
+      name
+    };
+    data.groups.push(group);
     item.groupId = group.id;
     saveData(data);
     render();
@@ -1168,7 +1333,7 @@
     const newItem = {
       id:         uid(),
       url,
-      name:       custName || '',
+      name:       custName || nameFromUrl(url),
       customName: !!custName,
       store,
       history:    [],
