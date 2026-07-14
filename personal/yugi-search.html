@@ -265,6 +265,17 @@
       margin-left: 6px;
     }
 
+    .section-header {
+      grid-column: 1 / -1;
+      font-size: 10px;
+      color: #555;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      padding: 6px 2px 2px;
+      border-top: 1px solid #1a1a1a;
+      margin-top: 4px;
+    }
+
   </style>
 </head>
 
@@ -756,7 +767,7 @@
         const price = s.set_price && s.set_price !== '0.00' ? '$' + parseFloat(s.set_price).toFixed(2) : '\u2014';
         return `<tr style="${hi ? 'background:#1a2a1a;' : ''}">
           <td style="padding:2px 6px;color:#aaa;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(s.set_name)}">${esc(s.set_name)}</td>
-          <td style="padding:2px 6px;font-family:monospace;font-size:10px;"><a href="#" onclick="document.getElementById('q').value='${esc(s.set_code)}';search(true);return false;" style="color:${hi ? '#7dff7d' : '#88aaff'};text-decoration:underline;cursor:pointer;font-family:monospace;font-size:10px;">${esc(s.set_code)}</a></td>
+          <td style="padding:2px 6px;font-family:monospace;font-size:10px;"><a href="javascript:void(0)" onclick="document.getElementById('q').value='${esc(s.set_code)}';search(true);" style="color:${hi ? '#7dff7d' : '#88aaff'};text-decoration:underline;cursor:pointer;font-family:monospace;font-size:10px;">${esc(s.set_code)}</a></td>
           <td style="padding:2px 6px;color:#aaa;">${esc(s.set_rarity)}</td>
           <td style="padding:2px 6px;color:#7dff7d;white-space:nowrap;">${esc(price)} <span style="color:#333;font-size:9px;">USD</span></td>
         </tr>`;
@@ -781,15 +792,17 @@
         </details>` : '';
 
       return `
-        <div style="background:#131310;border:1px solid #3a3510;padding:14px;display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;">
-          ${imgUrl ? `<img src="${esc(imgUrl)}" alt="${esc(card.name)}" style="width:120px;height:auto;border:1px solid #2a2a1a;flex-shrink:0;" loading="lazy" />` : ''}
-          <div style="flex:1;min-width:220px;">
-            <div style="font-size:15px;font-weight:bold;color:#ffd700;margin-bottom:4px;">${esc(card.name)}</div>
-            <div style="font-size:11px;color:#555;margin-bottom:6px;">${esc(card.type || '')}${card.race ? ' &middot; ' + esc(card.race) : ''}</div>
-            ${statParts.length ? `<div style="font-size:11px;color:#aaa;display:flex;gap:14px;flex-wrap:wrap;margin-bottom:8px;">${statParts.map(p => `<span>${esc(p)}</span>`).join('')}</div>` : ''}
-            <div style="font-size:11px;color:#bbb;line-height:1.7;border-top:1px solid #1e1e1e;padding-top:8px;white-space:pre-line;">${esc(card.desc || '')}</div>
-            ${setsSection}
+        <div style="background:#131310;border:1px solid #3a3510;padding:14px;">
+          <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;">
+            ${imgUrl ? `<img src="${esc(imgUrl)}" alt="${esc(card.name)}" style="width:90px;height:auto;border:1px solid #2a2a1a;flex-shrink:0;" loading="lazy" />` : ''}
+            <div style="flex:1;min-width:220px;">
+              <div style="font-size:15px;font-weight:bold;color:#ffd700;margin-bottom:4px;">${esc(card.name)}</div>
+              <div style="font-size:11px;color:#555;margin-bottom:6px;">${esc(card.type || '')}${card.race ? ' &middot; ' + esc(card.race) : ''}</div>
+              ${statParts.length ? `<div style="font-size:11px;color:#aaa;display:flex;gap:14px;flex-wrap:wrap;margin-bottom:8px;">${statParts.map(p => `<span>${esc(p)}</span>`).join('')}</div>` : ''}
+              <div style="font-size:11px;color:#bbb;line-height:1.7;border-top:1px solid #1e1e1e;padding-top:8px;white-space:pre-line;">${esc(card.desc || '')}</div>
+            </div>
           </div>
+          ${setsSection}
         </div>
         <div style="font-size:9px;color:#252510;text-align:right;margin-top:1px;">via YGOPRODeck API${matchCode ? ' &middot; ' + esc(matchCode) : ''}</div>`;
     }
@@ -800,6 +813,7 @@
         const trimmed = query.trim();
         let card = null;
         let matchCode = null;
+        let ygoStatus = 'not_found'; // 'found' | 'multiple' | 'not_found'
         const ctrl = new AbortController();
         const tid = setTimeout(() => ctrl.abort(), YGO_TIMEOUT_MS);
 
@@ -813,19 +827,21 @@
             if (r.ok) {
               const d = await r.json();
               card = (d.data || []).find(c => (c.card_sets || []).some(s => s.set_code.toUpperCase() === matchCode)) || null;
+              if (card) ygoStatus = 'found';
             }
           }
         } else {
           const r = await fetch(`https://db.ygoprodeck.com/api/v7/cardinfo.php?name=${encodeURIComponent(trimmed)}`, { signal: ctrl.signal });
           if (r.ok) {
             const d = await r.json();
-            if (d.data?.length === 1) card = d.data[0];
+            if (d.data?.length === 1) { card = d.data[0]; ygoStatus = 'found'; }
+            else if (d.data?.length > 1) ygoStatus = 'multiple';
           }
         }
         clearTimeout(tid);
 
-        if (card) {
-          const node = document.createElement('div');
+        const node = document.createElement('div');
+        if (ygoStatus === 'found') {
           node.style.cssText = 'grid-column: 1 / -1; border: 1px solid #b8860b; background: #1a1500; box-shadow: 0 0 22px rgba(255,200,0,0.18), inset 0 0 0 1px rgba(255,200,0,0.10); margin-bottom: 2px;';
           node.innerHTML = `<details open>
             <summary style="cursor:pointer; padding:9px 14px; font-size:13px; font-weight:bold; color:#ffd700; user-select:none; text-shadow:0 0 10px rgba(255,200,0,0.5);">
@@ -833,8 +849,13 @@
             </summary>
             <div style="padding:0 12px 12px;">${renderYGOPanel(card, matchCode)}</div>
           </details>`;
-          onResult(node);
+        } else {
+          node.style.cssText = 'grid-column: 1 / -1; border: 1px solid #1e1e1e; background: #111; padding: 6px 14px; font-size: 10px; color: #444; letter-spacing: 0.3px;';
+          node.textContent = ygoStatus === 'multiple'
+            ? '\u22ef YGOPRODeck: multiple results \u2014 try exact card name or use a set code (e.g. DUPO-EN017)'
+            : '\u22ef YGOPRODeck: not returned for this query';
         }
+        onResult(node);
       } catch (e) {
         console.warn('YGO lookup:', e);
       }
@@ -855,6 +876,17 @@
       ygoPanelNode = null;
       lookupYGOCard(q, node => { ygoPanelNode = node; reorderStoreCards(); });
       let linkGroupNode = null;
+
+      // Section header nodes (managed by reorderStoreCards)
+      const hitHeaderNode = document.createElement('div');
+      hitHeaderNode.className = 'section-header';
+      hitHeaderNode.textContent = '\u2713 Results Found';
+      const linksHeaderNode = document.createElement('div');
+      linksHeaderNode.className = 'section-header';
+      linksHeaderNode.textContent = '\u2197 External Links';
+      const missHeaderNode = document.createElement('div');
+      missHeaderNode.className = 'section-header';
+      missHeaderNode.textContent = '\u2717 Not Found / No Results';
 
       /* Render all slots — link-only stores populate immediately, Shopify show placeholder */
       const slots = STORES.map(store => {
@@ -927,17 +959,19 @@
             return a.index - b.index;
           });
 
-        if (linkGroupNode) linkGroupNode.remove();
-        if (ygoPanelNode?.parentNode) ygoPanelNode.remove();
-        if (comingSoonNode?.parentNode) comingSoonNode.remove();
+        [hitHeaderNode, ygoPanelNode, comingSoonNode, linksHeaderNode, linkGroupNode, missHeaderNode]
+          .forEach(n => n?.parentNode && n.remove());
 
         const hitStores = ordered.filter(e => e.state === 'hit');
         const notHitStores = ordered.filter(e => e.state !== 'hit');
 
+        if (hitStores.length) resultsEl.appendChild(hitHeaderNode);
         hitStores.forEach(entry => resultsEl.appendChild(entry.node));
         if (ygoPanelNode) resultsEl.appendChild(ygoPanelNode);
+        resultsEl.appendChild(linksHeaderNode);
         if (comingSoonNode) resultsEl.appendChild(comingSoonNode);
         if (linkGroupNode) resultsEl.appendChild(linkGroupNode);
+        if (notHitStores.length) resultsEl.appendChild(missHeaderNode);
         notHitStores.forEach(entry => resultsEl.appendChild(entry.node));
       }
 

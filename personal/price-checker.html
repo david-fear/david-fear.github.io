@@ -232,30 +232,39 @@
     .group-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 12px;
+      font-size: 11px;
+      color: #888;
       margin: 4px 0 2px;
     }
 
     .group-table th {
       text-align: left;
-      color: #555;
+      color: #777;
       font-weight: normal;
       font-size: 10px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      padding: 2px 8px 4px 0;
+      padding: 1px 6px 3px 0;
       border-bottom: 1px solid #222;
     }
 
     .group-table td {
-      padding: 5px 8px 5px 0;
+      padding: 2px 6px 2px 0;
       vertical-align: middle;
       border-bottom: 1px solid #1a1a1a;
     }
 
+    .group-table tr:hover td { color: #bbb; }
+
     .group-table tr:last-child td { border-bottom: none; }
 
     .group-table .gt-store { white-space: nowrap; }
+
+    .group-table .store-badge {
+      font-size: 10px;
+      font-weight: normal;
+      letter-spacing: 0;
+    }
 
     .group-table .gt-name {
       width: 99%;
@@ -265,14 +274,12 @@
       color: #ccc;
       text-decoration: none;
       word-break: break-word;
+      font-size: 11px;
     }
 
     .group-table .gt-name a:hover { color: #fff; text-decoration: underline; }
 
-    .group-table .gt-price {
-      white-space: nowrap;
-      font-size: 13px;
-    }
+    .group-table .gt-price { white-space: nowrap; }
 
     .group-table .gt-change { white-space: nowrap; }
 
