@@ -352,6 +352,7 @@
   <script>
 
     let linkTarget = location.hash === '#sametab' ? '_self' : '_blank';
+    let ygoPanelNode = null;
 
     const STORES = [
       // ── Shopify (live API results) ───────────────────────────
@@ -723,6 +724,122 @@
       return `<div class="store"><div class="store-name">${esc(domain)}${jsonLink}</div>${inner}</div>`;
     }
 
+    // ── YGOPRODeck card lookup ───────────────────────────────────────────────
+
+    const YGO_CODE_RE = /^[A-Z][A-Z0-9]{1,7}-[A-Z]{2}\d{3,}$/i;
+    let _cardSetsCache = null;
+
+    async function fetchCardSets() {
+      if (_cardSetsCache) return _cardSetsCache;
+      const r = await fetch('https://db.ygoprodeck.com/api/v7/cardsets.php');
+      if (!r.ok) throw new Error('cardsets unavailable');
+      _cardSetsCache = await r.json();
+      return _cardSetsCache;
+    }
+
+    function renderYGOPanel(card, matchCode) {
+      const img    = card.card_images?.[0];
+      const imgUrl = img?.image_url || '';
+      const isLink = /link/i.test(card.type || '');
+
+      const statParts = [];
+      if (/monster/i.test(card.type || '')) {
+        const levelLabel = /xyz/i.test(card.type) ? 'Rank' : isLink ? 'Link' : 'Level';
+        const levelVal   = card.level ?? card.linkval;
+        if (levelVal != null) statParts.push(`${levelLabel} ${levelVal}`);
+        if (card.attribute) statParts.push(card.attribute);
+        if (card.atk != null) statParts.push(isLink ? `ATK ${card.atk}` : `ATK ${card.atk} / DEF ${card.def}`);
+      }
+
+      const setsRows = (card.card_sets || []).map(s => {
+        const hi    = matchCode && s.set_code.toUpperCase() === matchCode.toUpperCase();
+        const price = s.set_price && s.set_price !== '0.00' ? '$' + parseFloat(s.set_price).toFixed(2) : '\u2014';
+        return `<tr style="${hi ? 'background:#1a2a1a;' : ''}">
+          <td style="padding:2px 6px;color:#aaa;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(s.set_name)}">${esc(s.set_name)}</td>
+          <td style="padding:2px 6px;font-family:monospace;font-size:10px;color:${hi ? '#7dff7d' : '#ccc'};">${esc(s.set_code)}</td>
+          <td style="padding:2px 6px;color:#aaa;">${esc(s.set_rarity)}</td>
+          <td style="padding:2px 6px;color:#7dff7d;white-space:nowrap;">${esc(price)} <span style="color:#333;font-size:9px;">USD</span></td>
+        </tr>`;
+      }).join('');
+
+      const setsSection = card.card_sets?.length ? `
+        <details style="margin-top:10px;" open>
+          <summary style="cursor:pointer;font-size:11px;color:#888;user-select:none;">
+            ${card.card_sets.length} print${card.card_sets.length !== 1 ? 's' : ''} across sets
+          </summary>
+          <div style="overflow-x:auto;margin-top:6px;">
+            <table style="border-collapse:collapse;font-size:11px;width:100%;">
+              <thead><tr style="color:#444;text-align:left;">
+                <th style="padding:2px 6px;border-bottom:1px solid #1e1e1e;">Set</th>
+                <th style="padding:2px 6px;border-bottom:1px solid #1e1e1e;">Code</th>
+                <th style="padding:2px 6px;border-bottom:1px solid #1e1e1e;">Rarity</th>
+                <th style="padding:2px 6px;border-bottom:1px solid #1e1e1e;">~Price</th>
+              </tr></thead>
+              <tbody>${setsRows}</tbody>
+            </table>
+          </div>
+        </details>` : '';
+
+      return `
+        <div style="background:#131310;border:1px solid #3a3510;padding:14px;display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;">
+          ${imgUrl ? `<img src="${esc(imgUrl)}" alt="${esc(card.name)}" style="width:120px;height:auto;border:1px solid #2a2a1a;flex-shrink:0;" loading="lazy" />` : ''}
+          <div style="flex:1;min-width:220px;">
+            <div style="font-size:15px;font-weight:bold;color:#ffd700;margin-bottom:4px;">${esc(card.name)}</div>
+            <div style="font-size:11px;color:#555;margin-bottom:6px;">${esc(card.type || '')}${card.race ? ' &middot; ' + esc(card.race) : ''}</div>
+            ${statParts.length ? `<div style="font-size:11px;color:#aaa;display:flex;gap:14px;flex-wrap:wrap;margin-bottom:8px;">${statParts.map(p => `<span>${esc(p)}</span>`).join('')}</div>` : ''}
+            <div style="font-size:11px;color:#bbb;line-height:1.7;border-top:1px solid #1e1e1e;padding-top:8px;white-space:pre-line;">${esc(card.desc || '')}</div>
+            ${setsSection}
+          </div>
+        </div>
+        <div style="font-size:9px;color:#252510;text-align:right;margin-top:1px;">via YGOPRODeck API${matchCode ? ' &middot; ' + esc(matchCode) : ''}</div>`;
+    }
+
+    async function lookupYGOCard(query, onResult) {
+      const YGO_TIMEOUT_MS = 5000;
+      try {
+        const trimmed = query.trim();
+        let card = null;
+        let matchCode = null;
+        const ctrl = new AbortController();
+        const tid = setTimeout(() => ctrl.abort(), YGO_TIMEOUT_MS);
+
+        if (YGO_CODE_RE.test(trimmed)) {
+          matchCode = trimmed.toUpperCase();
+          const setCode = matchCode.match(/^([A-Z][A-Z0-9]+)-/)[1];
+          const sets    = await fetchCardSets();
+          const setInfo = sets.find(s => s.set_code.toUpperCase() === setCode);
+          if (setInfo) {
+            const r = await fetch(`https://db.ygoprodeck.com/api/v7/cardinfo.php?cardset=${encodeURIComponent(setInfo.set_name)}`, { signal: ctrl.signal });
+            if (r.ok) {
+              const d = await r.json();
+              card = (d.data || []).find(c => (c.card_sets || []).some(s => s.set_code.toUpperCase() === matchCode)) || null;
+            }
+          }
+        } else {
+          const r = await fetch(`https://db.ygoprodeck.com/api/v7/cardinfo.php?name=${encodeURIComponent(trimmed)}`, { signal: ctrl.signal });
+          if (r.ok) {
+            const d = await r.json();
+            if (d.data?.length === 1) card = d.data[0];
+          }
+        }
+        clearTimeout(tid);
+
+        if (card) {
+          const node = document.createElement('div');
+          node.style.cssText = 'grid-column: 1 / -1; border: 1px solid #b8860b; background: #1a1500; box-shadow: 0 0 22px rgba(255,200,0,0.18), inset 0 0 0 1px rgba(255,200,0,0.10); margin-bottom: 2px;';
+          node.innerHTML = `<details open>
+            <summary style="cursor:pointer; padding:9px 14px; font-size:13px; font-weight:bold; color:#ffd700; user-select:none; text-shadow:0 0 10px rgba(255,200,0,0.5);">
+              &#9733; YGOPRODeck: ${esc(card.name)}&ensp;<small style="font-size:10px; font-weight:normal; color:#888;">(click to expand/collapse)</small>
+            </summary>
+            <div style="padding:0 12px 12px;">${renderYGOPanel(card, matchCode)}</div>
+          </details>`;
+          onResult(node);
+        }
+      } catch (e) {
+        console.warn('YGO lookup:', e);
+      }
+    }
+
     async function search(exact = true) {
       const q = document.getElementById('q').value.trim();
       if (!q) return;
@@ -735,6 +852,8 @@
 
       const resultsEl = document.getElementById('results');
       resultsEl.innerHTML = '';
+      ygoPanelNode = null;
+      lookupYGOCard(q, node => { ygoPanelNode = node; reorderStoreCards(); });
       let linkGroupNode = null;
 
       /* Render all slots — link-only stores populate immediately, Shopify show placeholder */
@@ -807,11 +926,13 @@
           });
 
         if (linkGroupNode) linkGroupNode.remove();
-        
+        if (ygoPanelNode?.parentNode) ygoPanelNode.remove();
+
         const hitStores = ordered.filter(e => e.state === 'hit');
         const notHitStores = ordered.filter(e => e.state !== 'hit');
-        
+
         hitStores.forEach(entry => resultsEl.appendChild(entry.node));
+        if (ygoPanelNode) resultsEl.appendChild(ygoPanelNode);
         if (linkGroupNode) resultsEl.appendChild(linkGroupNode);
         notHitStores.forEach(entry => resultsEl.appendChild(entry.node));
       }
