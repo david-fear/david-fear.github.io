@@ -217,31 +217,6 @@
       color: #ffcc66;
     }
 
-    .group-store-row {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 8px;
-      padding: 7px 0;
-      border-top: 1px solid #222;
-      flex-wrap: wrap;
-    }
-
-    .group-store-left {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      flex: 1 1 160px;
-      min-width: 0;
-    }
-
-    .group-store-right {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-
     .cheapest-badge {
       font-size: 10px;
       background: #1a3a1a;
@@ -252,6 +227,57 @@
     }
 
     .group-chart { height: 250px !important; }
+
+    /* ── Group table ── */
+    .group-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin: 4px 0 2px;
+    }
+
+    .group-table th {
+      text-align: left;
+      color: #555;
+      font-weight: normal;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 2px 8px 4px 0;
+      border-bottom: 1px solid #222;
+    }
+
+    .group-table td {
+      padding: 5px 8px 5px 0;
+      vertical-align: middle;
+      border-bottom: 1px solid #1a1a1a;
+    }
+
+    .group-table tr:last-child td { border-bottom: none; }
+
+    .group-table .gt-store { white-space: nowrap; }
+
+    .group-table .gt-name {
+      width: 99%;
+    }
+
+    .group-table .gt-name a {
+      color: #ccc;
+      text-decoration: none;
+      word-break: break-word;
+    }
+
+    .group-table .gt-name a:hover { color: #fff; text-decoration: underline; }
+
+    .group-table .gt-price {
+      white-space: nowrap;
+      font-size: 15px;
+      font-weight: bold;
+    }
+
+    .group-table .gt-change { white-space: nowrap; }
+
+    .group-table .gt-actions { white-space: nowrap; }
 
     /* ── History table ── */
     .hist-table {
@@ -404,7 +430,13 @@
       &bull;
       <a href="https://www.briscoes.co.nz" target="_blank">Briscoes</a>
       &bull;
-      <a href="https://www.woolworths.co.nz" target="_blank">Woolworths NZ</a> <em>(untested)</em>
+      <a href="https://www.woolworths.co.nz" target="_blank">Woolworths NZ</a>
+      &bull;
+      <a href="https://www.rebelsport.co.nz" target="_blank">Rebel Sport</a>
+      &bull;
+      <a href="https://theclubroom.co.nz" target="_blank">The Club Room</a>
+      &bull;
+      <a href="https://www.golfhq.co.nz" target="_blank">Golf HQ</a>
     </p>
     <details class="support-info" style="margin-top:6px; margin-bottom:0;">
       <summary>How it works &amp; known limitations</summary>
@@ -558,6 +590,8 @@
       if (h.includes('kmart.co.nz'))                              return 'Kmart';
       if (h.includes('bunnings.co.nz'))                          return 'Bunnings';
       if (h.includes('rebelsport.co.nz'))                         return 'Rebel Sport';
+      if (h.includes('theclubroom.co.nz'))                         return 'The Club Room';
+      if (h.includes('golfhq.co.nz'))                              return 'Golf HQ';
       return new URL(url).hostname.replace(/^www\./, '');
     } catch { return 'Unknown'; }
   }
@@ -887,39 +921,38 @@
       const prev    = history.length >= 2 ? history.at(-2) : null;
       const color   = GROUP_COLORS[idx % GROUP_COLORS.length];
 
-      let priceHtml = '';
+      let priceCell  = '';
+      let changeCell = '';
+
       if (item.status === 'loading') {
-        priceHtml = '<span class="loading-badge">Fetching…</span>';
+        priceCell = '<span class="loading-badge">Fetching…</span>';
       } else if (latest?.price != null) {
-        priceHtml = `<span style="font-size:20px;font-weight:bold;color:${color}">$${parseFloat(latest.price).toFixed(2)}</span>`;
+        priceCell = `<span style="color:${color}">$${parseFloat(latest.price).toFixed(2)}</span>`;
+        if (cheapest?.item.id === item.id && withPrices.length > 1) {
+          priceCell += ` <span class="cheapest-badge">CHEAPEST</span>`;
+        }
         if (prev?.price != null) {
           const diff = latest.price - prev.price;
-          if      (diff >  0.001) priceHtml += ` <span class="price-up">▲ +$${diff.toFixed(2)}</span>`;
-          else if (diff < -0.001) priceHtml += ` <span class="price-down">▼ −$${Math.abs(diff).toFixed(2)}</span>`;
-        }
-        if (cheapest?.item.id === item.id && withPrices.length > 1) {
-          priceHtml += ` <span class="cheapest-badge">CHEAPEST</span>`;
+          if      (diff >  0.001) changeCell = `<span class="price-up">▲ +$${diff.toFixed(2)}</span>`;
+          else if (diff < -0.001) changeCell = `<span class="price-down">▼ −$${Math.abs(diff).toFixed(2)}</span>`;
+          else                    changeCell = `<span class="price-same">→</span>`;
         }
       } else {
-        priceHtml = `<span class="no-price">${item.error ? 'Not detected' : 'Not fetched'}</span>`;
+        priceCell = `<span class="no-price">${item.error ? 'Error' : '—'}</span>`;
       }
 
       return `
-        <div class="group-store-row">
-          <div class="group-store-left">
-            <span class="store-badge" style="color:${color}">${esc(item.store)}</span>
-            <span style="font-size:12px"><a href="${esc(item.url)}" target="_blank" style="color:#ccc;text-decoration:none;word-break:break-word;">${esc(item.name || item.url)}</a></span>
-            ${item.error ? `<span class="error-badge" style="font-size:10px;" title="${esc(item.error)}">⚠ ${esc(item.error)}</span>` : ''}
-          </div>
-          <div class="group-store-right">
-            <div class="card-price">${priceHtml}</div>
-            <div class="card-actions">
-              <button onclick="refreshItem('${esc(item.id)}')" title="Refresh">↻</button>
-              <button onclick="ungroupItem('${esc(item.id)}')" title="Remove from group" style="font-size:11px;">↩</button>
-              <button class="btn-remove" onclick="removeItem('${esc(item.id)}')" title="Remove">✕</button>
-            </div>
-          </div>
-        </div>`;
+        <tr>
+          <td class="gt-store"><span class="store-badge" style="color:${color}">${esc(item.store)}</span></td>
+          <td class="gt-name"><a href="${esc(item.url)}" target="_blank">${esc(item.name || item.url)}</a>${item.error ? ` <span class="error-badge" title="${esc(item.error)}">⚠</span>` : ''}</td>
+          <td class="gt-price">${priceCell}</td>
+          <td class="gt-change">${changeCell}</td>
+          <td class="gt-actions"><div class="card-actions">
+            <button onclick="refreshItem('${esc(item.id)}')" title="Refresh">↻</button>
+            <button onclick="ungroupItem('${esc(item.id)}')" title="Remove from group" style="font-size:11px;">↩</button>
+            <button class="btn-remove" onclick="removeItem('${esc(item.id)}')" title="Remove">✕</button>
+          </div></td>
+        </tr>`;
     }).join('');
 
     // Comparative history table — all unique dates, one column per store
@@ -958,7 +991,10 @@
           <button class="btn-remove" onclick="ungroupAll('${esc(group.id)}')" title="Dissolve group">↩ Ungroup all</button>
         </div>
       </div>
-      ${storeRows}
+      <table class="group-table">
+        <thead><tr><th>Store</th><th>Item</th><th>Price</th><th>Change</th><th></th></tr></thead>
+        <tbody>${storeRows}</tbody>
+      </table>
       ${hasGraph ? `<canvas id="${canvasId}" class="price-chart group-chart"></canvas>` : ''}
       ${histHtml}`;
     return div;
