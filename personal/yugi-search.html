@@ -756,7 +756,7 @@
         const price = s.set_price && s.set_price !== '0.00' ? '$' + parseFloat(s.set_price).toFixed(2) : '\u2014';
         return `<tr style="${hi ? 'background:#1a2a1a;' : ''}">
           <td style="padding:2px 6px;color:#aaa;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(s.set_name)}">${esc(s.set_name)}</td>
-          <td style="padding:2px 6px;font-family:monospace;font-size:10px;color:${hi ? '#7dff7d' : '#ccc'};">${esc(s.set_code)}</td>
+          <td style="padding:2px 6px;font-family:monospace;font-size:10px;"><a href="#" onclick="document.getElementById('q').value='${esc(s.set_code)}';search(true);return false;" style="color:${hi ? '#7dff7d' : '#88aaff'};text-decoration:underline;cursor:pointer;font-family:monospace;font-size:10px;">${esc(s.set_code)}</a></td>
           <td style="padding:2px 6px;color:#aaa;">${esc(s.set_rarity)}</td>
           <td style="padding:2px 6px;color:#7dff7d;white-space:nowrap;">${esc(price)} <span style="color:#333;font-size:9px;">USD</span></td>
         </tr>`;
@@ -886,7 +886,8 @@
         linkGroupNode = linkDiv;
       }
 
-      /* Render coming-soon group */
+      /* Render coming-soon group — inserted between YGO panel and external links */
+      let comingSoonNode = null;
       if (COMING_SOON_STORES.length) {
         const csDiv = document.createElement('div');
         csDiv.className = 'store';
@@ -896,6 +897,7 @@
           COMING_SOON_STORES.map(s =>
             `<div class="item" style="font-size:12px;"><a href="${esc(s.url)}" target="${linkTarget}" rel="noopener" style="color:#ffe066; text-shadow:0 0 6px rgba(255,200,0,0.2);">${esc(s.d)}</a></div>`
           ).join('');
+        comingSoonNode = csDiv;
         resultsEl.appendChild(csDiv);
       }
 
@@ -927,12 +929,14 @@
 
         if (linkGroupNode) linkGroupNode.remove();
         if (ygoPanelNode?.parentNode) ygoPanelNode.remove();
+        if (comingSoonNode?.parentNode) comingSoonNode.remove();
 
         const hitStores = ordered.filter(e => e.state === 'hit');
         const notHitStores = ordered.filter(e => e.state !== 'hit');
 
         hitStores.forEach(entry => resultsEl.appendChild(entry.node));
         if (ygoPanelNode) resultsEl.appendChild(ygoPanelNode);
+        if (comingSoonNode) resultsEl.appendChild(comingSoonNode);
         if (linkGroupNode) resultsEl.appendChild(linkGroupNode);
         notHitStores.forEach(entry => resultsEl.appendChild(entry.node));
       }

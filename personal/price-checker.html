@@ -271,8 +271,7 @@
 
     .group-table .gt-price {
       white-space: nowrap;
-      font-size: 15px;
-      font-weight: bold;
+      font-size: 13px;
     }
 
     .group-table .gt-change { white-space: nowrap; }
@@ -590,7 +589,7 @@
       if (h.includes('kmart.co.nz'))                              return 'Kmart';
       if (h.includes('bunnings.co.nz'))                          return 'Bunnings';
       if (h.includes('rebelsport.co.nz'))                         return 'Rebel Sport';
-      if (h.includes('theclubroom.co.nz'))                         return 'The Club Room';
+      if (h.includes('theclubroom.co.nz'))                         return '(Golf) The Club Room';
       if (h.includes('golfhq.co.nz'))                              return 'Golf HQ';
       return new URL(url).hostname.replace(/^www\./, '');
     } catch { return 'Unknown'; }
@@ -928,9 +927,7 @@
         priceCell = '<span class="loading-badge">Fetching…</span>';
       } else if (latest?.price != null) {
         priceCell = `<span style="color:${color}">$${parseFloat(latest.price).toFixed(2)}</span>`;
-        if (cheapest?.item.id === item.id && withPrices.length > 1) {
-          priceCell += ` <span class="cheapest-badge">CHEAPEST</span>`;
-        }
+
         if (prev?.price != null) {
           const diff = latest.price - prev.price;
           if      (diff >  0.001) changeCell = `<span class="price-up">▲ +$${diff.toFixed(2)}</span>`;
@@ -1389,10 +1386,12 @@
     await refreshItem(newItem.id, true);
   }
 
-  // Allow Enter key to submit from the URL field
+  // Allow Enter key to submit from either input field
   document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('add-url').addEventListener('keydown', e => {
-      if (e.key === 'Enter') addItem();
+    ['add-url', 'add-name'].forEach(id => {
+      document.getElementById(id).addEventListener('keydown', e => {
+        if (e.key === 'Enter') addItem();
+      });
     });
     render();
     refreshForce();
