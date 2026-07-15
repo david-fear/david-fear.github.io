@@ -223,7 +223,7 @@
       position: absolute;
       right: 0;
       top: 0;
-      color: #555;
+      color: #888;
       font-size: 10px;
       white-space: nowrap;
       background: #181818;
@@ -268,7 +268,7 @@
     .section-header {
       grid-column: 1 / -1;
       font-size: 10px;
-      color: #555;
+      color: #888;
       letter-spacing: 0.8px;
       text-transform: uppercase;
       padding: 6px 2px 2px;
@@ -764,12 +764,13 @@
 
       const setsRows = (card.card_sets || []).map(s => {
         const hi    = matchCode && s.set_code.toUpperCase() === matchCode.toUpperCase();
-        const price = s.set_price && s.set_price !== '0.00' ? '$' + parseFloat(s.set_price).toFixed(2) : '\u2014';
+        const priceVal = parseFloat(s.set_price);
+        const price = !isNaN(priceVal) && priceVal > 0 ? '$' + priceVal.toFixed(2) : '\u2014';
         return `<tr style="${hi ? 'background:#1a2a1a;' : ''}">
           <td style="padding:2px 6px;color:#aaa;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(s.set_name)}">${esc(s.set_name)}</td>
           <td style="padding:2px 6px;font-family:monospace;font-size:10px;"><a href="javascript:void(0)" onclick="document.getElementById('q').value='${esc(s.set_code)}';search(true);" style="color:${hi ? '#7dff7d' : '#88aaff'};text-decoration:underline;cursor:pointer;font-family:monospace;font-size:10px;">${esc(s.set_code)}</a></td>
           <td style="padding:2px 6px;color:#aaa;">${esc(s.set_rarity)}</td>
-          <td style="padding:2px 6px;color:#7dff7d;white-space:nowrap;">${esc(price)} <span style="color:#333;font-size:9px;">USD</span></td>
+          <td style="padding:2px 6px;color:#7dff7d;white-space:nowrap;">${esc(price)} <span style="color:#666;font-size:9px;">USD</span></td>
         </tr>`;
       }).join('');
 
@@ -780,7 +781,7 @@
           </summary>
           <div style="overflow-x:auto;margin-top:6px;">
             <table style="border-collapse:collapse;font-size:11px;width:100%;">
-              <thead><tr style="color:#444;text-align:left;">
+              <thead><tr style="color:#777;text-align:left;">
                 <th style="padding:2px 6px;border-bottom:1px solid #1e1e1e;">Set</th>
                 <th style="padding:2px 6px;border-bottom:1px solid #1e1e1e;">Code</th>
                 <th style="padding:2px 6px;border-bottom:1px solid #1e1e1e;">Rarity</th>
@@ -797,7 +798,7 @@
             ${imgUrl ? `<img src="${esc(imgUrl)}" alt="${esc(card.name)}" style="width:90px;height:auto;border:1px solid #2a2a1a;flex-shrink:0;" loading="lazy" />` : ''}
             <div style="flex:1;min-width:220px;">
               <div style="font-size:15px;font-weight:bold;color:#ffd700;margin-bottom:4px;">${esc(card.name)}</div>
-              <div style="font-size:11px;color:#555;margin-bottom:6px;">${esc(card.type || '')}${card.race ? ' &middot; ' + esc(card.race) : ''}</div>
+              <div style="font-size:11px;color:#888;margin-bottom:6px;">${esc(card.type || '')}${card.race ? ' &middot; ' + esc(card.race) : ''}</div>
               ${statParts.length ? `<div style="font-size:11px;color:#aaa;display:flex;gap:14px;flex-wrap:wrap;margin-bottom:8px;">${statParts.map(p => `<span>${esc(p)}</span>`).join('')}</div>` : ''}
               <div style="font-size:11px;color:#bbb;line-height:1.7;border-top:1px solid #1e1e1e;padding-top:8px;white-space:pre-line;">${esc(card.desc || '')}</div>
             </div>
@@ -843,14 +844,15 @@
         const node = document.createElement('div');
         if (ygoStatus === 'found') {
           node.style.cssText = 'grid-column: 1 / -1; border: 1px solid #b8860b; background: #1a1500; box-shadow: 0 0 22px rgba(255,200,0,0.18), inset 0 0 0 1px rgba(255,200,0,0.10); margin-bottom: 2px;';
+        const ygoUrl = `https://ygoprodeck.com/card/${card.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}-${card.id}/`;
           node.innerHTML = `<details open>
             <summary style="cursor:pointer; padding:9px 14px; font-size:13px; font-weight:bold; color:#ffd700; user-select:none; text-shadow:0 0 10px rgba(255,200,0,0.5);">
-              &#9733; YGOPRODeck: ${esc(card.name)}&ensp;<small style="font-size:10px; font-weight:normal; color:#888;">(click to expand/collapse)</small>
+              &#9733; YGOPRODeck: ${esc(card.name)}&ensp;<a href="${esc(ygoUrl)}" target="_blank" onclick="event.stopPropagation()" style="font-size:11px;font-weight:normal;color:#88aaff;text-decoration:none;border:1px solid #335;padding:1px 6px;vertical-align:middle;">&#8599; Open</a>&ensp;<small style="font-size:10px; font-weight:normal; color:#888;">(click to expand/collapse)</small>
             </summary>
             <div style="padding:0 12px 12px;">${renderYGOPanel(card, matchCode)}</div>
           </details>`;
         } else {
-          node.style.cssText = 'grid-column: 1 / -1; border: 1px solid #1e1e1e; background: #111; padding: 6px 14px; font-size: 10px; color: #444; letter-spacing: 0.3px;';
+          node.style.cssText = 'grid-column: 1 / -1; border: 1px solid #1e1e1e; background: #111; padding: 6px 14px; font-size: 10px; color: #777; letter-spacing: 0.3px;';
           node.textContent = ygoStatus === 'multiple'
             ? '\u22ef YGOPRODeck: multiple results \u2014 try exact card name or use a set code (e.g. DUPO-EN017)'
             : '\u22ef YGOPRODeck: not returned for this query';

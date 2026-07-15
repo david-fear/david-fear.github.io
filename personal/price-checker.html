@@ -598,7 +598,7 @@
       if (h.includes('rebelsport.co.nz'))                         return 'Rebel Sport';
       if (h.includes('theclubroom.co.nz'))                         return '(Golf) The Club Room';
       if (h.includes('golfhq.co.nz'))                              return 'Golf HQ';
-      return new URL(url).hostname.replace(/^www\./, '');
+      return new URL(url).hostname.replace(/^www\./, '').replace(/\.[a-z]{2,}(\.[a-z]{2})?$/i, '');
     } catch { return 'Unknown'; }
   }
 
@@ -928,19 +928,11 @@
       const color   = GROUP_COLORS[idx % GROUP_COLORS.length];
 
       let priceCell  = '';
-      let changeCell = '';
 
       if (item.status === 'loading') {
         priceCell = '<span class="loading-badge">Fetching…</span>';
       } else if (latest?.price != null) {
         priceCell = `<span style="color:${color}">$${parseFloat(latest.price).toFixed(2)}</span>`;
-
-        if (prev?.price != null) {
-          const diff = latest.price - prev.price;
-          if      (diff >  0.001) changeCell = `<span class="price-up">▲ +$${diff.toFixed(2)}</span>`;
-          else if (diff < -0.001) changeCell = `<span class="price-down">▼ −$${Math.abs(diff).toFixed(2)}</span>`;
-          else                    changeCell = `<span class="price-same">→</span>`;
-        }
       } else {
         priceCell = `<span class="no-price">${item.error ? 'Error' : '—'}</span>`;
       }
@@ -950,9 +942,7 @@
           <td class="gt-store"><span class="store-badge" style="color:${color}">${esc(item.store)}</span></td>
           <td class="gt-name"><a href="${esc(item.url)}" target="_blank">${esc(item.name || item.url)}</a>${item.error ? ` <span class="error-badge" title="${esc(item.error)}">⚠</span>` : ''}</td>
           <td class="gt-price">${priceCell}</td>
-          <td class="gt-change">${changeCell}</td>
           <td class="gt-actions"><div class="card-actions">
-            <button onclick="refreshItem('${esc(item.id)}')" title="Refresh">↻</button>
             <button onclick="ungroupItem('${esc(item.id)}')" title="Remove from group" style="font-size:11px;">↩</button>
             <button class="btn-remove" onclick="removeItem('${esc(item.id)}')" title="Remove">✕</button>
           </div></td>
@@ -996,7 +986,7 @@
         </div>
       </div>
       <table class="group-table">
-        <thead><tr><th>Store</th><th>Item</th><th>Price</th><th>Change</th><th></th></tr></thead>
+        <thead><tr><th>Store</th><th>Item</th><th>Price</th><th></th></tr></thead>
         <tbody>${storeRows}</tbody>
       </table>
       ${hasGraph ? `<canvas id="${canvasId}" class="price-chart group-chart"></canvas>` : ''}
