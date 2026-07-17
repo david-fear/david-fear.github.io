@@ -710,9 +710,13 @@
         : '';
       const viewHref = result.apiUrl || result.href || '';
       const viewLabel = result.apiUrl ? 'view JSON' : 'view website';
-      const jsonLink = viewHref
-        ? ` <a class="json-link" href="${esc(viewHref)}" target="_blank" rel="noopener">[${viewLabel}]</a>${noteHtml}`
-        : noteHtml;
+      let jsonLink = viewHref
+        ? ` <a class="json-link" href="${esc(viewHref)}" target="_blank" rel="noopener">[${viewLabel}]</a>`
+        : '';
+      if (result.apiUrl && result.href) {
+        jsonLink += ` <a class="json-link" href="${esc(result.href)}" target="_blank" rel="noopener">[open site]</a>`;
+      }
+      jsonLink += noteHtml;
       let inner = '';
       if (result.ok) {
         inner = result.items.map(r => {
@@ -843,7 +847,7 @@
 
         const node = document.createElement('div');
         if (ygoStatus === 'found') {
-          node.style.cssText = 'grid-column: 1 / -1; border: 1px solid #b8860b; background: #1a1500; box-shadow: 0 0 22px rgba(255,200,0,0.18), inset 0 0 0 1px rgba(255,200,0,0.10); margin-bottom: 2px;';
+        node.style.cssText = 'grid-column: 1 / -1; border: 1px solid #b8860b; background: #1a1500; box-shadow: 0 0 18px rgba(255,200,0,0.35), 0 0 34px rgba(255,200,0,0.15), inset 0 0 0 1px rgba(255,200,0,0.18); margin-bottom: 2px;';
         const ygoUrl = `https://ygoprodeck.com/card/${card.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}-${card.id}/`;
           node.innerHTML = `<details open>
             <summary style="cursor:pointer; padding:9px 14px; font-size:13px; font-weight:bold; color:#ffd700; user-select:none; text-shadow:0 0 10px rgba(255,200,0,0.5);">
@@ -925,11 +929,11 @@
       if (COMING_SOON_STORES.length) {
         const csDiv = document.createElement('div');
         csDiv.className = 'store';
-        csDiv.style.cssText = 'border-color:#665500; background:#1e1a00; box-shadow: 0 0 18px rgba(255,200,0,0.1), inset 0 0 0 1px rgba(255,200,0,0.08);';
+        csDiv.style.cssText = 'border-color:#006655; background:#001a14; box-shadow: 0 0 18px rgba(0,220,200,0.22), 0 0 34px rgba(0,220,200,0.10), inset 0 0 0 1px rgba(0,220,200,0.12);';
         csDiv.innerHTML =
-          `<div class="store-name" style="color:#ffcc00; border-bottom-color:#443800; text-shadow:0 0 8px rgba(255,200,0,0.3);">🔜 coming soon</div>` +
+          `<div class="store-name" style="color:#00dcc8; border-bottom-color:#004d44; text-shadow:0 0 8px rgba(0,220,200,0.4);">🔜 coming soon</div>` +
           COMING_SOON_STORES.map(s =>
-            `<div class="item" style="font-size:12px;"><a href="${esc(s.url)}" target="${linkTarget}" rel="noopener" style="color:#ffe066; text-shadow:0 0 6px rgba(255,200,0,0.2);">${esc(s.d)}</a></div>`
+            `<div class="item" style="font-size:12px;"><a href="${esc(s.url)}" target="${linkTarget}" rel="noopener" style="color:#00dcc8; text-shadow:0 0 6px rgba(0,220,200,0.25);">${esc(s.d)}</a></div>`
           ).join('');
         comingSoonNode = csDiv;
         resultsEl.appendChild(csDiv);

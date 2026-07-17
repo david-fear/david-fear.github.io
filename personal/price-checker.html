@@ -443,6 +443,12 @@
       <a href="https://theclubroom.co.nz" target="_blank">The Club Room</a>
       &bull;
       <a href="https://www.golfhq.co.nz" target="_blank">Golf HQ</a>
+      &bull;
+      <a href="https://www.liquorland.co.nz" target="_blank">Liquorland</a>
+      &bull;
+      <a href="https://www.superliquor.co.nz" target="_blank">Super Liquor</a>
+      &bull;
+      <a href="https://www.bigbarrel.co.nz" target="_blank">Big Barrel</a>
     </p>
     <details class="support-info" style="margin-top:6px; margin-bottom:0;">
       <summary>How it works &amp; known limitations</summary>
@@ -598,6 +604,9 @@
       if (h.includes('rebelsport.co.nz'))                         return 'Rebel Sport';
       if (h.includes('theclubroom.co.nz'))                         return '(Golf) The Club Room';
       if (h.includes('golfhq.co.nz'))                              return 'Golf HQ';
+      if (h.includes('liquorland.co.nz'))                          return 'Liquorland';
+      if (h.includes('superliquor.co.nz'))                         return 'Super Liquor';
+      if (h.includes('bigbarrel.co.nz'))                           return 'Big Barrel';
       return new URL(url).hostname.replace(/^www\./, '').replace(/\.[a-z]{2,}(\.[a-z]{2})?$/i, '');
     } catch { return 'Unknown'; }
   }
@@ -1391,7 +1400,7 @@
       });
     });
     render();
-    refreshForce();
+    refreshAll();
   });
 </script>
 
