@@ -416,19 +416,26 @@
 
   <!-- ── Add item form ── -->
   <section>
-    <h3 style="font-size:15px; margin-bottom:8px;">Track a new item</h3>
+    <h3 style="font-size:15px;">Track a new item</h3>
     <div class="add-form">
       <label class="url-label">
-        Product URL
+        Copy Product URL, and paste it here:
         <input id="add-url" type="url" placeholder="https://www.thewarehouse.co.nz/p/…" autocomplete="off" />
       </label>
       <label class="name-label">
-        Custom name <span style="color:#555">(optional)</span>
+        <span>Custom name <span style="color:#888;">(optional)</span></span>
         <input id="add-name" type="text" placeholder="e.g. Gaming Mouse" autocomplete="off" />
       </label>
       <button onclick="addItem()">+ Add &amp; Fetch</button>
     </div>
     <div id="add-status" style="font-size:12px; color:#888; min-height:16px;"></div>
+    <p style="font-size:12px; color:#666;">
+      Try an example:
+      <a href="#" onclick="tryExample('https://www.liquorland.co.nz/jim-beam-bourbon-1125lt-080686002123');return false;" style="color:#88aaff;">Jim Beam (Liquorland)</a> &bull;
+      <a href="#" onclick="tryExample('https://www.superliquor.co.nz/jim-beam-white-label-bourbon-1125-litre-2');return false;" style="color:#88aaff;">Jim Beam (Super Liquor)</a> &bull;
+      <a href="#" onclick="tryExample('https://www.thewarehouse.co.nz/p/gamenote-wired-gaming-mouse-black/R3016083.html');return false;" style="color:#88aaff;">Gaming Mouse (The Warehouse)</a> &bull;
+      <a href="#" onclick="tryExample('https://www.jbhifi.co.nz/products/playstation-5-grand-theft-auto-vi-code-in-box');return false;" style="color:#88aaff;">GTA VI (JB Hi-Fi)</a>
+    </p>
     <p style="font-size:12px; color:#888;">Available Sites: 
       <a href="https://www.thewarehouse.co.nz" target="_blank">The Warehouse</a>
       &bull;
@@ -1342,6 +1349,12 @@
   }
 
   // ── Add item ────────────────────────────────────────────────────────────────
+
+  function tryExample(url) {
+    document.getElementById('add-url').value = url;
+    document.getElementById('add-name').value = '';
+    addItem();
+  }
 
   async function addItem() {
     const urlInput  = document.getElementById('add-url');
