@@ -427,8 +427,7 @@
         <span>Custom name <span style="color:#888;">(optional)</span></span>
         <input id="add-name" type="text" placeholder="e.g. Gaming Mouse" autocomplete="off" />
       </label>
-      <button onclick="addItem()">+ Add</button>
-      <button onclick="refreshAll()" style="font-size:12px; background:#252525;">↻ Refresh today's prices</button>
+      <button onclick="addItem()">+ Add &amp; Fetch</button>
     </div>
     <div id="add-status" style="font-size:12px; color:#888; min-height:16px;"></div>
     <p style="font-size:12px; color:#666;">
@@ -495,7 +494,10 @@
 
   <!-- ── Item list ── -->
   <section>
-    <div id="refresh-status" style="font-size:12px; color:#aaa; margin-bottom:10px;"></div>
+    <div class="top-actions">
+      <button onclick="refreshAll()">↻ Refresh today's prices</button>
+      <span id="refresh-status"></span>
+    </div>
     <div class="items-grid" id="items-grid">
       <p class="muted">No items tracked yet.</p>
     </div>
@@ -902,6 +904,7 @@
         }]
       },
       options: {
+        animation:           false,
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
@@ -1047,6 +1050,7 @@
       type: 'line',
       data: { labels: allDates, datasets },
       options: {
+        animation:           false,
         responsive:          true,
         maintainAspectRatio: false,
         plugins: {
@@ -1316,6 +1320,8 @@
       const fresh = loadData().items.find(i => i.id === item.id);
       if (fresh?.error) errors++;
       else fetched++;
+      if (pending.indexOf(item) < pending.length - 1)
+        await new Promise(r => setTimeout(r, 1000));
     }
 
     const parts = [];
@@ -1338,6 +1344,8 @@
       const fresh = loadData().items.find(i => i.id === item.id);
       if (fresh?.error) errors++;
       else fetched++;
+      if (data.items.indexOf(item) < data.items.length - 1)
+        await new Promise(r => setTimeout(r, 1000));
     }
     const parts = [];
     if (fetched) parts.push(`${fetched} updated`);

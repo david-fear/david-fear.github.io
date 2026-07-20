@@ -368,6 +368,7 @@
     const STORES = [
       // ── Shopify (live API results) ───────────────────────────
       { d: "cardspotnz.com", note: " ** card name search only; data model differs **" },
+      { d: "www.theslyfox.nz", scraper: searchSlyFox },
       { d: "www.shuffleandcutgames.co.nz" },
       { d: "tcgcollectornz.com" },
       { d: "tcgculture.com" },
@@ -699,6 +700,51 @@
       } catch (e) {
         clearTimeout(tid);
         return { ok: false, reason: e.name === 'AbortError' ? 'timeout' : 'unavailable', href: fallback };
+      }
+    }
+
+    /* Query theslyfox.nz via its JSON ajax search endpoint */
+    async function searchSlyFox(store, query, limit, exact) {
+      const domain = 'www.theslyfox.nz';
+      const fallback = `https://${domain}/apps/search?q=${encodeURIComponent(query)}`;
+      const apiUrl = `https://${domain}/ajax/apps/search.php?q=${encodeURIComponent(query)}`;
+      const ctrl = new AbortController();
+      const tid = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+      try {
+        const proxied = PROXY + encodeURIComponent(apiUrl);
+        const resp = await fetch(proxied, { signal: ctrl.signal });
+        clearTimeout(tid);
+        if (!resp.ok) throw new Error(resp.status);
+        const data = await resp.json();
+        const docs = Array.isArray(data?.documents) ? data.documents : [];
+        if (!docs.length) return { ok: false, reason: 'empty', href: fallback, apiUrl };
+
+        const productDocs = docs.filter(d => d?.type === 'product' && d?.name && d?.path);
+        const matched = exact
+          ? productDocs.filter(d => matchesQuery({ title: d.name || '', handle: d.path || '' }, query))
+          : productDocs;
+        if (!matched.length) return { ok: false, reason: 'empty', href: fallback, apiUrl };
+
+        const items = matched.slice(0, limit).map(d => {
+          const low = Number(d.lowprice);
+          const high = Number(d.highprice);
+          const priceNum = Number.isFinite(low) && low > 0 ? low : (Number.isFinite(high) && high > 0 ? high : NaN);
+          const price = Number.isFinite(priceNum) ? `$${priceNum.toFixed(2)}` : '';
+          const soldOut = d.out_of_stock === true || Number(d.num_found_skus) === 0;
+          let path = String(d.path || '');
+          if (!path.startsWith('/')) path = '/' + path;
+          return {
+            title: String(d.name || '').trim(),
+            link: `https://${domain}${path}`,
+            price,
+            soldOut
+          };
+        });
+
+        return { ok: true, items, href: fallback, apiUrl };
+      } catch (e) {
+        clearTimeout(tid);
+        return { ok: false, reason: e.name === 'AbortError' ? 'timeout' : 'unavailable', href: fallback, apiUrl };
       }
     }
 
