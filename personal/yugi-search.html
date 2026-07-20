@@ -706,16 +706,39 @@
     /* Query theslyfox.nz via its JSON ajax search endpoint */
     async function searchSlyFox(store, query, limit, exact) {
       const domain = 'www.theslyfox.nz';
-      const fallback = `https://${domain}/apps/search?q=${encodeURIComponent(query)}`;
+      const fallback = `https://${domain}/apps/search?q=${encodeURIComponent(query)}#/`;
       const apiUrl = `https://${domain}/ajax/apps/search.php?q=${encodeURIComponent(query)}`;
-      const ctrl = new AbortController();
-      const tid = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
       try {
-        const proxied = PROXY + encodeURIComponent(apiUrl);
-        const resp = await fetch(proxied, { signal: ctrl.signal });
-        clearTimeout(tid);
-        if (!resp.ok) throw new Error(resp.status);
-        const data = await resp.json();
+        const proxyUrls = [
+          PROXY + encodeURIComponent(apiUrl),
+          `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}`
+        ];
+
+        let data = null;
+        for (const proxied of proxyUrls) {
+          const ctrl = new AbortController();
+          const tid = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+          try {
+            const resp = await fetch(proxied, { signal: ctrl.signal });
+            clearTimeout(tid);
+            if (!resp.ok) continue;
+
+            const text = await resp.text();
+            try {
+              data = JSON.parse(text);
+            } catch {
+              continue;
+            }
+            if (data && Array.isArray(data.documents)) break;
+          } catch (e2) {
+            clearTimeout(tid);
+            if (e2.name === 'AbortError') continue;
+          }
+        }
+
+        if (!data || !Array.isArray(data.documents)) {
+          return { ok: false, reason: 'unavailable', href: fallback, apiUrl };
+        }
         const docs = Array.isArray(data?.documents) ? data.documents : [];
         if (!docs.length) return { ok: false, reason: 'empty', href: fallback, apiUrl };
 
@@ -743,7 +766,6 @@
 
         return { ok: true, items, href: fallback, apiUrl };
       } catch (e) {
-        clearTimeout(tid);
         return { ok: false, reason: e.name === 'AbortError' ? 'timeout' : 'unavailable', href: fallback, apiUrl };
       }
     }
@@ -1030,12 +1052,18 @@
       let done = 0;
       const promises = STORES.map((store, i) => {
         if (store.link) return Promise.resolve();
-        return (store.scraper ? store.scraper(store, q, limit, exact) : searchStore(store, q, limit, exact)).then(result => {
+        return Promise.resolve()
+          .then(() => (store.scraper ? store.scraper(store, q, limit, exact) : searchStore(store, q, limit, exact)))
+          .catch(() => ({ ok: false, reason: 'unavailable', href: `https://${store.d}/search?q=${encodeURIComponent(q)}` }))
+          .then(result => {
+          const safeResult = result && typeof result === 'object'
+            ? result
+            : { ok: false, reason: 'unavailable', href: `https://${store.d}/search?q=${encodeURIComponent(q)}` };
           const fresh = document.createElement('div');
           fresh.className = 'store';
-          fresh.dataset.resultState = result.ok ? 'hit' : 'miss';
+          fresh.dataset.resultState = safeResult.ok ? 'hit' : 'miss';
           fresh.dataset.storeDomain = store.d;
-          fresh.innerHTML = renderStore(store, result, q)
+          fresh.innerHTML = renderStore(store, safeResult, q)
             .replace(/^<div class="store">/, '').replace(/<\/div>$/, '');
           slots[i].replaceWith(fresh);
           slots[i] = fresh;
