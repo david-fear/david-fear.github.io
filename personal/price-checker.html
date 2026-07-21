@@ -665,9 +665,11 @@
         try {
           const json = JSON.parse(ndMatch[1]);
           const str  = JSON.stringify(json);
-          // Look for "price":"24.00" or "price":24
-          const pm = str.match(/"price"\s*:\s*"?(\d+(?:\.\d{1,2})?)"?/);
-          if (pm) { const p = parseFloat(pm[1]); if (!isNaN(p) && p > 0) price = p; }
+          // Try common price field names in priority order (sale/current first, then generic)
+          for (const key of ['salePrice', 'nowPrice', 'currentPrice', 'specialPrice', 'price', 'priceNow', 'promoPrice']) {
+            const pm = str.match(new RegExp('"' + key + '"\\s*:\\s*"?(\\d+(?:\\.\\d{1,2})?)"?'));
+            if (pm) { const p = parseFloat(pm[1]); if (!isNaN(p) && p > 0) { price = p; break; } }
+          }
           if (!name) {
             const nm = str.match(/"(?:productName|displayName|name)"\s*:\s*"([^"]{3,120})"/);
             if (nm) name = nm[1];
@@ -1321,7 +1323,7 @@
       if (fresh?.error) errors++;
       else fetched++;
       if (pending.indexOf(item) < pending.length - 1)
-        await new Promise(r => setTimeout(r, 1000));
+        await new Promise(r => setTimeout(r, 200));
     }
 
     const parts = [];
@@ -1345,7 +1347,7 @@
       if (fresh?.error) errors++;
       else fetched++;
       if (data.items.indexOf(item) < data.items.length - 1)
-        await new Promise(r => setTimeout(r, 1000));
+        await new Promise(r => setTimeout(r, 200));
     }
     const parts = [];
     if (fetched) parts.push(`${fetched} updated`);
