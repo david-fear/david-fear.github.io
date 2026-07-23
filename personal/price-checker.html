@@ -308,15 +308,27 @@
 
     .muted { color: #555; font-style: italic; font-size: 13px; }
 
-    /* ── Group dropdown ── */
+    /* ── Group dropdown (centered modal) ── */
+    #group-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 1999;
+    }
+
     #group-dropdown {
       position: fixed;
       z-index: 2000;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       background: #1e1e1e;
       border: 1px solid #444;
       padding: 10px 12px;
-      min-width: 230px;
-      max-width: 290px;
+      width: 90%;
+      max-width: 340px;
+      max-height: 80vh;
+      overflow-y: auto;
       box-shadow: 0 4px 20px rgba(0,0,0,0.7);
       font-size: 12px;
       color: #ccc;
@@ -421,11 +433,15 @@
     <div class="add-form">
       <label class="url-label">
         Copy Product URL, and paste it here:
-        <input id="add-url" type="url" placeholder="https://www.thewarehouse.co.nz/p/…" autocomplete="off" />
+        <input id="add-url" type="url" placeholder="https://www.thewarehouse.co.nz/p/…" oninput="onUrlChange(this)" autocomplete="off" />
       </label>
       <label class="name-label">
         <span>Custom name <span style="color:#888;">(optional)</span></span>
         <input id="add-name" type="text" placeholder="e.g. Gaming Mouse" autocomplete="off" />
+      </label>
+      <label id="storeid-row" class="storeid-label">
+        <span id="storeid-store-label">Store ID (UUID)</span>
+        <input id="add-storeid" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" autocomplete="off" />
       </label>
       <button onclick="addItem()">+ Add &amp; Fetch</button>
     </div>
@@ -457,7 +473,12 @@
       <a href="https://www.superliquor.co.nz" target="_blank">Super Liquor</a>
       &bull;
       <a href="https://www.bigbarrel.co.nz" target="_blank">Big Barrel</a>
+      &bull;
+      <a href="https://www.paknsave.co.nz" target="_blank">Pak'nSave</a>*
+      &bull;
+      <a href="https://www.newworld.co.nz" target="_blank">New World</a>*
     </p>
+    <p style="font-size:11px; color:#666;">* Pak'nSave and New World require a Store ID (UUID). To find it: go to your local store's page, open DevTools Network tab, add any item to cart, look for a request to <code>api-prod.paknsave.co.nz</code> and copy the store UUID from the URL.</p>
     <details class="support-info" style="margin-top:6px; margin-bottom:0;">
       <summary>How it works &amp; known limitations</summary>
       <div class="support-content">
@@ -471,7 +492,6 @@
           <li><strong>Harvey Norman</strong> — Imperva/Incapsula bot challenge</li>
           <li><strong>Bunnings</strong> — Cloudflare bot protection</li>
           <li><strong>Mighty Ape</strong> — Cloudflare (HTTP 403 via proxy)</li>
-          <li><strong>Pak'nSave</strong> — SPA; price not in static HTML</li>
         </ul>
 
         <h4>ℹ️ Storage</h4>
@@ -496,6 +516,7 @@
   <section>
     <div class="top-actions">
       <button onclick="refreshAll()">↻ Refresh today's prices</button>
+      <button onclick="refreshForce()" style="font-size:12px; background:#252525;">↻ Force Refresh All</button>
       <span id="refresh-status"></span>
     </div>
     <div class="items-grid" id="items-grid">
@@ -599,6 +620,8 @@
     try {
       const h = new URL(url).hostname.toLowerCase().replace(/^www\./, '');
       if (h.includes('thewarehouse.co.nz'))                       return 'The Warehouse';
+      if (h.includes('paknsave.co.nz'))                            return "Pak'nSave";
+      if (h.includes('newworld.co.nz'))                            return 'New World';
       if (h.includes('woolworths.co.nz') || h.includes('countdown.co.nz')) return 'Woolworths NZ';
       if (h.includes('mitre10.co.nz'))                            return 'Mitre 10';
       if (h.includes('pbtech.co.nz'))                             return 'PB Tech';
@@ -618,6 +641,10 @@
     } catch { return 'Unknown'; }
   }
 
+  function needsStoreId(store) {
+    return ["Pak'nSave", 'New World'].includes(store);
+  }
+
   // ── Price extraction from HTML (JSON-LD → __NEXT_DATA__ → meta → selectors) ─
 
   function stripExternalAssets(html) {
@@ -635,6 +662,7 @@
 
     let price = null;
     let name  = null;
+    let jsonLdOffersWasArray = false;
 
     // 1. JSON-LD (most reliable — used by The Warehouse, most schema-compliant retailers)
     for (const el of doc.querySelectorAll('script[type="application/ld+json"]')) {
@@ -646,15 +674,34 @@
           if (obj.name && !name) name = String(obj.name);
           const offers = obj.offers;
           if (offers && price == null) {
-            const o = Array.isArray(offers) ? offers[0] : offers;
-            if (o?.price != null) {
-              const p = parseFloat(String(o.price).replace(/[^0-9.]/g, ''));
-              if (!isNaN(p) && p > 0) price = p;
+            if (Array.isArray(offers)) {
+              jsonLdOffersWasArray = true;
+              const o = offers[0];
+              if (o?.price != null) {
+                const p = parseFloat(String(o.price).replace(/[^0-9.]/g, ''));
+                if (!isNaN(p) && p > 0) price = p;
+              }
+            } else {
+              if (offers.price != null) {
+                const p = parseFloat(String(offers.price).replace(/[^0-9.]/g, ''));
+                if (!isNaN(p) && p > 0) price = p;
+              }
             }
           }
         };
         walkLD(JSON.parse(el.textContent));
       } catch { /* malformed JSON-LD — skip */ }
+    }
+
+    // When JSON-LD lists offers as an array (product with variants), offers[0] is not
+    // necessarily the page's displayed default variant. Shopify sets og:price:amount
+    // to the default variant's price, so prefer it in that case.
+    if (jsonLdOffersWasArray && price != null) {
+      const metaEl = doc.querySelector('meta[property="og:price:amount"], meta[property="product:price:amount"]');
+      if (metaEl) {
+        const metaPrice = parseFloat((metaEl.getAttribute('content') || '').replace(/[^0-9.]/g, ''));
+        if (!isNaN(metaPrice) && metaPrice > 0) price = metaPrice;
+      }
     }
 
     // 2. Next.js __NEXT_DATA__ (common in React/Next storefronts)
@@ -715,6 +762,49 @@
     return { price: price ?? null, name: name ?? null };
   }
 
+  // ── Pak'nSave / New World API ─────────────────────────────────────────────
+
+  async function fetchPakNSavePrice(item) {
+    if (!item.storeId) throw new Error("Store ID required — see 'How it works' above.");
+
+    const urlPath   = new URL(item.url).pathname;
+    const rawSlug   = urlPath.split('/').pop().split('?')[0];
+    const productId = rawSlug
+      .replace(/pns$|nw$|fg$/i, '')
+      .replace(/_/g, '-')
+      .toUpperCase()
+      .replace(/-+$/, '');
+
+    const apiUrl  = `https://api-prod.paknsave.co.nz/v1/edge/store/${encodeURIComponent(item.storeId)}/decorateProducts`;
+    const proxied = PROXIES[0](apiUrl);
+
+    const ctrl = new AbortController();
+    const tid  = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+    let resp;
+    try {
+      resp = await fetch(proxied, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ productIds: [productId] }),
+        signal:  ctrl.signal
+      });
+    } finally { clearTimeout(tid); }
+
+    if (!resp.ok) throw new Error(`API HTTP ${resp.status}`);
+    const data    = await resp.json();
+    const product = data.products?.[0];
+    if (!product) throw new Error(`Product ${productId} not found — check Store ID and URL`);
+
+    const price = product.singlePrice?.price ?? product.price?.price ?? null;
+    if (price == null) throw new Error('Price field missing in API response');
+
+    const nameParts = [product.brand, product.name, product.displayName].filter(Boolean);
+    return {
+      price: price / 100,
+      name:  nameParts.join(' ') || product.productId
+    };
+  }
+
   // ── Generic HTML fetch ─────────────────────────────────────────────────────
 
   async function fetchHTMLPrice(item, proxies = PROXIES) {
@@ -751,6 +841,10 @@
   // ── Main fetch dispatcher ──────────────────────────────────────────────────
 
   async function fetchCurrentPrice(item) {
+    const store = item.store || detectStore(item.url);
+    if (store === "Pak'nSave" || store === 'New World') {
+      return await fetchPakNSavePrice(item);
+    }
     return await fetchHTMLPrice(item);
   }
 
@@ -1116,25 +1210,17 @@
         <button onclick="createGroupWithName('${esc(id)}')" style="padding:4px 10px;">OK</button>
       </div>`;
 
+    const overlay = document.createElement('div');
+    overlay.id = 'group-overlay';
+    overlay.addEventListener('click', closeGroupDropdown);
+    document.body.appendChild(overlay);
+
     const dd = document.createElement('div');
     dd.id = 'group-dropdown';
     dd.innerHTML = html;
     document.body.appendChild(dd);
 
-    // Position below the clicked button (fixed = viewport coords, no scroll offset)
-    const rect = e.target.getBoundingClientRect();
-    let top  = rect.bottom + 4;
-    let left = rect.left;
-    const ddW = 290;
-    if (left + ddW > window.innerWidth - 8) left = window.innerWidth - ddW - 8;
-    if (top < 0) top = rect.top - dd.offsetHeight - 4;  // flip above if cut off
-    dd.style.top  = top  + 'px';
-    dd.style.left = left + 'px';
-
     document.getElementById('group-name-input').focus();
-
-    // Close on outside click
-    setTimeout(() => document.addEventListener('click', _groupDropdownOutsideClick), 0);
   }
 
   function _groupDropdownOutsideClick(e) {
@@ -1143,6 +1229,8 @@
   }
 
   function closeGroupDropdown() {
+    const overlay = document.getElementById('group-overlay');
+    if (overlay) overlay.remove();
     const dd = document.getElementById('group-dropdown');
     if (dd) dd.remove();
     document.removeEventListener('click', _groupDropdownOutsideClick);
@@ -1382,8 +1470,15 @@
       return;
     }
 
-    const store    = detectStore(url);
-    const custName = nameInput.value.trim();
+    const store       = detectStore(url);
+    const storeIdInput = document.getElementById('add-storeid');
+    const storeId      = storeIdInput?.value.trim() || '';
+    const custName     = nameInput.value.trim();
+
+    if (needsStoreId(store) && !storeId) {
+      statusEl.textContent = `${store} requires a Store ID — see 'How it works' above for how to find it.`;
+      return;
+    }
 
     const data = loadData();
     if (data.items.some(i => i.url === url)) {
@@ -1397,6 +1492,7 @@
       name:       custName || nameFromUrl(url),
       customName: !!custName,
       store,
+      storeId:    storeId || null,
       history:    [],
       status:     null,
       error:      null
@@ -1407,6 +1503,8 @@
 
     urlInput.value  = '';
     nameInput.value = '';
+    if (storeIdInput) storeIdInput.value = '';
+    document.getElementById('storeid-row').style.display = 'none';
     statusEl.textContent = '';
 
     render();
@@ -1414,9 +1512,21 @@
   }
 
   // Allow Enter key to submit from either input field
+  function onUrlChange(input) {
+    const store = detectStore(input.value);
+    const row   = document.getElementById('storeid-row');
+    const label = document.getElementById('storeid-store-label');
+    if (needsStoreId(store)) {
+      row.style.display = '';
+      label.textContent = `${store} Store ID (UUID):`;
+    } else {
+      row.style.display = 'none';
+    }
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
-    ['add-url', 'add-name'].forEach(id => {
-      document.getElementById(id).addEventListener('keydown', e => {
+    ['add-url', 'add-name', 'add-storeid'].forEach(id => {
+      document.getElementById(id)?.addEventListener('keydown', e => {
         if (e.key === 'Enter') addItem();
       });
     });
