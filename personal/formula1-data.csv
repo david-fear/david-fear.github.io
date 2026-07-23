@@ -1,23 +1,23 @@
-driver,constructor,AUS,CHN-S,CHN,JPN,MIA-S,MIA,CAN-S,CAN,MON,ESP,RBR,GBR-S,GBR
-Antonelli,Mercedes,18,4,25,25,3,25,6,25,25,0,15,8,0
-Russell,Mercedes,25,8,18,12,5,12,8,0,0,18,25,5,18
-Hamilton,Ferrari,12,6,15,8,2,8,3,18,18,25,10,7,15
-Piastri,McLaren,0,3,0,18,7,15,5,0,10,10,12,2,0
-Norris,McLaren,10,5,0,10,8,18,7,0,0,15,6,6,12
-Leclerc,Ferrari,15,7,12,15,6,4,4,12,0,0,4,4,25
-Verstappen,Red Bull,8,0,0,4,4,10,2,15,0,12,18,3,0
-Hadjar,Red Bull,0,0,4,0,0,0,0,10,12,8,8,0,10
-Gasly,Alpine,1,0,8,6,1,0,0,4,15,6,0,0,1
-Lawson,Racing Bulls,0,2,6,2,0,0,0,6,8,4,2,1,8
-Bearman,Haas,6,1,10,0,0,0,0,1,0,0,0,0,0
-Colapinto,Alpine,0,0,1,0,0,6,0,8,0,1,0,0,2
-Lindblad,Racing Bulls,4,0,0,0,0,0,1,0,6,2,1,0,6
-Albon,Williams,0,0,0,0,0,1,0,0,4,0,0,0,0
-Bortoleto,Audi,2,0,2,0,0,0,0,0,0,0,0,0,4
-Sainz,Williams,0,0,0,0,0,2,0,2,0,0,0,0,0
-Ocon,Haas,0,0,0,1,0,0,0,0,2,0,0,0,0
-Alonso,Aston Martin,0,0,0,0,0,0,0,0,1,0,0,0,0
-Hulkenberg,Audi,0,0,0,0,0,0,0,0,0,0,0,0,0
-Bottas,Cadillac,0,0,0,0,0,0,0,0,0,0,0,0,0
-Perez,Cadillac,0,0,0,0,0,0,0,0,0,0,0,0,0
-Stroll,Aston Martin,0,0,0,0,0,0,0,0,0,0,0,0,0
+driver,constructor,AUS,CHN-S,CHN,JPN,MIA-S,MIA,CAN-S,CAN,MON,ESP,RBR,GBR-S,GBR,BEL
+Antonelli,Mercedes,18,4,25,25,3,25,6,25,25,0,15,8,0,25
+Hamilton,Ferrari,12,6,15,8,2,8,3,18,18,25,10,7,15,12
+Russell,Mercedes,25,8,18,12,5,12,8,0,0,18,25,5,18,0
+Leclerc,Ferrari,15,7,12,15,6,4,4,12,0,0,4,4,25,18
+Norris,McLaren,10,5,0,10,8,18,7,0,0,15,6,6,12,6
+Piastri,McLaren,0,3,0,18,7,15,5,0,10,10,12,2,0,10
+Verstappen,Red Bull,8,0,0,4,4,10,2,15,0,12,18,3,0,15
+Hadjar,Red Bull,0,0,4,0,0,0,0,10,12,8,8,0,10,8
+Gasly,Alpine,1,0,8,6,1,0,0,4,15,6,0,0,1,0
+Lawson,Racing Bulls,0,2,6,2,0,0,0,6,8,4,2,1,8,0
+Lindblad,Racing Bulls,4,0,0,0,0,0,1,0,6,2,1,0,6,2
+Colapinto,Alpine,0,0,1,0,0,6,0,8,0,1,0,0,2,1
+Bearman,Haas,6,1,10,0,0,0,0,1,0,0,0,0,0,0
+Bortoleto,Audi,2,0,2,0,0,0,0,0,0,0,0,0,4,4
+Sainz,Williams,0,0,0,0,0,2,0,2,0,0,0,0,0,0
+Albon,Williams,0,0,0,0,0,1,0,0,4,0,0,0,0,0
+Ocon,Haas,0,0,0,1,0,0,0,0,2,0,0,0,0,0
+Alonso,Aston Martin,0,0,0,0,0,0,0,0,1,0,0,0,0,0
+Hulkenberg,Audi,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Bottas,Cadillac,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Perez,Cadillac,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Stroll,Aston Martin,0,0,0,0,0,0,0,0,0,0,0,0,0,0
