@@ -516,7 +516,6 @@
   <section>
     <div class="top-actions">
       <button onclick="refreshAll()">↻ Refresh today's prices</button>
-      <button onclick="refreshForce()" style="font-size:12px; background:#252525;">↻ Force Refresh All</button>
       <span id="refresh-status"></span>
     </div>
     <div class="items-grid" id="items-grid">
@@ -1402,15 +1401,15 @@
       return;
     }
 
-    status.textContent = `Checking ${pending.length} item${pending.length !== 1 ? 's' : ''} not yet fetched today…`;
     let fetched = 0;
     let errors  = 0;
-    for (const item of pending) {
-      await refreshItem(item.id, false);
-      const fresh = loadData().items.find(i => i.id === item.id);
+    for (let i = 0; i < pending.length; i++) {
+      status.textContent = `Fetching ${i + 1} of ${pending.length}…`;
+      await refreshItem(pending[i].id, false);
+      const fresh = loadData().items.find(x => x.id === pending[i].id);
       if (fresh?.error) errors++;
       else fetched++;
-      if (pending.indexOf(item) < pending.length - 1)
+      if (i < pending.length - 1)
         await new Promise(r => setTimeout(r, 200));
     }
 
@@ -1426,15 +1425,16 @@
     const data   = loadData();
     const status = document.getElementById('refresh-status');
     if (!data.items.length) return;
-    status.textContent = `Re-checking all ${data.items.length} item${data.items.length !== 1 ? 's' : ''}…`;
+    const all = data.items;
     let fetched = 0;
     let errors  = 0;
-    for (const item of data.items) {
-      await refreshItem(item.id, true);
-      const fresh = loadData().items.find(i => i.id === item.id);
+    for (let i = 0; i < all.length; i++) {
+      status.textContent = `Fetching ${i + 1} of ${all.length}…`;
+      await refreshItem(all[i].id, true);
+      const fresh = loadData().items.find(x => x.id === all[i].id);
       if (fresh?.error) errors++;
       else fetched++;
-      if (data.items.indexOf(item) < data.items.length - 1)
+      if (i < all.length - 1)
         await new Promise(r => setTimeout(r, 200));
     }
     const parts = [];
