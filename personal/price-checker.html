@@ -245,12 +245,12 @@
       font-size: 10px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      padding: 1px 6px 3px 0;
+      padding: 1px 4px 2px 0;
       border-bottom: 1px solid #222;
     }
 
     .group-table td {
-      padding: 2px 6px 2px 0;
+      padding: 1px 4px 1px 0;
       vertical-align: middle;
       border-bottom: 1px solid #1a1a1a;
     }
@@ -285,6 +285,12 @@
     .group-table .gt-change { white-space: nowrap; }
 
     .group-table .gt-actions { white-space: nowrap; }
+
+    .group-table .card-actions button {
+      padding: 1px 4px;
+      font-size: 10px;
+      line-height: 1.3;
+    }
 
     /* ── History table ── */
     .hist-table {
@@ -371,6 +377,56 @@
       color: #eee;
       padding: 4px 6px;
       font-size: 12px;
+    }
+
+    /* ── Rename modal ── */
+    #rename-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 2001;
+    }
+
+    #rename-modal {
+      position: fixed;
+      z-index: 2002;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #1e1e1e;
+      border: 1px solid #444;
+      padding: 14px 16px;
+      width: 90%;
+      max-width: 320px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.7);
+      font-size: 13px;
+      color: #ccc;
+    }
+
+    #rename-modal label {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      font-size: 11px;
+      color: #888;
+      margin-bottom: 10px;
+    }
+
+    #rename-modal input {
+      background: #111;
+      border: 1px solid #333;
+      color: #eee;
+      padding: 6px 8px;
+      font-size: 13px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    #rename-modal .rename-actions {
+      display: flex;
+      gap: 6px;
+      justify-content: flex-end;
+      margin-top: 4px;
     }
 
     /* ── Disclaimer ── */
@@ -1010,13 +1066,13 @@
         },
         scales: {
           x: {
-            ticks: { color: '#666', font: { size: 11 }, maxRotation: 40 },
+            ticks: { color: '#666', font: { size: 9 }, maxRotation: 0, minRotation: 0 },
             grid:  { color: '#222' }
           },
           y: {
             min: minVal - pad,
             max: maxVal + pad,
-            ticks: { color: '#666', font: { size: 11 }, callback: v => `$${v.toFixed(2)}` },
+            ticks: { color: '#666', font: { size: 9 }, callback: v => `$${v.toFixed(2)}` },
             grid: { color: '#222' }
           }
         }
@@ -1055,6 +1111,7 @@
           <td class="gt-name"><a href="${esc(item.url)}" target="_blank">${esc(item.name || item.url)}</a>${item.error ? ` <span class="error-badge" title="${esc(item.error)}">⚠</span>` : ''}</td>
           <td class="gt-price">${priceCell}</td>
           <td class="gt-actions"><div class="card-actions">
+            <button onclick="renameGroupedItem('${esc(item.id)}')" title="Rename store / item" style="font-size:11px;">✎</button>
             <button onclick="ungroupItem('${esc(item.id)}')" title="Remove from group" style="font-size:11px;">↩</button>
             <button class="btn-remove" onclick="removeItem('${esc(item.id)}')" title="Remove">✕</button>
           </div></td>
@@ -1153,11 +1210,11 @@
           tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: $${ctx.parsed.y.toFixed(2)}` } }
         },
         scales: {
-          x: { ticks: { color: '#666', font: { size: 11 }, maxRotation: 40 }, grid: { color: '#222' } },
+          x: { ticks: { color: '#666', font: { size: 9 }, maxRotation: 0, minRotation: 0 }, grid: { color: '#222' } },
           y: {
             min: minVal - pad,
             max: maxVal + pad,
-            ticks: { color: '#666', font: { size: 11 }, callback: v => `$${v.toFixed(2)}` },
+            ticks: { color: '#666', font: { size: 9 }, callback: v => `$${v.toFixed(2)}` },
             grid: { color: '#222' }
           }
         }
@@ -1300,17 +1357,92 @@
     render();
   }
 
+  // ── Rename modal ─────────────────────────────────────────────────────────────────────────────
+
+  function openRenameModal(title, fields, onSave) {
+    closeRenameModal();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'rename-overlay';
+    overlay.addEventListener('click', closeRenameModal);
+    document.body.appendChild(overlay);
+
+    const fieldsHtml = fields.map((f, i) => `
+      <label>
+        ${esc(f.label)}
+        <input id="rename-field-${i}" type="text" value="${esc(f.value)}" />
+      </label>`).join('');
+
+    const modal = document.createElement('div');
+    modal.id = 'rename-modal';
+    modal.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <strong>${esc(title)}</strong>
+        <button onclick="closeRenameModal()" style="background:none;border:none;color:#888;font-size:16px;cursor:pointer;padding:0 4px;line-height:1;">✕</button>
+      </div>
+      ${fieldsHtml}
+      <div class="rename-actions">
+        <button onclick="closeRenameModal()" style="background:#252525;border:1px solid #333;color:#888;padding:5px 14px;font-size:12px;cursor:pointer;">Cancel</button>
+        <button id="rename-save-btn" style="padding:5px 14px;font-size:12px;cursor:pointer;">Save</button>
+      </div>`;
+    document.body.appendChild(modal);
+
+    document.getElementById('rename-save-btn').addEventListener('click', () => {
+      const values = fields.map((_, i) => document.getElementById(`rename-field-${i}`).value.trim());
+      closeRenameModal();
+      onSave(values);
+    });
+
+    modal.querySelectorAll('input').forEach(inp => {
+      inp.addEventListener('keydown', e => {
+        if (e.key === 'Enter')  document.getElementById('rename-save-btn').click();
+        if (e.key === 'Escape') closeRenameModal();
+      });
+    });
+
+    const first = document.getElementById('rename-field-0');
+    if (first) { first.focus(); first.select(); }
+  }
+
+  function closeRenameModal() {
+    document.getElementById('rename-overlay')?.remove();
+    document.getElementById('rename-modal')?.remove();
+  }
+
+  function renameGroupedItem(itemId) {
+    const data = loadData();
+    const item = data.items.find(i => i.id === itemId);
+    if (!item) return;
+    openRenameModal(
+      'Rename',
+      [
+        { label: 'Store',     value: item.store || '' },
+        { label: 'Item name', value: item.name  || '' }
+      ],
+      ([newStore, newName]) => {
+        if (newStore) item.store = newStore;
+        item.name       = newName || (item.customName ? item.name : '');
+        item.customName = !!newName;
+        saveData(data);
+        render();
+      }
+    );
+  }
+
   function renameGroup(groupId) {
     const data  = loadData();
     const group = (data.groups || []).find(g => g.id === groupId);
     if (!group) return;
-    const newName = prompt('Rename group:', group.name);
-    if (newName === null) return;
-    const trimmed = newName.trim();
-    if (!trimmed) return;
-    group.name = trimmed;
-    saveData(data);
-    render();
+    openRenameModal(
+      'Rename group',
+      [{ label: 'Group name', value: group.name }],
+      ([newName]) => {
+        if (!newName) return;
+        group.name = newName;
+        saveData(data);
+        render();
+      }
+    );
   }
 
   function ungroupAll(groupId) {
@@ -1369,13 +1501,16 @@
     const data = loadData();
     const item = data.items.find(i => i.id === id);
     if (!item) return;
-    const newName = prompt('Rename item:', item.name || '');
-    if (newName === null) return;  // cancelled
-    const trimmed = newName.trim();
-    item.name = trimmed || (item.customName ? item.name : '');
-    item.customName = !!trimmed;
-    saveData(data);
-    render();
+    openRenameModal(
+      'Rename item',
+      [{ label: 'Item name', value: item.name || '' }],
+      ([newName]) => {
+        item.name       = newName || (item.customName ? item.name : '');
+        item.customName = !!newName;
+        saveData(data);
+        render();
+      }
+    );
   }
 
   function removeItem(id) {
