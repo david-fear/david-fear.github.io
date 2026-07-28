@@ -580,6 +580,7 @@
           <li><strong>Harvey Norman</strong> — Imperva/Incapsula bot challenge</li>
           <li><strong>Bunnings</strong> — Cloudflare bot protection</li>
           <li><strong>Mighty Ape</strong> — Cloudflare (HTTP 403 via proxy)</li>
+          <li><strong>Warehouse Stationery</strong> — bot protection aborts all CORS proxy connections</li>
         </ul>
 
         <h4>ℹ️ Storage</h4>
@@ -731,6 +732,7 @@
       if (h.includes('bigbarrel.co.nz'))                           return 'Big Barrel';
       if (h.includes('farmers.co.nz'))                             return 'Farmers';
       if (h.includes('chemistwarehouse.co.nz'))                    return 'Chemist Warehouse';
+      if (h.includes('warehousestationery.co.nz'))                  return 'Warehouse Stationery';
       return new URL(url).hostname.replace(/^www\./, '').replace(/\.[a-z]{2,}(\.[a-z]{2})?$/i, '');
     } catch { return 'Unknown'; }
   }
