@@ -549,8 +549,6 @@
       &bull;
       <a href="https://www.briscoes.co.nz" target="_blank">Briscoes</a>
       &bull;
-      <a href="https://www.woolworths.co.nz" target="_blank">Woolworths NZ</a>
-      &bull;
       <a href="https://www.rebelsport.co.nz" target="_blank">Rebel Sport</a>
       &bull;
       <a href="https://theclubroom.co.nz" target="_blank">The Club Room</a>
@@ -563,12 +561,11 @@
       &bull;
       <a href="https://www.bigbarrel.co.nz" target="_blank">Big Barrel</a>
       &bull;
-      <a href="https://www.paknsave.co.nz" target="_blank">Pak'nSave</a>*
+      <a href="https://www.farmers.co.nz" target="_blank">Farmers</a>
       &bull;
-      <a href="https://www.newworld.co.nz" target="_blank">New World</a>*
+      <a href="https://www.chemistwarehouse.co.nz" target="_blank">Chemist Warehouse</a>
     </p>
     <p style="font-size:11px; color:#666;">† Liquorland: only some products work — pages with 13-digit EAN barcodes in the URL tend to succeed; shorter product codes are blocked by Liquorland's anti-bot protection.</p>
-    <p style="font-size:11px; color:#666;">* Pak'nSave and New World require a Store ID (UUID). To find it: go to your local store's page, open DevTools Network tab, add any item to cart, look for a request to <code>api-prod.paknsave.co.nz</code> and copy the store UUID from the URL.</p>
     <details class="support-info" style="margin-top:6px; margin-bottom:0;">
       <summary>How it works &amp; known limitations</summary>
       <div class="support-content">
@@ -732,6 +729,8 @@
       if (h.includes('liquorland.co.nz'))                          return 'Liquorland';
       if (h.includes('superliquor.co.nz'))                         return 'Super Liquor';
       if (h.includes('bigbarrel.co.nz'))                           return 'Big Barrel';
+      if (h.includes('farmers.co.nz'))                             return 'Farmers';
+      if (h.includes('chemistwarehouse.co.nz'))                    return 'Chemist Warehouse';
       return new URL(url).hostname.replace(/^www\./, '').replace(/\.[a-z]{2,}(\.[a-z]{2})?$/i, '');
     } catch { return 'Unknown'; }
   }
