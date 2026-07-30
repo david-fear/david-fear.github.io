@@ -839,11 +839,11 @@
         const hi    = matchCode && s.set_code.toUpperCase() === matchCode.toUpperCase();
         const priceVal = parseFloat(s.set_price);
         const price = !isNaN(priceVal) && priceVal > 0 ? '$' + priceVal.toFixed(2) : '\u2014';
-        return `<tr style="${hi ? 'background:#1a2a1a;' : ''}">
+        return `<tr style="${hi ? 'background:#1a1900;' : ''}">
           <td style="padding:2px 6px;color:#aaa;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(s.set_name)}">${esc(s.set_name)}</td>
-          <td style="padding:2px 6px;font-family:monospace;font-size:10px;"><a href="javascript:void(0)" onclick="ygoSearchCode('${esc(s.set_code)}')" style="color:${hi ? '#7dff7d' : '#88aaff'};text-decoration:underline;cursor:pointer;font-family:monospace;font-size:10px;">${esc(s.set_code)}</a></td>
+          <td style="padding:2px 6px;font-family:monospace;font-size:10px;"><a href="javascript:void(0)" onclick="ygoSearchCode('${esc(s.set_code)}')" style="color:${hi ? '#ffd700' : '#88aaff'};text-decoration:underline;cursor:pointer;font-family:monospace;font-size:10px;">${esc(s.set_code)}</a></td>
           <td style="padding:2px 6px;color:#aaa;">${esc(s.set_rarity)}</td>
-          <td style="padding:2px 6px;color:#7dff7d;white-space:nowrap;">${esc(price)} <span style="color:#666;font-size:9px;">USD</span></td>
+          <td style="padding:2px 6px;color:#ffe066;white-space:nowrap;">${esc(price)} <span style="color:#666;font-size:9px;">USD</span></td>
         </tr>`;
       }).join('');
 
@@ -887,6 +887,7 @@
 
     function ygoSearchCode(code) {
       document.getElementById('q').value = code;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       search(true);
     }
 
