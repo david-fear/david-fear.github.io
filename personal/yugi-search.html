@@ -205,6 +205,7 @@
 
     .item a:hover {
       text-decoration: underline;
+      text-shadow: 0 0 5px rgba(255,255,255,0.18);
     }
 
     .price {
@@ -215,6 +216,7 @@
       font-weight: bold;
       white-space: nowrap;
       font-size: 11px;
+      text-shadow: 0 0 6px rgba(125,255,125,0.5);
       background: linear-gradient(to right, transparent, #181818 22%);
       padding-left: 10px;
     }
@@ -839,7 +841,7 @@
         const hi    = matchCode && s.set_code.toUpperCase() === matchCode.toUpperCase();
         const priceVal = parseFloat(s.set_price);
         const price = !isNaN(priceVal) && priceVal > 0 ? '$' + priceVal.toFixed(2) : '\u2014';
-        return `<tr style="${hi ? 'background:#1a1900;' : ''}">
+        return `<tr style="${hi ? 'background:#262200; border-left:2px solid #ffd700;' : ''}">
           <td style="padding:2px 6px;color:#aaa;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(s.set_name)}">${esc(s.set_name)}</td>
           <td style="padding:2px 6px;font-family:monospace;font-size:10px;"><a href="javascript:void(0)" onclick="ygoSearchCode('${esc(s.set_code)}')" style="color:${hi ? '#ffd700' : '#88aaff'};text-decoration:underline;cursor:pointer;font-family:monospace;font-size:10px;">${esc(s.set_code)}</a></td>
           <td style="padding:2px 6px;color:#aaa;">${esc(s.set_rarity)}</td>
