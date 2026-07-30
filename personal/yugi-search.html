@@ -409,6 +409,7 @@
     /* Stores that are coming soon — shown as a preview section */
     const COMING_SOON_STORES = [
       { d: 'rawr.cards', url: 'https://www.rawr.cards/' },
+      { d: 'cardmerchanttaupo.co.nz', url: 'https://www.cardmerchanttaupo.co.nz/' },
     ];
 
     const TIMEOUT_MS = 6000;
@@ -840,14 +841,14 @@
         const price = !isNaN(priceVal) && priceVal > 0 ? '$' + priceVal.toFixed(2) : '\u2014';
         return `<tr style="${hi ? 'background:#1a2a1a;' : ''}">
           <td style="padding:2px 6px;color:#aaa;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(s.set_name)}">${esc(s.set_name)}</td>
-          <td style="padding:2px 6px;font-family:monospace;font-size:10px;"><a href="javascript:void(0)" onclick="document.getElementById('q').value='${esc(s.set_code)}';search(true);" style="color:${hi ? '#7dff7d' : '#88aaff'};text-decoration:underline;cursor:pointer;font-family:monospace;font-size:10px;">${esc(s.set_code)}</a></td>
+          <td style="padding:2px 6px;font-family:monospace;font-size:10px;"><a href="javascript:void(0)" onclick="ygoSearchCode('${esc(s.set_code)}')" style="color:${hi ? '#7dff7d' : '#88aaff'};text-decoration:underline;cursor:pointer;font-family:monospace;font-size:10px;">${esc(s.set_code)}</a></td>
           <td style="padding:2px 6px;color:#aaa;">${esc(s.set_rarity)}</td>
           <td style="padding:2px 6px;color:#7dff7d;white-space:nowrap;">${esc(price)} <span style="color:#666;font-size:9px;">USD</span></td>
         </tr>`;
       }).join('');
 
       const setsSection = card.card_sets?.length ? `
-        <details style="margin-top:10px;" open>
+        <details style="margin-top:6px;" open>
           <summary style="cursor:pointer;font-size:11px;color:#888;user-select:none;">
             ${card.card_sets.length} print${card.card_sets.length !== 1 ? 's' : ''} across sets
           </summary>
@@ -864,20 +865,29 @@
           </div>
         </details>` : '';
 
+      const ygoUrl = `https://ygoprodeck.com/card/${card.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}-${card.id}/`;
       return `
-        <div style="background:#131310;border:1px solid #3a3510;padding:14px;">
-          <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;">
-            ${imgUrl ? `<img src="${esc(imgUrl)}" alt="${esc(card.name)}" style="width:90px;height:auto;border:1px solid #2a2a1a;flex-shrink:0;" loading="lazy" />` : ''}
-            <div style="flex:1;min-width:220px;">
-              <div style="font-size:15px;font-weight:bold;color:#ffd700;margin-bottom:4px;">${esc(card.name)}</div>
-              <div style="font-size:11px;color:#888;margin-bottom:6px;">${esc(card.type || '')}${card.race ? ' &middot; ' + esc(card.race) : ''}</div>
-              ${statParts.length ? `<div style="font-size:11px;color:#aaa;display:flex;gap:14px;flex-wrap:wrap;margin-bottom:8px;">${statParts.map(p => `<span>${esc(p)}</span>`).join('')}</div>` : ''}
-              <div style="font-size:11px;color:#bbb;line-height:1.7;border-top:1px solid #1e1e1e;padding-top:8px;white-space:pre-line;">${esc(card.desc || '')}</div>
+        <div style="background:#131310;border:1px solid #3a3510;padding:7px;">
+          <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start;">
+            ${imgUrl ? `<div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:5px;">
+              <img src="${esc(imgUrl)}" alt="${esc(card.name)}" style="width:80px;height:auto;border:1px solid #2a2a1a;" loading="lazy" />
+              <a href="${esc(ygoUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="font-size:11px;color:#88aaff;text-decoration:none;border:1px solid #335;padding:2px 7px;white-space:nowrap;">&#8599; Open</a>
+            </div>` : ''}
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:14px;font-weight:bold;color:#ffd700;margin-bottom:4px;word-break:break-word;">${esc(card.name)}</div>
+              <div style="font-size:11px;color:#888;margin-bottom:3px;">${esc(card.type || '')}${card.race ? ' &middot; ' + esc(card.race) : ''}</div>
+              ${statParts.length ? `<div style="font-size:11px;color:#aaa;display:flex;gap:10px;flex-wrap:wrap;margin-bottom:4px;">${statParts.map(p => `<span>${esc(p)}</span>`).join('')}</div>` : ''}
+              <div style="font-size:11px;color:#bbb;line-height:1.6;border-top:1px solid #1e1e1e;padding-top:5px;white-space:pre-line;word-break:break-word;">${esc(card.desc || '')}</div>
             </div>
           </div>
           ${setsSection}
         </div>
         <div style="font-size:9px;color:#252510;text-align:right;margin-top:1px;">via YGOPRODeck API${matchCode ? ' &middot; ' + esc(matchCode) : ''}</div>`;
+    }
+
+    function ygoSearchCode(code) {
+      document.getElementById('q').value = code;
+      search(true);
     }
 
     async function lookupYGOCard(query, onResult) {
@@ -916,12 +926,11 @@
         const node = document.createElement('div');
         if (ygoStatus === 'found') {
         node.style.cssText = 'grid-column: 1 / -1; border: 1px solid #b8860b; background: #1a1500; box-shadow: 0 0 18px rgba(255,200,0,0.35), 0 0 34px rgba(255,200,0,0.15), inset 0 0 0 1px rgba(255,200,0,0.18); margin-bottom: 2px;';
-        const ygoUrl = `https://ygoprodeck.com/card/${card.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}-${card.id}/`;
           node.innerHTML = `<details open>
-            <summary style="cursor:pointer; padding:9px 14px; font-size:13px; font-weight:bold; color:#ffd700; user-select:none; text-shadow:0 0 10px rgba(255,200,0,0.5);">
-              &#9733; YGOPRODeck: ${esc(card.name)}&ensp;<a href="${esc(ygoUrl)}" target="_blank" onclick="event.stopPropagation()" style="font-size:11px;font-weight:normal;color:#88aaff;text-decoration:none;border:1px solid #335;padding:1px 6px;vertical-align:middle;">&#8599; Open</a>&ensp;<small style="font-size:10px; font-weight:normal; color:#888;">(click to expand/collapse)</small>
+            <summary style="cursor:pointer; padding:5px 12px; font-size:13px; font-weight:bold; color:#ffd700; user-select:none; text-shadow:0 0 10px rgba(255,200,0,0.5);">
+              &#9733; YGOPRODeck: ${esc(card.name)}
             </summary>
-            <div style="padding:0 12px 12px;">${renderYGOPanel(card, matchCode)}</div>
+            <div style="padding:0 8px 8px;">${renderYGOPanel(card, matchCode)}</div>
           </details>`;
         } else {
           node.style.cssText = 'grid-column: 1 / -1; border: 1px solid #1e1e1e; background: #111; padding: 6px 14px; font-size: 10px; color: #777; letter-spacing: 0.3px;';
