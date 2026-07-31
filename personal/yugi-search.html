@@ -842,7 +842,7 @@
         const priceVal = parseFloat(s.set_price);
         const price = !isNaN(priceVal) && priceVal > 0 ? '$' + priceVal.toFixed(2) : '\u2014';
         return `<tr style="${hi ? 'background:#262200; border-left:2px solid #ffd700;' : ''}">
-          <td style="padding:2px 6px;color:#aaa;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(s.set_name)}">${esc(s.set_name)}</td>
+          <td style="padding:2px 4px;color:#aaa;word-break:break-word;" title="${esc(s.set_name)}">${esc(s.set_name)}</td>
           <td style="padding:2px 6px;font-family:monospace;font-size:10px;"><a href="javascript:void(0)" onclick="ygoSearchCode('${esc(s.set_code)}')" style="color:${hi ? '#ffd700' : '#88aaff'};text-decoration:underline;cursor:pointer;font-family:monospace;font-size:10px;">${esc(s.set_code)}</a></td>
           <td style="padding:2px 6px;color:#aaa;">${esc(s.set_rarity)}</td>
           <td style="padding:2px 6px;color:#ffe066;white-space:nowrap;">${esc(price)} <span style="color:#666;font-size:9px;">USD</span></td>
@@ -852,10 +852,10 @@
       const setsSection = card.card_sets?.length ? `
         <details style="margin-top:6px;" open>
           <summary style="cursor:pointer;font-size:11px;color:#888;user-select:none;">
-            ${card.card_sets.length} print${card.card_sets.length !== 1 ? 's' : ''} across sets <span style="color:#555;font-size:10px;">— tap a code to search it</span>
+            ${card.card_sets.length} print${card.card_sets.length !== 1 ? 's' : ''} across sets <span style="color:#555;font-size:10px;">— tap code to reinitiate search </span>
           </summary>
           <div style="overflow-x:auto;margin-top:6px;">
-            <table style="border-collapse:collapse;font-size:11px;width:100%;">
+            <table style="border-collapse:collapse;font-size:10px;width:100%;">
               <thead><tr style="color:#777;text-align:left;">
                 <th style="padding:2px 6px;border-bottom:1px solid #1e1e1e;">Set</th>
                 <th style="padding:2px 6px;border-bottom:1px solid #1e1e1e;">Code</th>
