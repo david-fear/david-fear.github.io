@@ -852,7 +852,7 @@
       const setsSection = card.card_sets?.length ? `
         <details style="margin-top:6px;" open>
           <summary style="cursor:pointer;font-size:11px;color:#888;user-select:none;">
-            ${card.card_sets.length} print${card.card_sets.length !== 1 ? 's' : ''} across sets
+            ${card.card_sets.length} print${card.card_sets.length !== 1 ? 's' : ''} across sets <span style="color:#555;font-size:10px;">— tap a code to search it</span>
           </summary>
           <div style="overflow-x:auto;margin-top:6px;">
             <table style="border-collapse:collapse;font-size:11px;width:100%;">
@@ -867,13 +867,16 @@
           </div>
         </details>` : '';
 
-      const ygoUrl = `https://ygoprodeck.com/card/${card.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}-${card.id}/`;
+      const dbId = card.misc_info?.[0]?.db_id;
+      const ygoUrl = dbId
+        ? `https://ygoprodeck.com/card/${card.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}-${dbId}/`
+        : `https://ygoprodeck.com/card-search/?search=${encodeURIComponent(card.name)}`;
       return `
-        <div style="background:#131310;border:1px solid #3a3510;padding:7px;">
+        <div style="background:#131310;border:1px solid #3a3510;padding:7px;min-width:0;max-width:100%;box-sizing:border-box;">
           <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start;">
             ${imgUrl ? `<div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:5px;">
               <img src="${esc(imgUrl)}" alt="${esc(card.name)}" style="width:80px;height:auto;border:1px solid #2a2a1a;" loading="lazy" />
-              <a href="${esc(ygoUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="font-size:11px;color:#88aaff;text-decoration:none;border:1px solid #335;padding:2px 7px;white-space:nowrap;">&#8599; Open</a>
+              <a href="${esc(ygoUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="font-size:13px;color:#88aaff;text-decoration:none;border:1px solid #335;padding:4px 10px;white-space:nowrap;margin-top:6px;display:inline-block;">&#8599; Open</a>
             </div>` : ''}
             <div style="flex:1;min-width:0;">
               <div style="font-size:14px;font-weight:bold;color:#ffd700;margin-bottom:4px;word-break:break-word;">${esc(card.name)}</div>
@@ -909,7 +912,7 @@
           const sets    = await fetchCardSets();
           const setInfo = sets.find(s => s.set_code.toUpperCase() === setCode);
           if (setInfo) {
-            const r = await fetch(`https://db.ygoprodeck.com/api/v7/cardinfo.php?cardset=${encodeURIComponent(setInfo.set_name)}`, { signal: ctrl.signal });
+            const r = await fetch(`https://db.ygoprodeck.com/api/v7/cardinfo.php?cardset=${encodeURIComponent(setInfo.set_name)}&misc=yes`, { signal: ctrl.signal });
             if (r.ok) {
               const d = await r.json();
               card = (d.data || []).find(c => (c.card_sets || []).some(s => s.set_code.toUpperCase() === matchCode)) || null;
@@ -917,7 +920,7 @@
             }
           }
         } else {
-          const r = await fetch(`https://db.ygoprodeck.com/api/v7/cardinfo.php?name=${encodeURIComponent(trimmed)}`, { signal: ctrl.signal });
+          const r = await fetch(`https://db.ygoprodeck.com/api/v7/cardinfo.php?name=${encodeURIComponent(trimmed)}&misc=yes`, { signal: ctrl.signal });
           if (r.ok) {
             const d = await r.json();
             if (d.data?.length === 1) { card = d.data[0]; ygoStatus = 'found'; }
@@ -928,7 +931,7 @@
 
         const node = document.createElement('div');
         if (ygoStatus === 'found') {
-        node.style.cssText = 'grid-column: 1 / -1; border: 1px solid #b8860b; background: #1a1500; box-shadow: 0 0 18px rgba(255,200,0,0.35), 0 0 34px rgba(255,200,0,0.15), inset 0 0 0 1px rgba(255,200,0,0.18); margin-bottom: 2px;';
+        node.style.cssText = 'grid-column: 1 / -1; border: 1px solid #b8860b; background: #1a1500; box-shadow: 0 0 18px rgba(255,200,0,0.35), 0 0 34px rgba(255,200,0,0.15), inset 0 0 0 1px rgba(255,200,0,0.18); margin-bottom: 2px; max-width:100%; min-width:0; box-sizing:border-box; overflow-x:auto;';
           node.innerHTML = `<details open>
             <summary style="cursor:pointer; padding:5px 12px; font-size:13px; font-weight:bold; color:#ffd700; user-select:none; text-shadow:0 0 10px rgba(255,200,0,0.5);">
               &#9733; YGOPRODeck: ${esc(card.name)}
