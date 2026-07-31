@@ -845,7 +845,7 @@
           <td style="padding:2px 4px;color:#aaa;word-break:break-word;" title="${esc(s.set_name)}">${esc(s.set_name)}</td>
           <td style="padding:2px 6px;font-family:monospace;font-size:10px;"><a href="javascript:void(0)" onclick="ygoSearchCode('${esc(s.set_code)}')" style="color:${hi ? '#ffd700' : '#88aaff'};text-decoration:underline;cursor:pointer;font-family:monospace;font-size:10px;">${esc(s.set_code)}</a></td>
           <td style="padding:2px 6px;color:#aaa;">${esc(s.set_rarity)}</td>
-          <td style="padding:2px 6px;color:#ffe066;white-space:nowrap;">${esc(price)} <span style="color:#666;font-size:9px;">USD</span></td>
+          <td style="padding:2px 6px;color:#ffe066;white-space:nowrap;"><span style="display:inline-flex;flex-direction:column;align-items:flex-start;line-height:1.2;"><span>${esc(price)}</span><span style="color:#555;font-size:8px;">USD</span></span></td>
         </tr>`;
       }).join('');
 
@@ -867,10 +867,7 @@
           </div>
         </details>` : '';
 
-      const dbId = card.misc_info?.[0]?.db_id;
-      const ygoUrl = dbId
-        ? `https://ygoprodeck.com/card/${card.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}-${dbId}/`
-        : `https://ygoprodeck.com/card-search/?search=${encodeURIComponent(card.name)}`;
+      const ygoUrl = `https://db.ygoprodeck.com/card/?id=${card.id}`;
       return `
         <div style="background:#131310;border:1px solid #3a3510;padding:7px;min-width:0;max-width:100%;box-sizing:border-box;">
           <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start;">
@@ -892,8 +889,9 @@
 
     function ygoSearchCode(code) {
       document.getElementById('q').value = code;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo(0, 0);
       search(true);
+      setTimeout(() => window.scrollTo(0, 0), 150);
     }
 
     async function lookupYGOCard(query, onResult) {
