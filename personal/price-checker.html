@@ -535,7 +535,7 @@
       <button onclick="addItem()">+ Add &amp; Fetch</button>
     </div>
     <div id="add-status" style="font-size:12px; color:#888; min-height:16px;"></div>
-    <p style="font-size:12px; color:#666;">
+    <p style="font-size:12px; color:#888; margin-top:4px;">
       Try an example:
       <a href="#" onclick="tryExample('https://onekawa.shop.thebottleo.co.nz/lines/jim-beam-1-125l');return false;" style="color:#88aaff;">Jim Beam (The Bottle-O)</a> &bull;
       <a href="#" onclick="tryExample('https://bigbarrel.co.nz/en/jim-beam-bourbon-1125ml');return false;" style="color:#88aaff;">Jim Beam (Big Barrel)</a> &bull;
@@ -566,30 +566,31 @@
       <a href="https://www.farmers.co.nz" target="_blank">Farmers</a>
       &bull;
       <a href="https://www.chemistwarehouse.co.nz" target="_blank">Chemist Warehouse</a>
+      &bull; and others
     </p>
-    <p style="font-size:11px; color:#666;">† Liquorland: only some products work — pages with 13-digit EAN barcodes in the URL tend to succeed; shorter product codes are blocked by Liquorland's anti-bot protection.</p>
+    <p style="font-size:11px; color:#666;">† Liquorland: only some products work. Pages with 13-digit EAN barcodes in the URL tend to succeed; shorter product codes are blocked by Liquorland's anti-bot protection.</p>
     <details class="support-info" style="margin-top:6px; margin-bottom:0;">
       <summary>How it works &amp; known limitations</summary>
       <div class="support-content">
 
         <h4>❌ Known not to work</h4>
         <ul>
-          <li><strong>Liquorland</strong> — partially working: 13-digit EAN barcode URLs (e.g. <code>…-5013626111284</code>) may succeed; shorter product code URLs are now blocked</li>
-          <li><strong>Mitre 10</strong> — Cloudflare blocks all CORS proxy IPs</li>
-          <li><strong>PB Tech</strong> — WAF blocks all CORS proxies</li>
-          <li><strong>Noel Leeming</strong> — WAF blocks all CORS proxies</li>
-          <li><strong>Kmart</strong> — Akamai CDN blocks all CORS proxies</li>
-          <li><strong>Harvey Norman</strong> — Imperva/Incapsula bot challenge</li>
-          <li><strong>Bunnings</strong> — Cloudflare bot protection</li>
-          <li><strong>Mighty Ape</strong> — Cloudflare (HTTP 403 via proxy)</li>
-          <li><strong>Warehouse Stationery</strong> — bot protection aborts all CORS proxy connections</li>
+          <li><strong>Liquorland</strong>: partially working. 13-digit EAN barcode URLs (e.g. <code>…-5013626111284</code>) may succeed; shorter product code URLs are now blocked</li>
+          <li><strong>Mitre 10</strong>: Cloudflare blocks all CORS proxy IPs</li>
+          <li><strong>PB Tech</strong>: WAF blocks all CORS proxies</li>
+          <li><strong>Noel Leeming</strong>: WAF blocks all CORS proxies</li>
+          <li><strong>Kmart</strong>: Akamai CDN blocks all CORS proxies</li>
+          <li><strong>Harvey Norman</strong>: Imperva/Incapsula bot challenge</li>
+          <li><strong>Bunnings</strong>: Cloudflare bot protection</li>
+          <li><strong>Mighty Ape</strong>: Cloudflare (HTTP 403 via proxy)</li>
+          <li><strong>Warehouse Stationery</strong>: bot protection aborts all CORS proxy connections</li>
         </ul>
 
         <h4>ℹ️ Storage</h4>
-        <p>History is stored in <strong>localStorage</strong> — it stays on your device and is never sent anywhere. One entry is recorded per item per day, updated on page load.</p>
+        <p>History is stored in <strong>localStorage</strong>. It stays on your device and is never sent anywhere. One entry is recorded per item per day, updated on page load.</p>
 
         <h4>⚠️ Fair use</h4>
-        <p>Personal use only. Fetching is done via the public CORS proxy <a href="https://corsproxy.io" target="_blank">corsproxy.io</a>. Retail sites' Terms of Service may restrict automated access — use responsibly.</p>
+        <p>Personal use only. Fetching is done via the public CORS proxy <a href="https://corsproxy.io" target="_blank">corsproxy.io</a>. Retail sites' Terms of Service may restrict automated access. Use responsibly.</p>
 
         <h4>🗑️ Deleting data</h4>
         <p>Use the <strong>✕</strong> button on a card to remove that item. To wipe everything at once:</p>
@@ -599,27 +600,27 @@
           <li>Find the key <code>pricetracker_v1</code> and press <kbd>Delete</kbd></li>
         </ol>
 
-        <details style="margin-top:12px;">
-          <summary>Example screenshot</summary>
-          <div style="margin-top:8px;">
-            <img src="https://david-fear.github.io/images/price-checker-examples.png" alt="Price checker example screenshot" style="max-width:100%; height:auto; border:1px solid #333; display:block;" />
-          </div>
-        </details>
-
+      </div>
+    </details>
+    <details class="support-info" style="margin-top:6px; margin-bottom:0;">
+      <summary>Example screenshot</summary>
+      <div style="margin-top:8px;">
+        <img src="https://david-fear.github.io/images/price-checker-examples.png" alt="Price checker example screenshot" style="max-width:100%; height:auto; border:1px solid #333; display:block;" />
       </div>
     </details>
   </section>
 
   <!-- ── Item list ── -->
   <section>
-    <div class="top-actions">
-      <button onclick="refreshAll()">↻ Refresh today's prices</button>
-      <span id="refresh-status"></span>
-    </div>
     <div class="items-grid" id="items-grid">
       <p class="muted">No items tracked yet.</p>
     </div>
   </section>
+
+  <div class="top-actions" style="margin-top:14px;">
+    <button onclick="refreshAll()">↻ Refresh today's prices</button>
+    <span id="refresh-status"></span>
+  </div>
 
   <div class="disclaimer">
     Price history is stored locally in localStorage key <code>pricetracker_v1</code>. Uses
