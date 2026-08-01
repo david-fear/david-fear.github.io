@@ -338,14 +338,41 @@
         <details class="search-examples">
           <summary>Search Examples</summary>
           <div>
+            <span style="color:#666;font-size:10px;">Yu-Gi-Oh</span>
             <a href="#" onclick="document.getElementById('q').value='DUPO-EN017'; search(true); return false;">DUPO-EN017</a> ,
-            <a href="#" onclick="document.getElementById('q').value='ash blossom quarter'; search(true); return false;">ash blossom quarter</a> ,
-            <a href="#" onclick="document.getElementById('q').value='structure deck'; search(true); return false;">structure deck</a> ,
-            <a href="#" onclick="document.getElementById('q').value='red eyes ghost'; search(true); return false;">red eyes ghost</a> ,
-            <a href="#" onclick="document.getElementById('q').value='GFP2 ghost rare'; search(true); return false;">GFP2 ghost rare</a> ,
-            <a href="#" onclick="document.getElementById('q').value='chocolate magician gold'; search(true); return false;">Chocolate Magician Gold</a> ,
-            <a href="#" onclick="document.getElementById('q').value='game mat'; search(true); return false;">Game Mat</a> ,
-            <a href="#" onclick="document.getElementById('q').value='dragonshield'; search(true); return false;">Dragonshield</a>
+            <a href="#" onclick="document.getElementById('q').value='ash blossom quarter century'; search(false); return false;">Ash Blossom Quarter Century</a> ,
+            <a href="#" onclick="document.getElementById('q').value='red eyes ghost'; search(false); return false;">Red Eyes Ghost</a> ,
+            <a href="#" onclick="document.getElementById('q').value='chocolate magician gold'; search(false); return false;">Chocolate Magician Gold</a> ,
+            <a href="#" onclick="document.getElementById('q').value='blue eyes white dragon'; search(false); return false;">Blue-Eyes White Dragon</a>
+            <br />
+            <span style="color:#666;font-size:10px;">Pokemon</span>
+            <a href="#" onclick="document.getElementById('q').value='charizard ex'; search(false); return false;">Charizard ex</a> ,
+            <a href="#" onclick="document.getElementById('q').value='umbreon vmax'; search(false); return false;">Umbreon VMAX</a> ,
+            <a href="#" onclick="document.getElementById('q').value='pikachu vmax'; search(false); return false;">Pikachu VMAX</a>
+            <br />
+            <span style="color:#666;font-size:10px;">Magic: The Gathering</span>
+            <a href="#" onclick="document.getElementById('q').value='rhystic study'; search(false); return false;">Rhystic Study</a> ,
+            <a href="#" onclick="document.getElementById('q').value='smothering tithe'; search(false); return false;">Smothering Tithe</a> ,
+            <a href="#" onclick="document.getElementById('q').value='sol ring'; search(false); return false;">Sol Ring</a> ,
+            <a href="#" onclick="document.getElementById('q').value='cyclonic rift'; search(false); return false;">Cyclonic Rift</a>
+            <br />
+            <span style="color:#666;font-size:10px;">Flesh and Blood</span>
+            <a href="#" onclick="document.getElementById('q').value='fyendal spring tunic'; search(false); return false;">Fyendal's Spring Tunic</a> ,
+            <a href="#" onclick="document.getElementById('q').value='aether wildfire'; search(false); return false;">Aether Wildfire</a> ,
+            <a href="#" onclick="document.getElementById('q').value='luminaris'; search(false); return false;">Luminaris</a>
+            <br />
+            <span style="color:#666;font-size:10px;">One Piece</span>
+            <a href="#" onclick="document.getElementById('q').value='monkey luffy secret'; search(false); return false;">Monkey D. Luffy Secret Rare</a> ,
+            <a href="#" onclick="document.getElementById('q').value='roronoa zoro'; search(false); return false;">Roronoa Zoro</a> ,
+            <a href="#" onclick="document.getElementById('q').value='shanks'; search(false); return false;">Shanks</a>
+            <br />
+            <span style="color:#666;font-size:10px;">Lorcana</span>
+            <a href="#" onclick="document.getElementById('q').value='elsa fifth spirit'; search(false); return false;">Elsa Fifth Spirit</a> ,
+            <a href="#" onclick="document.getElementById('q').value='moana motunui'; search(false); return false;">Moana of Motunui</a>
+            <br />
+            <span style="color:#666;font-size:10px;">Accessories</span>
+            <a href="#" onclick="document.getElementById('q').value='dragonshield'; search(true); return false;">Dragonshield</a> ,
+            <a href="#" onclick="document.getElementById('q').value='game mat'; search(true); return false;">Game Mat</a>
             <br />See Also: NZ TCG Card Search App: <a href="https://www.mtgsingles.co.nz/card/">mtgsingles.co.nz</a>
           </div>
         </details>
@@ -868,6 +895,11 @@
         </details>` : '';
 
       const ygoUrl = `https://db.ygoprodeck.com/card/?id=${card.id}`;
+      const jsonSection = `
+        <details style="margin-top:6px;">
+          <summary style="cursor:pointer;font-size:10px;color:#555;user-select:none;">view JSON</summary>
+          <pre style="font-size:9px;color:#666;background:#0a0a0a;border:1px solid #1a1a1a;padding:6px;overflow-x:auto;margin-top:4px;white-space:pre-wrap;word-break:break-all;max-height:260px;overflow-y:auto;">${esc(JSON.stringify(card, null, 2))}</pre>
+        </details>`;
       return `
         <div style="background:#131310;border:1px solid #3a3510;padding:7px;min-width:0;max-width:100%;box-sizing:border-box;">
           <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start;">
@@ -883,6 +915,7 @@
             </div>
           </div>
           ${setsSection}
+          ${jsonSection}
         </div>
         <div style="font-size:9px;color:#252510;text-align:right;margin-top:1px;">via YGOPRODeck API${matchCode ? ' &middot; ' + esc(matchCode) : ''}</div>`;
     }
