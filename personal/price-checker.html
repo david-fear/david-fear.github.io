@@ -94,7 +94,7 @@
 
     .top-actions span {
       font-size: 12px;
-      color: #aaa;
+      color: #ffcc00;
     }
 
     /* ── Item grid ── */
@@ -535,7 +535,9 @@
       <button onclick="addItem()">+ Add &amp; Fetch</button>
     </div>
     <div id="add-status" style="font-size:12px; color:#888; min-height:16px;"></div>
-    <details class="support-info" style="margin-top:4px; margin-bottom:0;">
+    <div style="display:flex; gap:20px; align-items:flex-start; flex-wrap:wrap; margin-top:4px;">
+      <div style="flex:1; min-width:200px;">
+    <details class="support-info" style="margin-top:0; margin-bottom:0;">
       <summary>Try an example</summary>
       <div class="support-content" style="padding-top:4px;">
         <a href="#" onclick="tryExample('https://onekawa.shop.thebottleo.co.nz/lines/jim-beam-1-125l');return false;" style="color:#88aaff;">Jim Beam (The Bottle-O)</a> &bull;
@@ -602,6 +604,12 @@
         <img src="https://david-fear.github.io/images/price-checker-examples.png" alt="Price checker example screenshot" style="max-width:100%; height:auto; border:1px solid #333; display:block;" />
       </div>
     </details>
+      </div>
+      <div class="top-actions" style="margin:0; flex-shrink:0;">
+        <button onclick="refreshAll()">↻ Refresh today's prices</button>
+        <span id="refresh-status"></span>
+      </div>
+    </div>
   </section>
 
   <!-- ── Item list ── -->
@@ -610,11 +618,6 @@
       <p class="muted">No items tracked yet.</p>
     </div>
   </section>
-
-  <div class="top-actions" style="margin-top:14px;">
-    <button onclick="refreshAll()">↻ Refresh today's prices</button>
-    <span id="refresh-status"></span>
-  </div>
 
   <div class="disclaimer">
     Price history is stored locally in localStorage key <code>pricetracker_v1</code>. Uses
