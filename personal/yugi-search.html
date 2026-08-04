@@ -324,7 +324,7 @@
         <div class="search-row">
           <input id="q" placeholder="Card name or code, e.g. DUPO-EN017" value="" title="Card name or code"
             autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" autofocus />
-          <input id="limit" type="number" min="1" max="50" value="10" style="width:50px;" title="Results per site" />
+          <input id="limit" type="number" min="1" max="10" value="10" style="width:50px;" title="Results per site (Shopify API hard cap is 10; higher values only apply to non-Shopify scrapers)" />
         </div>
         <div class="search-controls">
           <div class="ctrl-col"><button onclick="search(true);window.goatcounter&&goatcounter.count({path:'search-exact',event:true})">Exact Search</button></div>
@@ -373,8 +373,11 @@
             <span style="color:#666;font-size:10px;">Accessories</span>
             <a href="#" onclick="document.getElementById('q').value='dragonshield'; search(true); return false;">Dragonshield</a> ,
             <a href="#" onclick="document.getElementById('q').value='game mat'; search(true); return false;">Game Mat</a>
-            <br />See Also: NZ TCG Card Search App: <a href="https://www.mtgsingles.co.nz/card/">mtgsingles.co.nz</a>
           </div>
+        </details>
+        <details class="search-examples" id="available-sites-details">
+          <summary>Available sites to search across</summary>
+          <div id="available-sites-list"></div>
         </details>
         <div class="legend">
           <span><span class="legend-dot" style="background:#7dff7d"></span>In stock</span>
@@ -396,7 +399,7 @@
 
     const STORES = [
       // ── Shopify (live API results) ───────────────────────────
-      { d: "cardspotnz.com", note: " ** card name search only; data model differs **" },
+      { d: "cardspotnz.com", nameOnly: true, note: " ** card name search only; data model differs **" },
       { d: "www.theslyfox.nz", scraper: searchSlyFox },
       { d: "www.shuffleandcutgames.co.nz" },
       { d: "tcgcollectornz.com" },
@@ -420,7 +423,9 @@
       { d: "www.cardmerchantwhangarei.co.nz" },
       { d: "cardmerchantchristchurch.co.nz" },
       { d: "cardmerchantponsonby.co.nz" },
+      { d: "cardmerchanttaupo.co.nz" },
       { d: "thegametree.co.nz" },
+      { d: "magicreddragon.co.nz" },
       // ── Link-only (non-Shopify — opens search page) ──────────
     ];
 
@@ -438,7 +443,6 @@
     /* Stores that are coming soon — shown as a preview section */
     const COMING_SOON_STORES = [
       { d: 'rawr.cards', url: 'https://www.rawr.cards/' },
-      { d: 'cardmerchanttaupo.co.nz', url: 'https://www.cardmerchanttaupo.co.nz/' },
     ];
 
     const TIMEOUT_MS = 6000;
@@ -905,8 +909,8 @@
           <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start;">
             ${imgUrl ? `<div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:5px;">
               <img src="${esc(imgUrl)}" alt="${esc(card.name)}" style="width:80px;height:auto;border:1px solid #2a2a1a;" loading="lazy" />
-              <a href="${esc(ygoUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="font-size:13px;color:#88aaff;text-decoration:none;border:1px solid #335;padding:4px 10px;white-space:nowrap;margin-top:6px;display:inline-block;">&#8599; Open</a>
-              <a href="https://db.ygoprodeck.com/api/v7/cardinfo.php?id=${card.id}&misc=yes" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="font-size:10px;color:#555;text-decoration:none;white-space:nowrap;margin-top:2px;">[JSON]</a>
+              <a href="${esc(ygoUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="font-size:11px;color:#fff;text-decoration:none;background:var(--primary);padding:3px 8px;white-space:nowrap;margin-top:6px;display:inline-block;">&#8599; Open</a>
+              <a href="https://db.ygoprodeck.com/api/v7/cardinfo.php?id=${card.id}&misc=yes" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="font-size:11px;color:#fff;text-decoration:none;background:var(--primary);padding:3px 8px;white-space:nowrap;margin-top:3px;display:inline-block;">JSON</a>
             </div>` : ''}
             <div style="flex:1;min-width:0;">
               <div style="font-size:14px;font-weight:bold;color:#ffd700;margin-bottom:4px;word-break:break-word;">${esc(card.name)}</div>
@@ -1156,6 +1160,24 @@
         location.hash = cb.checked ? 'sametab' : 'newtab';
         document.querySelectorAll('#results a:not(.json-link)').forEach(a => { a.target = linkTarget; });
       });
+    })();
+
+    // Populate available sites list
+    (function () {
+      const el = document.getElementById('available-sites-list');
+      if (!el) return;
+      const sep = '<span style="color:#2a2a2a;"> · </span>';
+      const liveHtml = STORES.map(s => {
+        const tag = s.nameOnly ? '<sup style="color:#ffd700;font-size:8px;letter-spacing:0;"> +name</sup>' : '';
+        return `<span style="white-space:nowrap;">${esc(s.d)}${tag}</span>`;
+      }).join(sep);
+      const linkHtml = LINK_STORES.map(s =>
+        `<span style="color:#888;white-space:nowrap;">${esc(s.d.replace(/ \(.*/, ''))}</span>`
+      ).join(sep);
+      el.innerHTML =
+        `<span style="color:#555;font-size:10px;">live API &middot; ${STORES.length} stores:</span><br />${liveHtml}` +
+        `<br /><span style="color:#555;font-size:10px;margin-top:5px;display:inline-block;">link only &middot; ${LINK_STORES.length} sites:</span><br />${linkHtml}` +
+        `<br /><span style="color:#555;font-size:9px;font-style:italic;margin-top:4px;display:inline-block;"><sup style="color:#ffd700;">+name</sup> = name search only; set codes like DUPO-EN017 not supported</span>`;
     })();
 
   </script>
