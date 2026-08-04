@@ -898,7 +898,10 @@
           </div>
         </details>` : '';
 
-      const ygoUrl = `https://db.ygoprodeck.com/card/?id=${card.id}`;
+      const konamiId = card.misc_info?.[0]?.konami_id;
+      const ygoUrl = konamiId
+        ? `https://www.db.yugioh-card.com/yugiohdb/card_search.action?cid=${konamiId}&ope=2&request_locale=en`
+        : `https://db.ygoprodeck.com/card/?id=${card.id}`;
       const jsonSection = `
         <details style="margin-top:6px;">
           <summary style="cursor:pointer;font-size:10px;color:#555;user-select:none;">view JSON</summary>
@@ -909,8 +912,8 @@
           <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start;">
             ${imgUrl ? `<div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:5px;">
               <img src="${esc(imgUrl)}" alt="${esc(card.name)}" style="width:80px;height:auto;border:1px solid #2a2a1a;" loading="lazy" />
-              <a href="${esc(ygoUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="font-size:11px;color:#fff;text-decoration:none;background:var(--primary);padding:3px 8px;white-space:nowrap;margin-top:6px;display:inline-block;">&#8599; Open</a>
-              <a href="https://db.ygoprodeck.com/api/v7/cardinfo.php?id=${card.id}&misc=yes" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="font-size:11px;color:#fff;text-decoration:none;background:var(--primary);padding:3px 8px;white-space:nowrap;margin-top:3px;display:inline-block;">JSON</a>
+              <a href="${esc(ygoUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="font-size:10px;font-weight:bold;color:#fff;text-decoration:none;background:var(--primary);width:56px;text-align:center;padding:3px 0;box-sizing:border-box;white-space:nowrap;margin-top:6px;display:inline-block;">&#8599; Open</a>
+              <a href="https://db.ygoprodeck.com/api/v7/cardinfo.php?id=${card.id}&misc=yes" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="font-size:10px;font-weight:bold;color:#fff;text-decoration:none;background:var(--primary);width:56px;text-align:center;padding:3px 0;box-sizing:border-box;white-space:nowrap;margin-top:3px;display:inline-block;">JSON</a>
             </div>` : ''}
             <div style="flex:1;min-width:0;">
               <div style="font-size:14px;font-weight:bold;color:#ffd700;margin-bottom:4px;word-break:break-word;">${esc(card.name)}</div>
