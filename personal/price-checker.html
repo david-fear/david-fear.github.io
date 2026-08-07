@@ -512,6 +512,7 @@
 <header>
   <h1>NZ Price Tracker</h1>
   <p>Track product prices over time from NZ retail sites. History stored in your browser.</p>
+  <p style="font-size:13px; color:#aaa; margin-top:6px;">Use in conjunction with <a href="https://dupe.com" target="_blank" rel="noopener" style="color:#88aaff;">DUPE.COM</a> to find cheaper alternatives to the products you are tracking.</p>
 </header>
 
 <main>
@@ -1067,6 +1068,7 @@
         ${item.error ? `<span class="error-badge" title="${esc(item.error)}">⚠ ${esc(item.error)}</span>` : ''}
       </div>
       ${history.length >= 2 ? `<canvas id="${canvasId}" class="price-chart"></canvas>` : history.length === 1 ? `<div style="font-size:10px;color:#444;margin-top:4px;font-style:italic;">Graph appears once a second day's price is recorded.</div>` : ''}
+      <div style="font-size:11px;margin-top:6px;"><a href="https://dupe.com/search?q=${encodeURIComponent(item.name || '')}" target="_blank" rel="noopener" style="color:#88aaff;">View on DUPE.COM ↗</a></div>
       ${histHtml}
     `;
     return div;
