@@ -10,24 +10,90 @@
   <link rel="stylesheet" href="https://david-fear.github.io/stylesheet.css" />
 
   <style>
+    /* --- animated background --- */
+    body {
+      background: linear-gradient(-45deg, #0d1b2a, #121212, #1a0a1e, #0a1a2e);
+      background-size: 400% 400%;
+      animation: bgPulse 20s ease infinite;
+    }
+    @keyframes bgPulse {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* --- page title --- */
+    .page-header {
+      text-align: center;
+      padding: 1rem 1rem 0;
+    }
+    .page-header h1 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, #4db8ff 0%, #a78bfa 50%, #4db8ff 100%);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 4s linear infinite;
+    }
+    @keyframes shimmer {
+      to { background-position: 200% center; }
+    }
+
+    /* --- button grid --- */
     .button-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 2px;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 8px;
       max-width: 900px;
-      margin:  auto;
+      margin: auto;
     }
 
+    /* --- buttons --- */
     button {
       width: 100%;
-      font-size: 1em;
-      padding: 10px;
+      font-size: 1.1em;
+      padding: 16px 12px;
       cursor: pointer;
+      border: 1px solid rgba(77, 184, 255, 0.2);
+      border-radius: 8px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+    button:hover, button:focus {
+      transform: scale(1.05);
+      box-shadow: 0 0 22px rgba(77, 184, 255, 0.6), 0 4px 14px rgba(0, 0, 0, 0.4);
+      border-color: rgba(77, 184, 255, 0.9);
+      outline: none;
     }
 
+    /* --- sections --- */
     section {
       text-align: center;
+      border-left: 4px solid transparent;
     }
+    section h2 {
+      font-size: 1.2rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 1rem;
+    }
+
+    section:nth-of-type(1) { border-left-color: #4db8ff; }
+    section:nth-of-type(2) { border-left-color: #a78bfa; }
+    section:nth-of-type(3) { border-left-color: #34d399; }
+    section:nth-of-type(4) { border-left-color: #fbbf24; }
+    section:nth-of-type(5) { border-left-color: #f87171; }
+    section:nth-of-type(6) { border-left-color: #6b7280; }
+
+    section:nth-of-type(1) h2 { color: #4db8ff; }
+    section:nth-of-type(2) h2 { color: #a78bfa; }
+    section:nth-of-type(3) h2 { color: #34d399; }
+    section:nth-of-type(4) h2 { color: #fbbf24; }
+    section:nth-of-type(5) h2 { color: #f87171; }
+    section:nth-of-type(6) h2 { color: #9ca3af; }
+
+    section:nth-of-type(6) button { opacity: 0.7; font-size: 1em; }
   </style>
 </head>
 
@@ -64,6 +130,10 @@
       .catch(e => console.error('Failed to load menu:', e));
   </script>
   <!-- Dynamic sidebar menu END -->
+
+  <header class="page-header">
+    <h1>David Fear's Site</h1>
+  </header>
 
   <section>
     <h2>TV Family Games</h2>
@@ -118,6 +188,14 @@
       <button onclick="window.location.href='https://www.youtube.com/watch?v=9MBLHvmpXqU/'">Hollow Knight: Silksong</button>
       <button onclick="window.location.href='https://www.youtube.com/watch?v=caznxOmRByU'">Metallica - Seattle '89</button>
       <button onclick="window.location.href='https://www.youtube.com/watch?v=lcuoPczOZCQ'">Metallica - Mexico '93</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>Admin</h2>
+    <div class="button-grid">
+      <button onclick="window.location.href='https://search.google.com/search-console'">Google Search Console</button>
+      <button onclick="window.location.href='https://davidthegoat.goatcounter.com/'">GoatCounter</button>
     </div>
   </section>
 
