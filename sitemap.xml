@@ -108,6 +108,18 @@
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
+  <url>
+    <loc>https://david-fear.github.io/personal/kids-tasklist.html</loc>
+    <lastmod>2026-08-08</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://david-fear.github.io/personal/price-checker.html</loc>
+    <lastmod>2026-08-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
 
   <!-- Mixed Reality -->
   <url>
@@ -123,8 +135,8 @@
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://david-fear.github.io/mixed-reality/mixedrealityyugiohdmg3d.html</loc>
-    <lastmod>2026-06-02</lastmod>
+    <loc>https://david-fear.github.io/mixed-reality/mixedreality3dduck.html</loc>
+    <lastmod>2026-08-08</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
