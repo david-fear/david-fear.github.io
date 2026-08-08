@@ -22,32 +22,12 @@
       100% { background-position: 0% 50%; }
     }
 
-    /* --- page title --- */
-    .page-header {
-      text-align: center;
-      padding: 1rem 1rem 0;
-    }
-    .page-header h1 {
-      font-size: 2.8rem;
-      font-weight: 800;
-      background: linear-gradient(90deg, #4db8ff 0%, #a78bfa 50%, #4db8ff 100%);
-      background-size: 200% auto;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: shimmer 4s linear infinite;
-    }
-    @keyframes shimmer {
-      to { background-position: 200% center; }
-    }
-
     /* --- button grid --- */
     .button-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 8px;
-      max-width: 900px;
-      margin: auto;
+      flex: 1;
       position: relative;
       z-index: 1;
     }
@@ -61,36 +41,32 @@
       border-radius: 8px;
       transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
     }
-    button:hover, button:focus {
+    button:hover {
       transform: scale(1.05);
       box-shadow: 0 0 22px rgba(77, 184, 255, 0.6), 0 4px 14px rgba(0, 0, 0, 0.4);
       border-color: rgba(77, 184, 255, 0.9);
-      outline: none;
     }
 
-    /* --- sections: heading as background watermark --- */
+    /* --- sections with vertical category label --- */
     section {
-      text-align: center;
-      border-left: 4px solid transparent;
-      position: relative;
-      overflow: hidden;
-      padding: 1rem 1.5rem;
-    }
-    section h2 {
-      position: absolute;
-      inset: 0;
       display: flex;
       align-items: center;
-      justify-content: center;
-      font-size: 4rem;
-      font-weight: 900;
+      gap: 0.75rem;
+      border-left: 4px solid transparent;
+      padding: 0.75rem 1.5rem;
+      text-align: left;
+    }
+    section h2 {
+      writing-mode: vertical-rl;
+      transform: rotate(185deg);
+      font-size: 0.8rem;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.25em;
-      opacity: 0.07;
-      pointer-events: none;
+      letter-spacing: 0em;
       white-space: nowrap;
-      margin: 0;
-      z-index: 0;
+      flex-shrink: 0;
+      margin-left: -15px;
+      opacity: 0.7;
     }
 
     section:nth-of-type(1) { border-left-color: #4db8ff; }
@@ -107,7 +83,20 @@
     section:nth-of-type(5) h2 { color: #f87171; }
     section:nth-of-type(6) h2 { color: #9ca3af; }
 
-    section:nth-of-type(6) button { opacity: 0.7; font-size: 1em; }
+    /* --- per-section button colours --- */
+    section:nth-of-type(1) button { background: #4db8ff; border-color: rgba(77, 184, 255, 0.3); }
+    section:nth-of-type(2) button { background: #a78bfa; border-color: rgba(167, 139, 250, 0.3); }
+    section:nth-of-type(3) button { background: #34d399; border-color: rgba(52, 211, 153, 0.3); color: #111; }
+    section:nth-of-type(4) button { background: #fbbf24; border-color: rgba(251, 191, 36, 0.3); color: #111; }
+    section:nth-of-type(5) button { background: #f87171; border-color: rgba(248, 113, 113, 0.3); }
+    section:nth-of-type(6) button { background: #6b7280; border-color: rgba(107, 114, 128, 0.3); opacity: 0.7; font-size: 1em; }
+
+    section:nth-of-type(1) button:hover { box-shadow: 0 0 22px rgba(77, 184, 255, 0.7), 0 4px 14px rgba(0,0,0,0.4); border-color: #4db8ff; }
+    section:nth-of-type(2) button:hover { box-shadow: 0 0 22px rgba(167, 139, 250, 0.7), 0 4px 14px rgba(0,0,0,0.4); border-color: #a78bfa; }
+    section:nth-of-type(3) button:hover { box-shadow: 0 0 22px rgba(52, 211, 153, 0.7), 0 4px 14px rgba(0,0,0,0.4); border-color: #34d399; }
+    section:nth-of-type(4) button:hover { box-shadow: 0 0 22px rgba(251, 191, 36, 0.7), 0 4px 14px rgba(0,0,0,0.4); border-color: #fbbf24; }
+    section:nth-of-type(5) button:hover { box-shadow: 0 0 22px rgba(248, 113, 113, 0.7), 0 4px 14px rgba(0,0,0,0.4); border-color: #f87171; }
+    section:nth-of-type(6) button:hover { box-shadow: 0 0 22px rgba(107, 114, 128, 0.7), 0 4px 14px rgba(0,0,0,0.4); border-color: #9ca3af; }
   </style>
 </head>
 
@@ -145,7 +134,7 @@
   </script>
   <!-- Dynamic sidebar menu END -->
 
-  <header class="page-header">
+  <header>
     <h1>David Fear's Site</h1>
   </header>
 
@@ -177,11 +166,15 @@
   </section>
 
   <section>
-    <h2>Browser Gaming/Fun</h2>
+    <h2>Browser Gaming</h2>
     <div class="button-grid">
       <button onclick="window.location.href='https://myemulator.onl/'">myemulator.onl</button>
       <button onclick="window.location.href='https://rec0ded88.com'">rec0ded88</button>
       <button onclick="window.location.href='https://www.myinstants.com/en/categories/viral/nz/'">Meme Soundboard</button>
+      <button onclick="window.location.href='https://dos.zone/'">DOS.Zone</button>
+      <button onclick="window.location.href='https://classicreload.com/'">ClassicReload.com</button>
+      <button onclick="window.location.href='https://www.myabandonware.com/'">My Abandonware</button>
+      <button onclick="window.location.href='https://archive.org/details/softwarelibrary_msdos_games'">Internet Archive DOS</button>
     </div>
   </section>
 
@@ -197,7 +190,7 @@
   </section>
 
   <section>
-    <h2>Concerts/Music</h2>
+    <h2>Music</h2>
     <div class="button-grid">
       <button onclick="window.location.href='https://www.youtube.com/watch?v=9MBLHvmpXqU/'">Hollow Knight: Silksong</button>
       <button onclick="window.location.href='https://www.youtube.com/watch?v=caznxOmRByU'">Metallica - Seattle '89</button>
@@ -227,11 +220,6 @@
       });
   </script>
 
-  <script>
-    window.addEventListener('load', () => {
-      document.getElementById('default-btn').focus();
-    });
-  </script>
 
 </body>
 </html>
