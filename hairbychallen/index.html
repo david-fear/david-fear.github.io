@@ -453,89 +453,6 @@
     .insta-cell:nth-child(odd)  { background: #1c1b19; }
     .insta-cell:nth-child(even) { background: #242320; }
 
-    /* ─── BOOKING FORM ────────────────────────────────── */
-    .booking {
-      background: var(--black);
-      color: var(--cream);
-      padding: 3.5rem 2rem;
-      position: relative;
-      overflow: hidden;
-    }
-    .booking::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse 70% 60% at 50% 40%, rgba(200,169,126,0.07) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .booking .container {
-      display: grid;
-      grid-template-columns: 1fr 1.3fr;
-      gap: 4rem;
-      align-items: start;
-    }
-    .booking-info h2 { color: var(--cream); margin-bottom: 0.75rem; }
-    .booking-lead {
-      font-family: 'Cormorant Garamond', serif;
-      font-style: italic;
-      font-size: 1.05rem;
-      color: rgba(245,240,232,0.5);
-      margin-bottom: 2rem;
-    }
-    .contact-row {
-      display: flex;
-      align-items: center;
-      gap: 0.65rem;
-      margin-bottom: 0.85rem;
-      font-size: 0.82rem;
-      color: var(--gold-pale);
-      letter-spacing: 0.05em;
-    }
-    .contact-row svg { width: 1rem; height: 1rem; color: var(--gold); flex-shrink: 0; }
-    .contact-row a { color: var(--gold-pale); text-decoration: none; }
-    .contact-row a:hover { color: var(--gold); }
-
-    /* form */
-    .form-group { margin-bottom: 1.1rem; }
-    label {
-      display: block;
-      font-size: 0.6rem;
-      letter-spacing: 0.28em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 0.35rem;
-    }
-    input, select, textarea {
-      width: 100%;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(200,169,126,0.22);
-      color: var(--cream);
-      font-family: 'Jost', sans-serif;
-      font-weight: 300;
-      font-size: 0.88rem;
-      padding: 0.7rem 0.9rem;
-      outline: none;
-      transition: border-color 0.2s, background 0.2s;
-      -webkit-appearance: none;
-      appearance: none;
-    }
-    input::placeholder, textarea::placeholder { color: rgba(245,240,232,0.28); }
-    input:focus, select:focus, textarea:focus {
-      border-color: var(--gold);
-      background: rgba(200,169,126,0.06);
-    }
-    select option { background: var(--charcoal); color: var(--cream); }
-    textarea { resize: vertical; min-height: 90px; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; }
-    .form-note {
-      font-size: 0.7rem;
-      color: rgba(245,240,232,0.35);
-      line-height: 1.6;
-      margin-top: 0.5rem;
-    }
-    .form-submit { margin-top: 1.25rem; }
-    .form-submit .btn { width: 100%; justify-content: center; }
-
     /* ─── AFTERPAY ────────────────────────────────────── */
     .afterpay { background: var(--off-white); padding: 3.5rem 2rem; }
     .afterpay .container {
@@ -743,7 +660,6 @@
     }
     @media (max-width: 580px) {
       .services-grid { grid-template-columns: 1fr; }
-      .form-row { grid-template-columns: 1fr; }
       .footer-inner { flex-direction: column; text-align: center; }
       .footer-links { justify-content: center; }
     }
@@ -757,7 +673,7 @@
       <li><a href="#about">About</a></li>
       <li><a href="#services">Services</a></li>
       <li><a href="#instagram">Gallery</a></li>
-      <li><a href="#booking">Book Now</a></li>
+      <li><a href="#afterpay">Afterpay</a></li>
     </ul>
   </nav>
 
@@ -767,7 +683,7 @@
     <h1>Hair by<br><em>Challen</em></h1>
     <p class="hero-tagline">Where every detail matters.</p>
     <div class="hero-ctas">
-      <a href="#booking" class="btn btn-solid">Book an appointment</a>
+      <a href="https://www.instagram.com/hairbychallen/" target="_blank" rel="noopener noreferrer" class="btn btn-solid">Get in touch</a>
     </div>
     <div class="hero-scroll">
       <div class="scroll-line"></div>
@@ -928,78 +844,6 @@
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
         View on Instagram
       </a>
-    </div>
-  </section>
-
-  <!-- BOOKING FORM -->
-  <section class="booking" id="booking">
-    <div class="container">
-      <div class="booking-info">
-        <span class="section-label">Appointments</span>
-        <h2>Let's get started.</h2>
-        <p class="booking-lead">Fill in the form and I'll be in touch to confirm your booking.</p>
-        <div class="contact-row">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8 19.79 19.79 0 012 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
-          <a href="tel:+6427777156">+64 27 777 7156</a>
-        </div>
-        <div class="contact-row">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
-          <a href="https://www.instagram.com/hairbychallen/" target="_blank" rel="noopener noreferrer">@hairbychallen</a>
-        </div>
-        <div class="contact-row">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
-          <span>Napier City, Hawke's Bay</span>
-        </div>
-      </div>
-
-      <!--
-        FORM SETUP — this form uses Formspree (free tier available).
-        1. Go to https://formspree.io and create a free account
-        2. Create a new form and copy your unique form ID
-        3. Replace YOUR_FORM_ID in the action URL below
-        Alternatively: change action="mailto:your@email.com" for a basic mailto fallback.
-      -->
-      <form class="booking-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
-        <div class="form-row">
-          <div class="form-group">
-            <label for="f-name">Your name</label>
-            <input type="text" id="f-name" name="name" placeholder="Jane Smith" required />
-          </div>
-          <div class="form-group">
-            <label for="f-phone">Phone</label>
-            <input type="tel" id="f-phone" name="phone" placeholder="+64 21 000 0000" required />
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="f-email">Email</label>
-          <input type="email" id="f-email" name="email" placeholder="jane@example.com" required />
-        </div>
-        <div class="form-group">
-          <label for="f-service">Service</label>
-          <select id="f-service" name="service" required>
-            <option value="" disabled selected>Select a service...</option>
-            <option>Colour &amp; Highlights</option>
-            <option>Balayage</option>
-            <option>Cut &amp; Style</option>
-            <option>Toning &amp; Glossing</option>
-            <option>Treatment</option>
-            <option>Occasion Styling</option>
-            <option>Not sure yet / Consultation</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="f-when">Preferred day / time</label>
-          <input type="text" id="f-when" name="preferred_time" placeholder="e.g. Tuesday afternoons, weekend mornings..." />
-        </div>
-        <div class="form-group">
-          <label for="f-msg">Anything else?</label>
-          <textarea id="f-msg" name="message" placeholder="Tell me what you're after, any inspo, hair history, questions..."></textarea>
-        </div>
-        <p class="form-note">Your details are used only to confirm your appointment. Afterpay available in-salon.</p>
-        <div class="form-submit">
-          <button type="submit" class="btn btn-solid">Send Enquiry</button>
-        </div>
-      </form>
     </div>
   </section>
 
