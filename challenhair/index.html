@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hair by Challen | Napier City, Hawke's Bay</title>
+  <meta name="description" content="Hair by Challen — professional hairstyling in Napier City, Hawke's Bay. Colour, balayage, cuts and treatments. Book today. Ph: +64 27 777 7156" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black:      #0e0d0c;
+      --charcoal:   #1c1b19;
+      --cream:      #f5f0e8;
+      --logo-bg:    #f2f0eb;
+      --off-white:  #faf7f2;
+      --gold:       #c8a97e;
+      --gold-pale:  #e8d9c0;
+      --gold-dark:  #9a7848;
+      --mid:        #7a7570;
+      --border:     rgba(200,169,126,0.25);
+      --ap-mint:    #b2fce4;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+      background: var(--off-white);
+      color: var(--black);
+      font-size: 16px;
+      line-height: 1.7;
+    }
+
+    /* ─── NAV ─────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.85rem 3rem;
+      background: rgba(242,240,235,0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(200,169,126,0.2);
+      transition: background 0.4s, border-color 0.4s;
+    }
+    nav.scrolled {
+      background: rgba(14,13,12,0.95);
+      backdrop-filter: blur(10px);
+      border-bottom-color: rgba(200,169,126,0.12);
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+    }
+    .nav-logo img {
+      height: 2.6rem;
+      width: auto;
+      display: block;
+      transition: opacity 0.3s;
+    }
+    .nav-logo-fallback {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400;
+      font-size: 1.2rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--charcoal);
+      transition: color 0.3s;
+    }
+    nav.scrolled .nav-logo-fallback { color: var(--cream); }
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+    .nav-links a {
+      font-family: 'Jost', sans-serif;
+      font-weight: 400;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--charcoal);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    nav.scrolled .nav-links a { color: var(--gold-pale); }
+    .nav-links a:hover { color: var(--gold); }
+    .nav-phone {
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      color: var(--gold-dark);
+      text-decoration: none;
+      font-weight: 400;
+      white-space: nowrap;
+      border: 1px solid var(--gold);
+      padding: 0.35rem 0.85rem;
+      transition: background 0.2s, color 0.2s;
+    }
+    .nav-phone:hover { background: var(--gold); color: var(--black); }
+    nav.scrolled .nav-phone { color: var(--gold); }
+
+    /* ─── HERO ────────────────────────────────────────── */
+    .hero {
+      background: var(--logo-bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 7rem 2rem 3.5rem;
+    }
+    .hero-logo {
+      width: min(420px, 75vw);
+      height: auto;
+      display: block;
+      margin: 0 auto 0.75rem;
+    }
+    .hero-tagline {
+      font-size: 0.68rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--mid);
+      margin-bottom: 2rem;
+    }
+    .hero-ctas {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* ─── BUTTONS ─────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-family: 'Jost', sans-serif;
+      font-weight: 400;
+      font-size: 0.7rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: 0.85rem 2rem;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      background: transparent;
+      transition: background 0.22s, color 0.22s;
+      cursor: pointer;
+    }
+    .btn:hover { background: var(--gold); color: var(--black); }
+    .btn-solid { background: var(--gold); color: var(--black); border-color: var(--gold); }
+    .btn-solid:hover { background: transparent; color: var(--gold); }
+    .btn-dark { background: var(--charcoal); color: var(--cream); border-color: var(--charcoal); }
+    .btn-dark:hover { background: transparent; color: var(--charcoal); }
+
+    /* ─── DIVIDER ─────────────────────────────────────── */
+    .divider { width: 4rem; height: 1px; background: var(--gold); margin: 0 auto 2rem; }
+
+    /* ─── SECTION BASE ────────────────────────────────── */
+    section { padding: 3.5rem 2rem; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .section-label {
+      font-size: 0.62rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      display: block;
+      margin-bottom: 0.85rem;
+    }
+    h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      line-height: 1.1;
+      letter-spacing: 0.02em;
+    }
+
+    /* ─── TAGLINE STRIP ───────────────────────────────── */
+    .tagline-strip {
+      background: var(--gold);
+      padding: 0.8rem 2rem;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .tagline-strip-inner {
+      display: inline-flex;
+      gap: 3rem;
+      animation: ticker 28s linear infinite;
+    }
+    .tagline-strip span {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.95rem;
+      font-style: italic;
+      letter-spacing: 0.06em;
+      color: var(--black);
+      white-space: nowrap;
+    }
+    @keyframes ticker {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ─── ABOUT ───────────────────────────────────────── */
+    .about { background: var(--off-white); }
+    .about .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: center;
+    }
+    .about-visual { position: relative; }
+    .about-visual-box {
+      aspect-ratio: 3/4;
+      background: var(--charcoal);
+      position: relative;
+      overflow: hidden;
+    }
+    .about-visual-box::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(200,169,126,0.18) 0%, transparent 60%);
+    }
+    .about-visual-deco {
+      position: absolute;
+      bottom: -1.5rem; right: -1.5rem;
+      width: 80%; height: 80%;
+      border: 1px solid var(--gold);
+      z-index: -1;
+    }
+    .about-initials {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 8rem;
+      font-weight: 300;
+      font-style: italic;
+      color: rgba(200,169,126,0.25);
+      z-index: 1;
+    }
+    .about-content h2 { margin-bottom: 1.5rem; }
+    .about-content p { color: var(--mid); font-size: 0.93rem; line-height: 1.9; margin-bottom: 1rem; }
+    .about-content .btn { margin-top: 1.25rem; }
+
+    /* ─── LOCATION / ART DECO ─────────────────────────── */
+    .location {
+      background: var(--black);
+      color: var(--cream);
+      padding: 0;
+      position: relative;
+      overflow: hidden;
+    }
+    /* stepped Art Deco border bars */
+    .deco-border {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      height: 20px;
+      gap: 0;
+      overflow: hidden;
+    }
+    .deco-border.bottom { align-items: flex-start; }
+    .deco-bar {
+      background: var(--gold);
+      flex-shrink: 0;
+    }
+    .deco-border .deco-bar:nth-child(1),
+    .deco-border .deco-bar:nth-child(7) { width: 2px; height: 20px; }
+    .deco-border .deco-bar:nth-child(2),
+    .deco-border .deco-bar:nth-child(6) { width: 36px; height: 14px; margin: 0 2px; }
+    .deco-border .deco-bar:nth-child(3),
+    .deco-border .deco-bar:nth-child(5) { width: 72px; height: 8px; margin: 0 2px; }
+    .deco-border .deco-bar:nth-child(4) { flex: 1; height: 2px; max-width: 500px; margin: 0 2px; }
+
+    .location-inner {
+      text-align: center;
+      padding: 2.5rem 2rem;
+    }
+    .location-eyebrow {
+      font-size: 0.58rem;
+      letter-spacing: 0.55em;
+      text-transform: uppercase;
+      color: rgba(200,169,126,0.6);
+      margin-bottom: 1rem;
+    }
+    .deco-rule {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      margin: 0.75rem auto;
+    }
+    .deco-rule-line {
+      height: 1px;
+      width: 5rem;
+      background: linear-gradient(90deg, transparent, var(--gold));
+    }
+    .deco-rule-line.r { background: linear-gradient(90deg, var(--gold), transparent); }
+    .deco-diamond {
+      width: 5px; height: 5px;
+      background: var(--gold);
+      transform: rotate(45deg);
+      flex-shrink: 0;
+    }
+    .deco-dot {
+      width: 3px; height: 3px;
+      background: rgba(200,169,126,0.45);
+      transform: rotate(45deg);
+      flex-shrink: 0;
+    }
+    .location-city {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.5rem, 7vw, 4.5rem);
+      font-weight: 300;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 0.2rem;
+    }
+    .location-region {
+      font-size: 0.65rem;
+      letter-spacing: 0.55em;
+      text-transform: uppercase;
+      color: rgba(245,240,232,0.4);
+      margin-bottom: 0.25rem;
+    }
+    .location-details {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1.25rem;
+      margin-top: 1.25rem;
+    }
+    .location-detail {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      color: rgba(245,240,232,0.55);
+    }
+    .location-detail svg { width: 0.95rem; height: 0.95rem; color: var(--gold); flex-shrink: 0; }
+    .location-detail a { color: var(--gold); text-decoration: none; }
+    .location-detail a:hover { color: var(--cream); }
+
+    /* ─── SERVICES ────────────────────────────────────── */
+    .services { background: var(--charcoal); color: var(--cream); }
+    .services-header { text-align: center; margin-bottom: 2.5rem; }
+    .services-header h2 { color: var(--cream); }
+    .services-header p {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1.1rem;
+      color: rgba(245,240,232,0.5);
+      margin-top: 0.5rem;
+    }
+    .services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5px; }
+    .service-card {
+      background: rgba(255,255,255,0.04);
+      padding: 2.5rem 2rem;
+      border: 1px solid var(--border);
+      transition: background 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .service-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .service-card:hover { background: rgba(200,169,126,0.07); }
+    .service-card:hover::before { opacity: 1; }
+    .service-num { font-size: 0.62rem; letter-spacing: 0.3em; color: var(--gold); margin-bottom: 1rem; display: block; }
+    .service-card h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400;
+      font-size: 1.45rem;
+      color: var(--cream);
+      margin-bottom: 0.6rem;
+      letter-spacing: 0.02em;
+    }
+    .service-card p { font-size: 0.85rem; color: rgba(245,240,232,0.52); line-height: 1.8; }
+
+    /* ─── INSTAGRAM ───────────────────────────────────── */
+    .instagram { background: var(--cream); text-align: center; }
+    .insta-heading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.65rem;
+      margin-bottom: 0.4rem;
+    }
+    .insta-heading h2 { display: inline; }
+    .ig-icon { width: 2.2rem; height: 2.2rem; flex-shrink: 0; }
+    .insta-handle {
+      display: inline-block;
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      color: var(--gold-dark);
+      text-decoration: none;
+      margin-bottom: 0.75rem;
+    }
+    .insta-handle:hover { color: var(--black); }
+    .instagram .sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1.05rem;
+      color: var(--mid);
+      margin-bottom: 2rem;
+    }
+    .insta-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 3px;
+      margin-bottom: 2rem;
+    }
+    .insta-cell { aspect-ratio: 1; position: relative; overflow: hidden; }
+    .insta-cell-inner {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(200,169,126,0.3);
+    }
+    .insta-cell-inner svg { width: 2rem; height: 2rem; }
+    .insta-cell:nth-child(odd)  { background: #1c1b19; }
+    .insta-cell:nth-child(even) { background: #242320; }
+
+    /* ─── BOOKING FORM ────────────────────────────────── */
+    .booking {
+      background: var(--black);
+      color: var(--cream);
+      padding: 3.5rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .booking::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 70% 60% at 50% 40%, rgba(200,169,126,0.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .booking .container {
+      display: grid;
+      grid-template-columns: 1fr 1.3fr;
+      gap: 4rem;
+      align-items: start;
+    }
+    .booking-info h2 { color: var(--cream); margin-bottom: 0.75rem; }
+    .booking-lead {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1.05rem;
+      color: rgba(245,240,232,0.5);
+      margin-bottom: 2rem;
+    }
+    .contact-row {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      margin-bottom: 0.85rem;
+      font-size: 0.82rem;
+      color: var(--gold-pale);
+      letter-spacing: 0.05em;
+    }
+    .contact-row svg { width: 1rem; height: 1rem; color: var(--gold); flex-shrink: 0; }
+    .contact-row a { color: var(--gold-pale); text-decoration: none; }
+    .contact-row a:hover { color: var(--gold); }
+
+    /* form */
+    .form-group { margin-bottom: 1.1rem; }
+    label {
+      display: block;
+      font-size: 0.6rem;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.35rem;
+    }
+    input, select, textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(200,169,126,0.22);
+      color: var(--cream);
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+      font-size: 0.88rem;
+      padding: 0.7rem 0.9rem;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    input::placeholder, textarea::placeholder { color: rgba(245,240,232,0.28); }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--gold);
+      background: rgba(200,169,126,0.06);
+    }
+    select option { background: var(--charcoal); color: var(--cream); }
+    textarea { resize: vertical; min-height: 90px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; }
+    .form-note {
+      font-size: 0.7rem;
+      color: rgba(245,240,232,0.35);
+      line-height: 1.6;
+      margin-top: 0.5rem;
+    }
+    .form-submit { margin-top: 1.25rem; }
+    .form-submit .btn { width: 100%; justify-content: center; }
+
+    /* ─── AFTERPAY ────────────────────────────────────── */
+    .afterpay { background: var(--off-white); padding: 3.5rem 2rem; }
+    .afterpay .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+    .ap-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 1.25rem;
+    }
+    .ap-wordmark {
+      background: #000;
+      color: var(--ap-mint);
+      font-family: 'Jost', sans-serif;
+      font-weight: 500;
+      font-size: 1.05rem;
+      letter-spacing: 0.04em;
+      padding: 0.35rem 0.85rem;
+    }
+    .ap-pill {
+      background: var(--ap-mint);
+      color: #000;
+      font-size: 0.58rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.6rem;
+    }
+    .afterpay-left h2 { margin-bottom: 0.75rem; }
+    .afterpay-left p { color: var(--mid); font-size: 0.9rem; line-height: 1.85; margin-bottom: 1rem; }
+    .ap-steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+      margin: 1.5rem 0;
+    }
+    .ap-step {
+      background: var(--cream);
+      border: 1px solid rgba(0,0,0,0.07);
+      padding: 1.1rem 0.6rem;
+      text-align: center;
+      position: relative;
+    }
+    .ap-step::after {
+      content: '';
+      position: absolute;
+      top: 50%; right: -0.5rem;
+      transform: translateY(-50%);
+      border: 4px solid transparent;
+      border-left-color: var(--gold);
+    }
+    .ap-step:last-child::after { display: none; }
+    .ap-step-n {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      font-weight: 300;
+      color: #000;
+      line-height: 1;
+      margin-bottom: 0.35rem;
+    }
+    .ap-step p { font-size: 0.68rem; color: var(--mid); line-height: 1.4; margin: 0; }
+    .ap-notice {
+      background: #f0fdf8;
+      border: 1px solid #a8f0d4;
+      border-left: 3px solid #00c896;
+      padding: 0.9rem 1.1rem;
+      font-size: 0.8rem;
+      color: #1a5c44;
+      line-height: 1.7;
+    }
+    .ap-notice strong { color: #000; }
+    .ap-notice a { color: #007a57; }
+    /* requirements column */
+    .afterpay-right h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem;
+      font-weight: 400;
+      margin-bottom: 0.5rem;
+    }
+    .afterpay-right .intro { font-size: 0.82rem; color: var(--mid); line-height: 1.7; margin-bottom: 1rem; }
+    .req-list { list-style: none; margin-bottom: 1.25rem; }
+    .req-list li {
+      font-size: 0.83rem;
+      color: var(--mid);
+      padding: 0.4rem 0 0.4rem 1.2rem;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      position: relative;
+      line-height: 1.5;
+    }
+    .req-list li::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 50%;
+      transform: translateY(-50%);
+      width: 5px; height: 5px;
+      background: var(--gold);
+      border-radius: 50%;
+    }
+    .req-list a { color: var(--gold-dark); text-decoration: none; }
+    .req-list a:hover { color: var(--black); }
+    .ap-answer {
+      font-size: 0.8rem;
+      color: var(--mid);
+      line-height: 1.75;
+      background: var(--cream);
+      border: 1px solid rgba(0,0,0,0.06);
+      padding: 1rem 1.1rem;
+    }
+    .ap-answer strong { color: var(--black); }
+
+    /* ─── FOOTER ──────────────────────────────────────── */
+    footer {
+      background: var(--charcoal);
+      color: var(--mid);
+      padding: 1.75rem 3rem;
+    }
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.85rem;
+    }
+    .footer-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400;
+      font-size: 1rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold-pale);
+    }
+    footer p { font-size: 0.7rem; letter-spacing: 0.05em; }
+    .footer-links { display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap; }
+    footer a { color: var(--gold); text-decoration: none; font-size: 0.7rem; letter-spacing: 0.08em; }
+    footer a:hover { color: var(--cream); }
+
+    /* ─── RESPONSIVE ──────────────────────────────────── */
+    @media (max-width: 900px) {
+      nav { padding: 0.75rem 1.5rem; }
+      .nav-phone { display: none; }
+      .booking .container { grid-template-columns: 1fr; gap: 2.5rem; }
+      .afterpay .container { grid-template-columns: 1fr; gap: 2rem; }
+      .about .container { grid-template-columns: 1fr; }
+      .about-visual { display: none; }
+      .services-grid { grid-template-columns: 1fr 1fr; }
+      .insta-grid { grid-template-columns: repeat(2, 1fr); }
+      .ap-steps { grid-template-columns: repeat(2, 1fr); }
+      .ap-step::after { display: none; }
+    }
+    @media (max-width: 580px) {
+      .nav-links { display: none; }
+      .services-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .footer-inner { flex-direction: column; text-align: center; }
+      .footer-links { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="nav">
+    <a href="#top" class="nav-logo">
+      <img src="logo.png" alt="Hair By Challen"
+           onerror="this.style.display='none';document.getElementById('nav-text').style.display='inline'" />
+      <span id="nav-text" class="nav-logo-fallback" style="display:none">Hair by Challen</span>
+    </a>
+    <div class="nav-right">
+      <ul class="nav-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#instagram">Gallery</a></li>
+        <li><a href="#booking">Book Now</a></li>
+      </ul>
+      <a href="tel:+6427777156" class="nav-phone">+64 27 777 7156</a>
+    </div>
+  </nav>
+
+  <!-- HERO: logo on matching cream background -->
+  <section class="hero" id="top">
+    <img src="logo.png" alt="Hair By Challen — Hawkes Bay" class="hero-logo" />
+    <p class="hero-tagline">Professional Hairstyling &mdash; Napier City, Hawke's Bay</p>
+    <div class="hero-ctas">
+      <a href="#booking" class="btn btn-dark">Book an appointment</a>
+      <a href="tel:+6427777156" class="btn btn-solid">+64 27 777 7156</a>
+    </div>
+  </section>
+
+  <!-- TICKER -->
+  <div class="tagline-strip" aria-hidden="true">
+    <div class="tagline-strip-inner">
+      <span>Colour &amp; Highlights</span><span>&bull;</span>
+      <span>Cuts &amp; Style</span><span>&bull;</span>
+      <span>Balayage</span><span>&bull;</span>
+      <span>Treatments</span><span>&bull;</span>
+      <span>Napier City</span><span>&bull;</span>
+      <span>Afterpay Available</span><span>&bull;</span>
+      <span>Hair by Challen</span><span>&bull;</span>
+      <span>Colour &amp; Highlights</span><span>&bull;</span>
+      <span>Cuts &amp; Style</span><span>&bull;</span>
+      <span>Balayage</span><span>&bull;</span>
+      <span>Treatments</span><span>&bull;</span>
+      <span>Napier City</span><span>&bull;</span>
+      <span>Afterpay Available</span><span>&bull;</span>
+      <span>Hair by Challen</span><span>&bull;</span>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <section class="about" id="about">
+    <div class="container">
+      <div class="about-visual">
+        <div class="about-visual-box">
+          <div class="about-initials">C</div>
+        </div>
+        <div class="about-visual-deco"></div>
+      </div>
+      <div class="about-content">
+        <span class="section-label">About</span>
+        <h2>Crafted with care,<br>worn with confidence.</h2>
+        <div class="divider" style="margin: 1.25rem 0;"></div>
+        <p>Hi, I'm Challen &mdash; a passionate hairstylist dedicated to making you feel your absolute best. From precision cuts to stunning colour transformations, every appointment is a personal experience tailored entirely to you.</p>
+        <p>I believe that great hair has the power to shift how you feel about yourself. Whether you're after a bold new look or a beautiful refresh, I'm here to listen, collaborate, and deliver results you'll love.</p>
+        <a href="https://www.instagram.com/hairbychallen/" target="_blank" rel="noopener noreferrer" class="btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+          Follow on Instagram
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOCATION — ART DECO -->
+  <div class="location" id="location">
+    <div class="deco-border">
+      <div class="deco-bar"></div><div class="deco-bar"></div><div class="deco-bar"></div>
+      <div class="deco-bar"></div>
+      <div class="deco-bar"></div><div class="deco-bar"></div><div class="deco-bar"></div>
+    </div>
+    <div class="location-inner">
+      <p class="location-eyebrow">Find us in</p>
+      <div class="deco-rule">
+        <div class="deco-rule-line"></div>
+        <div class="deco-dot"></div><div class="deco-diamond"></div><div class="deco-dot"></div>
+        <div class="deco-rule-line r"></div>
+      </div>
+      <p class="location-city">Napier City</p>
+      <p class="location-region">Hawke's Bay &nbsp;&bull;&nbsp; New Zealand</p>
+      <div class="deco-rule">
+        <div class="deco-rule-line"></div>
+        <div class="deco-dot"></div><div class="deco-diamond"></div><div class="deco-dot"></div>
+        <div class="deco-rule-line r"></div>
+      </div>
+      <div class="location-details">
+        <div class="location-detail">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+          <span>Napier City, Hawke's Bay</span>
+        </div>
+        <div class="location-detail">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8 19.79 19.79 0 012 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+          <a href="tel:+6427777156">+64 27 777 7156</a>
+        </div>
+        <div class="location-detail">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+          <a href="https://www.instagram.com/hairbychallen/" target="_blank" rel="noopener noreferrer">@hairbychallen</a>
+        </div>
+      </div>
+    </div>
+    <div class="deco-border bottom">
+      <div class="deco-bar"></div><div class="deco-bar"></div><div class="deco-bar"></div>
+      <div class="deco-bar"></div>
+      <div class="deco-bar"></div><div class="deco-bar"></div><div class="deco-bar"></div>
+    </div>
+  </div>
+
+  <!-- SERVICES -->
+  <section class="services" id="services">
+    <div class="container">
+      <div class="services-header">
+        <span class="section-label">What I offer</span>
+        <h2>Services</h2>
+        <p>Every service, personalised to you.</p>
+      </div>
+      <div class="services-grid">
+        <div class="service-card">
+          <span class="service-num">01</span>
+          <h3>Colour &amp; Highlights</h3>
+          <p>From natural sun-kissed tones to rich, vibrant colour &mdash; precision work tailored to your skin tone and lifestyle.</p>
+        </div>
+        <div class="service-card">
+          <span class="service-num">02</span>
+          <h3>Balayage</h3>
+          <p>Hand-painted, lived-in colour that grows out beautifully. The ultimate low-maintenance, high-impact look.</p>
+        </div>
+        <div class="service-card">
+          <span class="service-num">03</span>
+          <h3>Cuts &amp; Style</h3>
+          <p>Shape, texture, and movement crafted for your face and your routine. Short and sharp or long and flowing.</p>
+        </div>
+        <div class="service-card">
+          <span class="service-num">04</span>
+          <h3>Toning &amp; Glossing</h3>
+          <p>Refresh your colour between appointments and restore shine with a custom gloss treatment.</p>
+        </div>
+        <div class="service-card">
+          <span class="service-num">05</span>
+          <h3>Treatments</h3>
+          <p>Restore health and vitality with nourishing in-salon treatments designed to repair, strengthen, and revive.</p>
+        </div>
+        <div class="service-card">
+          <span class="service-num">06</span>
+          <h3>Occasion Styling</h3>
+          <p>Weddings, events, special moments &mdash; a look that photographs beautifully and lasts all day.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INSTAGRAM -->
+  <section class="instagram" id="instagram">
+    <div class="container">
+      <div class="insta-heading">
+        <!-- Official Instagram gradient icon -->
+        <svg class="ig-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="ig-rg" cx="30%" cy="107%" r="150%">
+              <stop offset="0%"   stop-color="#fdf497"/>
+              <stop offset="5%"   stop-color="#fdf497"/>
+              <stop offset="45%"  stop-color="#fd5949"/>
+              <stop offset="60%"  stop-color="#d6249f"/>
+              <stop offset="90%"  stop-color="#285AEB"/>
+            </radialGradient>
+          </defs>
+          <rect x="0" y="0" width="24" height="24" rx="5.5" fill="url(#ig-rg)"/>
+          <rect x="2" y="2" width="20" height="20" rx="4" fill="none" stroke="white" stroke-width="1.6"/>
+          <circle cx="12" cy="12" r="4.5" fill="none" stroke="white" stroke-width="1.6"/>
+          <circle cx="17.6" cy="6.4" r="1.1" fill="white"/>
+        </svg>
+        <h2>Follow the work</h2>
+      </div>
+      <a href="https://www.instagram.com/hairbychallen/" target="_blank" rel="noopener noreferrer" class="insta-handle">@hairbychallen</a>
+      <p class="sub">Real results. Real people. Real transformations.</p>
+      <div class="insta-grid" aria-hidden="true">
+        <div class="insta-cell"><div class="insta-cell-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></div></div>
+        <div class="insta-cell"><div class="insta-cell-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></div></div>
+        <div class="insta-cell"><div class="insta-cell-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></div></div>
+        <div class="insta-cell"><div class="insta-cell-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></div></div>
+      </div>
+      <a href="https://www.instagram.com/hairbychallen/" target="_blank" rel="noopener noreferrer" class="btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+        View on Instagram
+      </a>
+    </div>
+  </section>
+
+  <!-- BOOKING FORM -->
+  <section class="booking" id="booking">
+    <div class="container">
+      <div class="booking-info">
+        <span class="section-label">Appointments</span>
+        <h2>Let's get started.</h2>
+        <p class="booking-lead">Fill in the form and I'll be in touch to confirm your booking.</p>
+        <div class="contact-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.8 19.79 19.79 0 012 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+          <a href="tel:+6427777156">+64 27 777 7156</a>
+        </div>
+        <div class="contact-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+          <a href="https://www.instagram.com/hairbychallen/" target="_blank" rel="noopener noreferrer">@hairbychallen</a>
+        </div>
+        <div class="contact-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+          <span>Napier City, Hawke's Bay</span>
+        </div>
+      </div>
+
+      <!--
+        FORM SETUP — this form uses Formspree (free tier available).
+        1. Go to https://formspree.io and create a free account
+        2. Create a new form and copy your unique form ID
+        3. Replace YOUR_FORM_ID in the action URL below
+        Alternatively: change action="mailto:your@email.com" for a basic mailto fallback.
+      -->
+      <form class="booking-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="f-name">Your name</label>
+            <input type="text" id="f-name" name="name" placeholder="Jane Smith" required />
+          </div>
+          <div class="form-group">
+            <label for="f-phone">Phone</label>
+            <input type="tel" id="f-phone" name="phone" placeholder="+64 21 000 0000" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="f-email">Email</label>
+          <input type="email" id="f-email" name="email" placeholder="jane@example.com" required />
+        </div>
+        <div class="form-group">
+          <label for="f-service">Service</label>
+          <select id="f-service" name="service" required>
+            <option value="" disabled selected>Select a service...</option>
+            <option>Colour &amp; Highlights</option>
+            <option>Balayage</option>
+            <option>Cut &amp; Style</option>
+            <option>Toning &amp; Glossing</option>
+            <option>Treatment</option>
+            <option>Occasion Styling</option>
+            <option>Not sure yet / Consultation</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="f-when">Preferred day / time</label>
+          <input type="text" id="f-when" name="preferred_time" placeholder="e.g. Tuesday afternoons, weekend mornings..." />
+        </div>
+        <div class="form-group">
+          <label for="f-msg">Anything else?</label>
+          <textarea id="f-msg" name="message" placeholder="Tell me what you're after, any inspo, hair history, questions..."></textarea>
+        </div>
+        <p class="form-note">Your details are used only to confirm your appointment. Afterpay available in-salon.</p>
+        <div class="form-submit">
+          <button type="submit" class="btn btn-solid">Send Enquiry</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- AFTERPAY -->
+  <section class="afterpay" id="afterpay">
+    <div class="container">
+      <div class="afterpay-left">
+        <div class="ap-brand">
+          <span class="ap-wordmark">Afterpay</span>
+          <span class="ap-pill">In-Salon</span>
+        </div>
+        <h2>Pay in 4.<br>Look amazing now.</h2>
+        <p>Afterpay is available in-salon at Hair by Challen. Split your appointment into 4 fortnightly, interest-free instalments &mdash; no surprises, no stress.</p>
+        <div class="ap-steps">
+          <div class="ap-step">
+            <div class="ap-step-n">1</div>
+            <p>Book your appointment</p>
+          </div>
+          <div class="ap-step">
+            <div class="ap-step-n">2</div>
+            <p>Choose Afterpay at checkout</p>
+          </div>
+          <div class="ap-step">
+            <div class="ap-step-n">3</div>
+            <p>Pay first instalment today</p>
+          </div>
+          <div class="ap-step">
+            <div class="ap-step-n">4</div>
+            <p>3 more fortnightly payments, done</p>
+          </div>
+        </div>
+        <div class="ap-notice">
+          <strong>Afterpay coming soon.</strong> We are in the process of completing our merchant setup. Once live, eligible appointments can be split into 4 interest-free fortnightly payments via the Afterpay app in-salon. <a href="https://www.afterpay.com/en-NZ" target="_blank" rel="noopener noreferrer">Learn more at afterpay.com</a>.
+        </div>
+      </div>
+
+      <div class="afterpay-right">
+        <h3>About Afterpay NZ merchant setup</h3>
+        <p class="intro">To apply as an Afterpay merchant in New Zealand, the following are required:</p>
+        <ul class="req-list">
+          <li>NZ registered business and NZBN number</li>
+          <li>NZ business bank account</li>
+          <li>An established website showing your services and contact details (this page satisfies this)</li>
+          <li>A published privacy policy</li>
+          <li>A cancellation / refund policy</li>
+          <li>Apply at <a href="https://merchants.afterpay.com" target="_blank" rel="noopener noreferrer">merchants.afterpay.com</a></li>
+        </ul>
+        <div class="ap-answer">
+          <strong>Do you need a website?</strong> Effectively yes. Afterpay reviews your online presence as part of the merchant application to verify your business is legitimate and active. For <em>in-salon</em> payments, customers simply open their Afterpay app and scan a barcode at the point of sale &mdash; no online checkout is needed. However, having this website strengthens your application significantly.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <span class="footer-logo">Hair by Challen</span>
+      <p>&copy; 2026 Hair by Challen &mdash; Napier City, Hawke's Bay</p>
+      <div class="footer-links">
+        <a href="tel:+6427777156">+64 27 777 7156</a>
+        <a href="https://www.instagram.com/hairbychallen/" target="_blank" rel="noopener noreferrer">@hairbychallen</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 60);
+    });
+  </script>
+
+</body>
+</html>
