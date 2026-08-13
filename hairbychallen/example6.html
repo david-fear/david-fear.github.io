@@ -27,16 +27,14 @@
 
     /* ── FLOATING PILL NAV ────────────────────────────── */
     nav {
-      position: fixed; top: 1.25rem; left: 50%; transform: translateX(-50%);
+      position: fixed; top: 0; left: 0; right: 0;
       z-index: 100;
-      display: flex; align-items: center; gap: 0;
-      padding: 0.65rem 2rem;
-      background: rgba(13,59,62,0.85);
+      display: flex; align-items: center; justify-content: center;
+      padding: 0.85rem 1.5rem;
+      background: rgba(13,59,62,0.88);
       backdrop-filter: blur(16px);
-      border: 1px solid rgba(79,189,186,0.2);
-      border-radius: 999px;
-      transition: background 0.3s, box-shadow 0.3s;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+      border-bottom: 1px solid rgba(79,189,186,0.15);
+      transition: background 0.3s;
     }
     nav.scrolled { background: rgba(13,59,62,0.97); }
     .nav-links { display: flex; gap: 0; list-style: none; align-items: center; flex-wrap: nowrap; }
@@ -214,14 +212,14 @@
 
     /* RESPONSIVE */
     @media (max-width: 900px) {
-      nav { width: 90%; padding: 0.65rem 1.5rem; }
+      nav { padding: 0.75rem 1rem; }
       .afterpay .container { grid-template-columns: 1fr; gap: 2rem; }
       .ap-steps { grid-template-columns: repeat(2, 1fr); }
       .ap-step::after { display: none; }
       .insta-grid { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 700px) {
-      nav { top: 0.75rem; }
+      nav { padding: 0.65rem 1rem; }
       .nav-links a { font-size: 0.6rem; }
       .nav-links li + li::before { margin: 0 0.65rem; }
       .service-row { grid-template-columns: 3.5rem 1fr; }
@@ -344,12 +342,6 @@
       </div>
       <a href="https://www.instagram.com/hairbychallen/" target="_blank" rel="noopener noreferrer" class="insta-handle">@hairbychallen</a>
       <p class="insta-sub">Real results. Real people. Real transformations.</p>
-      <div class="insta-grid" aria-hidden="true">
-        <div class="insta-cell"><div class="insta-cell-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></div></div>
-        <div class="insta-cell"><div class="insta-cell-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></div></div>
-        <div class="insta-cell"><div class="insta-cell-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></div></div>
-        <div class="insta-cell"><div class="insta-cell-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></div></div>
-      </div>
       <a href="https://www.instagram.com/hairbychallen/" target="_blank" rel="noopener noreferrer" class="btn btn-cream">View on Instagram</a>
     </div>
     <div class="wave-insta" aria-hidden="true">
