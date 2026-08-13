@@ -123,10 +123,11 @@
       padding: 7rem 2rem 3.5rem;
     }
     .hero-logo {
-      width: min(420px, 75vw);
+      width: min(300px, 55vw);
       height: auto;
       display: block;
-      margin: 0 auto 0.75rem;
+      margin: 0 auto 1rem;
+      object-fit: contain;
     }
     .hero-tagline {
       font-size: 0.68rem;
@@ -266,27 +267,7 @@
       position: relative;
       overflow: hidden;
     }
-    /* stepped Art Deco border bars */
-    .deco-border {
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      height: 20px;
-      gap: 0;
-      overflow: hidden;
-    }
-    .deco-border.bottom { align-items: flex-start; }
-    .deco-bar {
-      background: var(--gold);
-      flex-shrink: 0;
-    }
-    .deco-border .deco-bar:nth-child(1),
-    .deco-border .deco-bar:nth-child(7) { width: 2px; height: 20px; }
-    .deco-border .deco-bar:nth-child(2),
-    .deco-border .deco-bar:nth-child(6) { width: 36px; height: 14px; margin: 0 2px; }
-    .deco-border .deco-bar:nth-child(3),
-    .deco-border .deco-bar:nth-child(5) { width: 72px; height: 8px; margin: 0 2px; }
-    .deco-border .deco-bar:nth-child(4) { flex: 1; height: 2px; max-width: 500px; margin: 0 2px; }
+
 
     .location-inner {
       text-align: center;
@@ -700,7 +681,7 @@
   <!-- NAV -->
   <nav id="nav">
     <a href="#top" class="nav-logo">
-      <img src="logo.png" alt="Hair By Challen"
+      <img src="logo.jpg" alt="Hair By Challen"
            onerror="this.style.display='none';document.getElementById('nav-text').style.display='inline'" />
       <span id="nav-text" class="nav-logo-fallback" style="display:none">Hair by Challen</span>
     </a>
@@ -717,7 +698,7 @@
 
   <!-- HERO: logo on matching cream background -->
   <section class="hero" id="top">
-    <img src="logo.png" alt="Hair By Challen — Hawkes Bay" class="hero-logo" />
+    <img src="logo.jpg" alt="Hair By Challen — Hawkes Bay" class="hero-logo" />
     <p class="hero-tagline">Professional Hairstyling &mdash; Napier City, Hawke's Bay</p>
     <div class="hero-ctas">
       <a href="#booking" class="btn btn-dark">Book an appointment</a>
@@ -770,11 +751,6 @@
 
   <!-- LOCATION — ART DECO -->
   <div class="location" id="location">
-    <div class="deco-border">
-      <div class="deco-bar"></div><div class="deco-bar"></div><div class="deco-bar"></div>
-      <div class="deco-bar"></div>
-      <div class="deco-bar"></div><div class="deco-bar"></div><div class="deco-bar"></div>
-    </div>
     <div class="location-inner">
       <p class="location-eyebrow">Find us in</p>
       <div class="deco-rule">
@@ -803,11 +779,6 @@
           <a href="https://www.instagram.com/hairbychallen/" target="_blank" rel="noopener noreferrer">@hairbychallen</a>
         </div>
       </div>
-    </div>
-    <div class="deco-border bottom">
-      <div class="deco-bar"></div><div class="deco-bar"></div><div class="deco-bar"></div>
-      <div class="deco-bar"></div>
-      <div class="deco-bar"></div><div class="deco-bar"></div><div class="deco-bar"></div>
     </div>
   </div>
 
