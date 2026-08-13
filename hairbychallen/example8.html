@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hair by Challen | Napier City, Hawke's Bay</title>
+  <meta name="description" content="Hair by Challen — professional hairstyling in Napier City, Hawke's Bay." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Raleway:wght@200;300;400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --space:   #060610;
+      --deep:    #0e0c24;
+      --indigo:  #2a1a5c;
+      --lav:     #c8b0f0;
+      --lav-l:   #e4d8f8;
+      --champ:   #e8d4a0;
+      --champ-l: #f5e8c0;
+      --white:   #ffffff;
+      --glass:   rgba(255,255,255,0.06);
+      --glass-b: rgba(200,176,240,0.15);
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Raleway', sans-serif;
+      font-weight: 300;
+      background: var(--space);
+      color: var(--champ-l);
+      font-size: 16px;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* Gradient background layer */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: -1;
+      background:
+        radial-gradient(ellipse 80% 70% at 20% 20%, rgba(42,26,92,0.6) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 60% at 80% 80%, rgba(200,176,240,0.1) 0%, transparent 60%),
+        radial-gradient(ellipse 100% 80% at 50% 100%, rgba(14,12,36,0.8) 0%, transparent 70%);
+      background-color: var(--space);
+    }
+
+    /* ── ULTRA-MINIMAL NAV ────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: center;
+      padding: 1.25rem 2rem;
+      background: transparent;
+    }
+    .nav-links { display: flex; gap: 0; list-style: none; align-items: center; }
+    .nav-links li { display: flex; align-items: center; }
+    .nav-links a { font-family: 'Raleway', sans-serif; font-weight: 300; font-size: 0.62rem; letter-spacing: 0.3em; text-transform: uppercase; color: rgba(200,176,240,0.55); text-decoration: none; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--lav); }
+    .nav-links li + li::before { content: ''; display: block; width: 2px; height: 2px; background: var(--lav); border-radius: 50%; opacity: 0.4; margin: 0 1.2rem; flex-shrink: 0; }
+
+    /* ── ORNAMENTAL HERO ──────────────────────────────── */
+    .hero {
+      min-height: 100vh; min-height: 100dvh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      padding: 7rem 2rem 5rem;
+      position: relative; overflow: hidden;
+    }
+    /* Ornamental outer ring */
+    .hero-ring {
+      position: absolute;
+      width: min(600px, 90vw); height: min(600px, 90vw);
+      border: 1px solid rgba(200,176,240,0.08);
+      border-radius: 50%;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    .hero-ring-2 {
+      position: absolute;
+      width: min(450px, 70vw); height: min(450px, 70vw);
+      border: 1px solid rgba(200,176,240,0.05);
+      border-radius: 50%;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    /* Corner ornaments */
+    .hero-frame {
+      position: absolute;
+      width: min(500px, 80vw); height: min(500px, 80vw);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    .hero-frame::before, .hero-frame::after {
+      content: '';
+      position: absolute;
+      width: 3rem; height: 3rem;
+      border-color: rgba(200,176,240,0.2);
+      border-style: solid;
+    }
+    .hero-frame::before { top: 0; left: 0; border-width: 1px 0 0 1px; }
+    .hero-frame::after { bottom: 0; right: 0; border-width: 0 1px 1px 0; }
+    .hero-frame-tr, .hero-frame-bl {
+      position: absolute;
+      width: min(500px, 80vw); height: min(500px, 80vw);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    .hero-frame-tr::before { content: ''; position: absolute; top: 0; right: 0; width: 3rem; height: 3rem; border-top: 1px solid rgba(200,176,240,0.2); border-right: 1px solid rgba(200,176,240,0.2); }
+    .hero-frame-bl::before { content: ''; position: absolute; bottom: 0; left: 0; width: 3rem; height: 3rem; border-bottom: 1px solid rgba(200,176,240,0.2); border-left: 1px solid rgba(200,176,240,0.2); }
+
+    .hero-eyebrow { font-family: 'Raleway', sans-serif; font-weight: 200; font-size: 0.6rem; letter-spacing: 0.55em; text-transform: uppercase; color: var(--lav); margin-bottom: 1.5rem; opacity: 0.7; position: relative; }
+    .hero h1 { font-family: 'Cinzel', serif; font-weight: 400; font-size: clamp(2.8rem, 8vw, 6rem); line-height: 1.1; color: var(--champ-l); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.3em; position: relative; }
+    .hero h1 em { font-style: normal; font-weight: 500; color: var(--champ); display: block; }
+    .hero-rule { width: 8rem; height: 1px; background: linear-gradient(90deg, transparent, var(--lav), transparent); margin: 1.5rem auto; position: relative; }
+    .hero-tagline { font-family: 'Raleway', sans-serif; font-weight: 200; font-size: clamp(0.85rem, 2vw, 1.05rem); color: rgba(228,216,248,0.5); letter-spacing: 0.12em; margin-bottom: 2.5rem; position: relative; }
+    .hero-ctas { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; position: relative; }
+    .hero-scroll { position: absolute; bottom: calc(2.5rem + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+    .hero-scroll span { font-size: 0.55rem; letter-spacing: 0.4em; text-transform: uppercase; color: rgba(200,176,240,0.3); }
+    .scroll-line { width: 1px; height: 3rem; background: linear-gradient(to bottom, var(--lav), transparent); animation: pulse 2s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.8; } }
+
+    /* ── BUTTONS ───────────────────────────────────────── */
+    .btn { display: inline-flex; align-items: center; font-family: 'Raleway', sans-serif; font-weight: 400; font-size: 0.62rem; letter-spacing: 0.28em; text-transform: uppercase; text-decoration: none; padding: 0.85rem 2.2rem; border: 1px solid rgba(200,176,240,0.3); color: var(--lav-l); background: var(--glass); backdrop-filter: blur(8px); transition: all 0.25s; cursor: pointer; }
+    .btn:hover { border-color: var(--lav); background: rgba(200,176,240,0.12); color: #fff; }
+    .btn-champ { border-color: rgba(232,212,160,0.3); color: var(--champ); }
+    .btn-champ:hover { border-color: var(--champ); background: rgba(232,212,160,0.1); color: var(--champ-l); }
+
+    /* ── TICKER ────────────────────────────────────────── */
+    .ticker { background: rgba(200,176,240,0.06); border-top: 1px solid rgba(200,176,240,0.1); border-bottom: 1px solid rgba(200,176,240,0.1); padding: 0.75rem 2rem; overflow: hidden; white-space: nowrap; }
+    .ticker-inner { display: inline-flex; gap: 3rem; animation: tick 30s linear infinite; }
+    .ticker span { font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(200,176,240,0.4); white-space: nowrap; }
+    @keyframes tick { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+    /* ── ABOUT — glassmorphism panel ──────────────────── */
+    .about { padding: 6rem 2rem; }
+    .about .container { max-width: 900px; margin: 0 auto; }
+    .about-glass {
+      background: var(--glass);
+      border: 1px solid var(--glass-b);
+      backdrop-filter: blur(16px);
+      padding: 3.5rem;
+      text-align: center;
+      position: relative;
+    }
+    .about-glass::before { content: ''; position: absolute; top: -1px; left: 10%; right: 10%; height: 1px; background: linear-gradient(90deg, transparent, var(--lav), transparent); }
+    .label { font-size: 0.58rem; letter-spacing: 0.45em; text-transform: uppercase; color: var(--lav); display: block; margin-bottom: 0.85rem; opacity: 0.7; }
+    .about h2 { font-family: 'Cinzel', serif; font-size: clamp(1.5rem, 3.5vw, 2.2rem); font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase; color: var(--champ-l); margin-bottom: 1.5rem; }
+    .about p { font-size: 0.95rem; color: rgba(228,216,248,0.6); line-height: 1.9; margin-bottom: 1rem; max-width: 600px; margin-left: auto; margin-right: auto; }
+
+    /* ── LOCATION ──────────────────────────────────────── */
+    .location { padding: 5rem 2rem; text-align: center; }
+    .location .container { max-width: 700px; margin: 0 auto; }
+    .loc-label { font-size: 0.55rem; letter-spacing: 0.55em; text-transform: uppercase; color: rgba(200,176,240,0.4); margin-bottom: 1rem; }
+    .loc-rule { display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin: 1rem auto; }
+    .loc-line { height: 1px; width: 6rem; background: linear-gradient(90deg, transparent, rgba(200,176,240,0.3)); }
+    .loc-line.r { background: linear-gradient(90deg, rgba(200,176,240,0.3), transparent); }
+    .loc-diamond { width: 5px; height: 5px; background: var(--lav); transform: rotate(45deg); opacity: 0.5; }
+    .loc-city { font-family: 'Cinzel', serif; font-size: clamp(2.5rem, 7vw, 5rem); font-weight: 400; letter-spacing: 0.15em; text-transform: uppercase; color: var(--champ); line-height: 1; margin-bottom: 0.25rem; }
+    .loc-region { font-size: 0.6rem; letter-spacing: 0.55em; text-transform: uppercase; color: rgba(200,176,240,0.3); margin-bottom: 2rem; }
+    .loc-contacts { display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap; }
+    .loc-contact { font-size: 0.75rem; letter-spacing: 0.12em; color: rgba(228,216,248,0.4); }
+    .loc-contact a { color: var(--lav); text-decoration: none; transition: color 0.2s; }
+    .loc-contact a:hover { color: #fff; }
+
+    /* ── SERVICES — glass cards floating ──────────────── */
+    .services { padding: 5rem 2rem; }
+    .services .container { max-width: 1100px; margin: 0 auto; }
+    .services-header { text-align: center; margin-bottom: 3.5rem; }
+    .services-header h2 { font-family: 'Cinzel', serif; font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 400; letter-spacing: 0.1em; text-transform: uppercase; color: var(--champ-l); margin-bottom: 0.5rem; }
+    .services-header p { font-size: 0.85rem; color: rgba(200,176,240,0.4); letter-spacing: 0.1em; }
+    .services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+    .service-card {
+      background: var(--glass);
+      border: 1px solid var(--glass-b);
+      backdrop-filter: blur(12px);
+      padding: 2.25rem 2rem;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.3s, background 0.3s;
+    }
+    .service-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(200,176,240,0.3), transparent); opacity: 0; transition: opacity 0.3s; }
+    .service-card:hover { border-color: rgba(200,176,240,0.25); background: rgba(255,255,255,0.08); }
+    .service-card:hover::before { opacity: 1; }
+    .service-num { font-family: 'Cinzel', serif; font-size: 0.6rem; letter-spacing: 0.3em; color: var(--lav); margin-bottom: 1rem; display: block; opacity: 0.6; }
+    .service-card h3 { font-family: 'Cinzel', serif; font-weight: 400; font-size: 1.1rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--champ-l); margin-bottom: 0.6rem; }
+    .service-card p { font-size: 0.82rem; color: rgba(228,216,248,0.5); line-height: 1.75; }
+
+    /* ── INSTAGRAM ─────────────────────────────────────── */
+    .instagram { padding: 5rem 2rem; text-align: center; }
+    .instagram .container { max-width: 700px; margin: 0 auto; }
+    .insta-head { display: flex; align-items: center; justify-content: center; gap: 0.65rem; margin-bottom: 0.4rem; }
+    .ig-icon { width: 2rem; height: 2rem; flex-shrink: 0; }
+    .instagram h2 { font-family: 'Cinzel', serif; font-size: clamp(1.5rem, 3.5vw, 2.2rem); font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase; color: var(--champ-l); display: inline; }
+    .insta-handle { display: inline-block; font-size: 0.68rem; letter-spacing: 0.2em; color: var(--lav); text-decoration: none; margin-bottom: 0.75rem; opacity: 0.8; }
+    .insta-sub { font-size: 0.85rem; color: rgba(200,176,240,0.4); margin-bottom: 2rem; font-style: italic; letter-spacing: 0.06em; }
+    .insta-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-bottom: 2.5rem; }
+    .insta-cell { aspect-ratio: 1; background: rgba(200,176,240,0.04); border: 1px solid rgba(200,176,240,0.08); position: relative; overflow: hidden; }
+    .insta-cell:nth-child(even) { background: rgba(200,176,240,0.07); }
+    .insta-cell-inner { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: rgba(200,176,240,0.2); }
+    .insta-cell-inner svg { width: 1.8rem; height: 1.8rem; }
+
+    /* ── AFTERPAY ──────────────────────────────────────── */
+    .afterpay { padding: 5rem 2rem 6rem; }
+    .afterpay .container { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
+    .ap-glass { background: var(--glass); border: 1px solid var(--glass-b); backdrop-filter: blur(12px); padding: 2.5rem; }
+    .ap-glass::before { content: ''; display: block; width: 3rem; height: 1px; background: var(--champ); margin-bottom: 1.5rem; opacity: 0.4; }
+    .ap-brand { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1.25rem; }
+    .ap-wordmark { background: rgba(0,0,0,0.4); color: #b2fce4; font-family: 'Raleway', sans-serif; font-weight: 500; font-size: 1rem; padding: 0.35rem 0.85rem; border: 1px solid rgba(178,252,228,0.2); }
+    .ap-badge { background: rgba(178,252,228,0.15); color: #b2fce4; font-size: 0.58rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; padding: 0.2rem 0.6rem; border: 1px solid rgba(178,252,228,0.2); }
+    .ap-glass h2 { font-family: 'Cinzel', serif; font-size: clamp(1.5rem, 3vw, 2.2rem); font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase; color: var(--champ-l); margin-bottom: 0.75rem; }
+    .ap-glass p { color: rgba(228,216,248,0.5); font-size: 0.9rem; line-height: 1.85; margin-bottom: 1rem; }
+    .ap-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; margin: 1.5rem 0; }
+    .ap-step { background: rgba(255,255,255,0.04); border: 1px solid rgba(200,176,240,0.1); padding: 0.85rem 0.4rem; text-align: center; position: relative; }
+    .ap-step::after { content: ''; position: absolute; top: 50%; right: -0.5rem; transform: translateY(-50%); border: 4px solid transparent; border-left-color: rgba(200,176,240,0.2); }
+    .ap-step:last-child::after { display: none; }
+    .ap-step-n { font-family: 'Cinzel', serif; font-size: 1.3rem; color: var(--lav); line-height: 1; margin-bottom: 0.35rem; opacity: 0.7; }
+    .ap-step p { font-size: 0.65rem; color: rgba(200,176,240,0.4); line-height: 1.4; margin: 0; }
+    .ap-notice { background: rgba(0,200,150,0.08); border: 1px solid rgba(0,200,150,0.15); border-left: 2px solid rgba(0,200,150,0.4); padding: 0.9rem 1.1rem; font-size: 0.8rem; color: rgba(178,252,228,0.7); line-height: 1.7; }
+    .ap-notice a { color: rgba(178,252,228,0.8); }
+    .afterpay-right-glass { background: var(--glass); border: 1px solid var(--glass-b); backdrop-filter: blur(12px); padding: 2.5rem; }
+    .afterpay-right-glass::before { content: ''; display: block; width: 3rem; height: 1px; background: var(--lav); margin-bottom: 1.5rem; opacity: 0.3; }
+    .afterpay-right-glass h3 { font-family: 'Cinzel', serif; font-size: 1.1rem; font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase; color: var(--lav-l); margin-bottom: 0.5rem; }
+    .afterpay-right-glass .intro { font-size: 0.8rem; color: rgba(200,176,240,0.45); line-height: 1.7; margin-bottom: 1rem; }
+    .req-details { margin-bottom: 1.25rem; }
+    .req-details details { border-bottom: 1px solid rgba(200,176,240,0.08); }
+    .req-details details:first-of-type { border-top: 1px solid rgba(200,176,240,0.08); }
+    .req-details summary { list-style: none; display: flex; align-items: center; justify-content: space-between; padding: 0.8rem 0; cursor: pointer; font-size: 0.8rem; color: var(--lav-l); font-weight: 300; user-select: none; gap: 1rem; opacity: 0.8; }
+    .req-details summary::-webkit-details-marker { display: none; }
+    .req-details summary::marker { content: none; }
+    .req-icon { flex-shrink: 0; width: 1.4rem; height: 1.4rem; border: 1px solid rgba(200,176,240,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--lav); font-size: 0.85rem; transition: background 0.2s, color 0.2s; line-height: 1; }
+    .req-details details[open] summary .req-icon { background: rgba(200,176,240,0.15); color: var(--lav-l); }
+    .req-plus { display: block; } .req-minus { display: none; }
+    .req-details details[open] .req-plus { display: none; } .req-details details[open] .req-minus { display: block; }
+    .details-body { font-size: 0.78rem; color: rgba(200,176,240,0.5); line-height: 1.8; padding: 0 0 1rem 0; }
+    .details-body p { margin-bottom: 0.5rem; } .details-body a { color: var(--lav); text-decoration: none; }
+    .details-body strong { color: var(--lav-l); font-weight: 400; }
+    .draft-policy { background: rgba(255,255,255,0.04); border-left: 2px solid rgba(200,176,240,0.3); padding: 0.75rem 1rem; margin-top: 0.5rem; font-style: italic; font-size: 0.76rem; color: rgba(200,176,240,0.45); }
+    .ap-answer { font-size: 0.78rem; color: rgba(200,176,240,0.45); line-height: 1.75; background: rgba(255,255,255,0.03); border: 1px solid rgba(200,176,240,0.08); padding: 1rem 1.1rem; }
+    .ap-answer strong { color: var(--lav-l); font-weight: 400; }
+
+    /* ── FOOTER ────────────────────────────────────────── */
+    footer { background: rgba(0,0,0,0.3); border-top: 1px solid rgba(200,176,240,0.08); color: rgba(200,176,240,0.3); padding: 2rem; }
+    .footer-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    .footer-logo-text { font-family: 'Cinzel', serif; font-size: 0.9rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--champ); opacity: 0.7; }
+    footer img { height: 2rem; width: auto; opacity: 0.35; filter: brightness(2); }
+    footer p { font-size: 0.68rem; }
+    .footer-links { display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap; }
+    footer a { color: rgba(200,176,240,0.5); text-decoration: none; font-size: 0.68rem; letter-spacing: 0.1em; }
+    footer a:hover { color: var(--lav); }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .services-grid { grid-template-columns: 1fr 1fr; }
+      .afterpay .container { grid-template-columns: 1fr; gap: 2rem; }
+      .ap-steps { grid-template-columns: repeat(2, 1fr); }
+      .ap-step::after { display: none; }
+      .insta-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 700px) {
+      .nav-links a { font-size: 0.58rem; }
+      .nav-links li + li::before { margin: 0 0.65rem; }
+      .ticker { position: fixed; bottom: env(safe-area-inset-bottom, 0); left: 0; right: 0; z-index: 90; }
+      body { padding-bottom: 2.8rem; }
+      .about-glass { padding: 2rem; }
+    }
+    @media (max-width: 580px) {
+      .services-grid { grid-template-columns: 1fr; }
+      .footer-inner { flex-direction: column; text-align: center; }
+      .footer-links { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav id="nav">
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#instagram">Gallery</a></li>
+      <li><a href="#afterpay">Afterpay</a></li>
+    </ul>
+  </nav>
+
+  <section class="hero" id="top">
+    <div class="hero-ring" aria-hidden="true"></div>
+    <div class="hero-ring-2" aria-hidden="true"></div>
+    <div class="hero-frame" aria-hidden="true"></div>
+    <div class="hero-frame-tr" aria-hidden="true"></div>
+    <div class="hero-frame-bl" aria-hidden="true"></div>
+    <p class="hero-eyebrow">Professional Hairstyling &bull; Napier City, Hawke's Bay</p>
+    <h1>Hair by<br><em>Challen</em></h1>
+    <div class="hero-rule" aria-hidden="true"></div>
+    <p class="hero-tagline">Where every detail matters.</p>
+    <div class="hero-ctas">
+      <a href="https://www.instagram.com/hairbychallen/" target="_blank" rel="noopener noreferrer" class="btn">Get in touch</a>
+      <a href="tel:+6427777156" class="btn btn-champ">+64 27 777 7156</a>
+    </div>
+    <div class="hero-scroll">
+      <div class="scroll-line"></div>
+      <span>Scroll</span>
+    </div>
+  </section>
+
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-inner">
+      <span>Colour &amp; Highlights</span><span>&bull;</span>
+      <span>Balayage</span><span>&bull;</span>
+      <span>Cuts &amp; Style</span><span>&bull;</span>
+      <span>Treatments</span><span>&bull;</span>
+      <span>Napier City</span><span>&bull;</span>
+      <span>Afterpay Available</span><span>&bull;</span>
+      <span>Hair by Challen</span><span>&bull;</span>
+      <span>Colour &amp; Highlights</span><span>&bull;</span>
+      <span>Balayage</span><span>&bull;</span>
+      <span>Cuts &amp; Style</span><span>&bull;</span>
+      <span>Treatments</span><span>&bull;</span>
+      <span>Napier City</span><span>&bull;</span>
+      <span>Afterpay Available</span><span>&bull;</span>
+      <span>Hair by Challen</span><span>&bull;</span>
+    </div>
+  </div>
+
+  <section class="about" id="about">
+    <div class="container">
+      <div class="about-glass">
+        <span class="label">About</span>
+        <h2>Crafted with Care</h2>
+        <p>Hi, I'm Challen &mdash; a passionate hairstylist dedicated to making you feel your absolute best. From precision cuts to stunning colour transformations, every appointment is a personal experience tailored entirely to you.</p>
+        <p>Whether you're after a bold new look or a beautiful refresh, I'm here to listen, collaborate, and deliver results you'll love.</p>
+        <a href="https://www.instagram.com/hairbychallen/" target="_blank" rel="noopener noreferrer" class="btn" style="margin-top:1.75rem">Follow on Instagram</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="location" id="location">
+    <div class="container">
+      <p class="loc-label">Find us in</p>
+      <div class="loc-rule"><div class="loc-line"></div><div class="loc-diamond"></div><div class="loc-line r"></div></div>
+      <p class="loc-city">Napier City</p>
+      <p class="loc-region">Hawke's Bay &bull; New Zealand</p>
+      <div class="loc-rule"><div class="loc-line"></div><div class="loc-diamond"></div><div class="loc-line r"></div></div>
+      <div class="loc-contacts">
+        <span class="loc-contact"><a href="tel:+6427777156">+64 27 777 7156</a></span>
+        <span class="loc-contact"><a href="https://www.instagram.com/hairbychallen/" target="_blank" rel="noopener noreferrer">@hairbychallen</a></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="services" id="services">
+    <div class="container">
+      <div class="services-header">
+        <h2>Services</h2>
+        <p>Every service, personalised to you.</p>
+      </div>
+      <div class="services-grid">
+        <div class="service-card"><span class="service-num">01</span><h3>Colour &amp; Highlights</h3><p>Precision colour work tailored to your skin tone and lifestyle.</p></div>
+        <div class="service-card"><span class="service-num">02</span><h3>Balayage</h3><p>Hand-painted, lived-in colour that grows out beautifully.</p></div>
+        <div class="service-card"><span class="service-num">03</span><h3>Cuts &amp; Style</h3><p>Shape, texture, and movement crafted for your face and routine.</p></div>
+        <div class="service-card"><span class="service-num">04</span><h3>Toning &amp; Glossing</h3><p>Refresh colour and restore shine with a custom treatment.</p></div>
+        <div class="service-card"><span class="service-num">05</span><h3>Treatments</h3><p>Nourishing treatments to repair, strengthen, and revive.</p></div>
+        <div class="service-card"><span class="service-num">06</span><h3>Occasion Styling</h3><p>Weddings and events &mdash; a look that photographs beautifully.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="instagram" id="instagram">
+    <div class="container">
+      <div class="insta-head">
+        <svg class="ig-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="ig8" cx="30%" cy="107%" r="150%"><stop offset="0%" stop-color="#fdf497"/><stop offset="45%" stop-color="#fd5949"/><stop offset="60%" stop-color="#d6249f"/><stop offset="90%" stop-color="#285AEB"/></radialGradient></defs><rect x="0" y="0" width="24" height="24" rx="5.5" fill="url(#ig8)"/><rect x="2" y="2" width="20" height="20" rx="4" fill="none" stroke="white" stroke-width="1.6"/><circle cx="12" cy="12" r="4.5" fill="none" stroke="white" stroke-width="1.6"/><circle cx="17.6" cy="6.4" r="1.1" fill="white"/></svg>
+        <h2>Follow the work</h2>
+      </div>
+      <a href="https://www.instagram.com/hairbychallen/" target="_blank" rel="noopener noreferrer" class="insta-handle">@hairbychallen</a>
+      <p class="insta-sub">Real results. Real people. Real transformations.</p>
+      <div class="insta-grid" aria-hidden="true">
+        <div class="insta-cell"><div class="insta-cell-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></div></div>
+        <div class="insta-cell"><div class="insta-cell-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></div></div>
+        <div class="insta-cell"><div class="insta-cell-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></div></div>
+        <div class="insta-cell"><div class="insta-cell-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></div></div>
+      </div>
+      <a href="https://www.instagram.com/hairbychallen/" target="_blank" rel="noopener noreferrer" class="btn">View on Instagram</a>
+    </div>
+  </section>
+
+  <section class="afterpay" id="afterpay">
+    <div class="container">
+      <div class="ap-glass">
+        <div class="ap-brand"><span class="ap-wordmark">Afterpay</span><span class="ap-badge">In-Salon</span></div>
+        <h2>Pay in 4.<br>Look Amazing.</h2>
+        <p>Split your appointment into 4 fortnightly, interest-free instalments.</p>
+        <div class="ap-steps">
+          <div class="ap-step"><div class="ap-step-n">1</div><p>Book</p></div>
+          <div class="ap-step"><div class="ap-step-n">2</div><p>Choose AP</p></div>
+          <div class="ap-step"><div class="ap-step-n">3</div><p>First pay</p></div>
+          <div class="ap-step"><div class="ap-step-n">4</div><p>3 more</p></div>
+        </div>
+        <div class="ap-notice"><strong>Coming soon.</strong> <a href="https://www.afterpay.com/en-NZ" target="_blank" rel="noopener noreferrer">Learn more</a>.</div>
+      </div>
+      <div class="afterpay-right-glass">
+        <h3>Merchant Setup NZ</h3>
+        <p class="intro">Required to apply:</p>
+        <div class="req-details">
+          <details><summary>NZ registered business &amp; NZBN<span class="req-icon"><span class="req-plus">+</span><span class="req-minus">&minus;</span></span></summary><div class="details-body"><p>Register at <a href="https://www.nzbn.govt.nz" target="_blank" rel="noopener noreferrer">nzbn.govt.nz</a>.</p></div></details>
+          <details><summary>NZ business bank account<span class="req-icon"><span class="req-plus">+</span><span class="req-minus">&minus;</span></span></summary><div class="details-body"><p>A dedicated NZ business account is required.</p></div></details>
+          <details><summary>An established website<span class="req-icon"><span class="req-plus">+</span><span class="req-minus">&minus;</span></span></summary><div class="details-body"><p><strong>This website satisfies this requirement.</strong></p></div></details>
+          <details><summary>Privacy policy<span class="req-icon"><span class="req-plus">+</span><span class="req-minus">&minus;</span></span></summary><div class="details-body"><p>Generate at <a href="https://www.iubenda.com" target="_blank" rel="noopener noreferrer">iubenda.com</a>.</p></div></details>
+          <details><summary>Cancellation &amp; refund policy<span class="req-icon"><span class="req-plus">+</span><span class="req-minus">&minus;</span></span></summary><div class="details-body"><div class="draft-policy"><strong>Draft:</strong> 24 hours notice. Late cancellations 50% fee. No-shows charged in full.</div></div></details>
+          <details><summary>Apply at merchants.afterpay.com<span class="req-icon"><span class="req-plus">+</span><span class="req-minus">&minus;</span></span></summary><div class="details-body"><p>Visit <a href="https://merchants.afterpay.com" target="_blank" rel="noopener noreferrer">merchants.afterpay.com</a>. In-store QR payments.</p></div></details>
+        </div>
+        <div class="ap-answer"><strong>Do you need a website?</strong> Yes &mdash; this satisfies Afterpay's requirement.</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-inner">
+      <span class="footer-logo-text">Hair by Challen</span>
+      <img src="logosml.png" alt="Hair By Challen" />
+      <p>&copy; 2026 Hair by Challen &mdash; Napier City</p>
+      <div class="footer-links">
+        <a href="tel:+6427777156">+64 27 777 7156</a>
+        <a href="https://www.instagram.com/hairbychallen/" target="_blank" rel="noopener noreferrer">@hairbychallen</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 60));
+  </script>
+</body>
+</html>

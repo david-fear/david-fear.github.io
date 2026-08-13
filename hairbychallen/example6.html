@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hair by Challen | Napier City, Hawke's Bay</title>
+  <meta name="description" content="Hair by Challen — professional hairstyling in Napier City, Hawke's Bay." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,100;0,300;0,400;1,100;1,300;1,400&family=Work+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --teal:    #0d3b3e;
+      --teal-m:  #1a5c60;
+      --sea:     #4fbdba;
+      --sea-l:   #a8dedd;
+      --cream:   #fef9f0;
+      --warm:    #f5ede0;
+      --coral:   #e87560;
+      --mid:     #6a8080;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Work Sans', sans-serif; font-weight: 300; background: var(--cream); color: var(--teal); font-size: 16px; line-height: 1.7; overflow-x: hidden; }
+
+    /* ── FLOATING PILL NAV ────────────────────────────── */
+    nav {
+      position: fixed; top: 1.25rem; left: 50%; transform: translateX(-50%);
+      z-index: 100;
+      display: flex; align-items: center; gap: 0;
+      padding: 0.65rem 2rem;
+      background: rgba(13,59,62,0.85);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(79,189,186,0.2);
+      border-radius: 999px;
+      transition: background 0.3s, box-shadow 0.3s;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+    }
+    nav.scrolled { background: rgba(13,59,62,0.97); }
+    .nav-links { display: flex; gap: 0; list-style: none; align-items: center; flex-wrap: nowrap; }
+    .nav-links li { display: flex; align-items: center; }
+    .nav-links a { font-family: 'Work Sans', sans-serif; font-weight: 400; font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--sea-l); text-decoration: none; transition: color 0.2s; white-space: nowrap; }
+    .nav-links a:hover { color: #fff; }
+    .nav-links li + li::before { content: ''; display: block; width: 3px; height: 3px; background: var(--sea); border-radius: 50%; opacity: 0.5; margin: 0 1rem; flex-shrink: 0; }
+
+    /* ── HERO ──────────────────────────────────────────── */
+    .hero {
+      min-height: 100vh; min-height: 100dvh;
+      background: var(--teal);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 7rem 2rem 6rem;
+      position: relative; overflow: hidden;
+    }
+    /* Big background text */
+    .hero-bg-text {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Fraunces', serif; font-weight: 100;
+      font-size: clamp(8rem, 25vw, 22rem);
+      color: rgba(79,189,186,0.06);
+      letter-spacing: -0.02em; line-height: 0.85;
+      pointer-events: none; user-select: none;
+      white-space: nowrap;
+    }
+    .hero-eyebrow { font-size: 0.6rem; letter-spacing: 0.5em; text-transform: uppercase; color: var(--sea); margin-bottom: 1.5rem; position: relative; }
+    .hero h1 { font-family: 'Fraunces', serif; font-weight: 300; font-size: clamp(3.5rem, 10vw, 7.5rem); line-height: 1; color: var(--cream); letter-spacing: 0.01em; margin-bottom: 0.25em; position: relative; }
+    .hero h1 em { font-style: italic; color: var(--sea); }
+    .hero-tagline { font-family: 'Fraunces', serif; font-style: italic; font-size: clamp(1rem, 2.5vw, 1.35rem); color: rgba(254,249,240,0.5); margin-bottom: 2.5rem; position: relative; }
+    .hero-cta-row { display: flex; align-items: center; gap: 1.5rem; justify-content: center; position: relative; flex-wrap: wrap; }
+    .hero-phone { font-size: 0.75rem; letter-spacing: 0.12em; color: var(--sea-l); text-decoration: none; transition: color 0.2s; }
+    .hero-phone:hover { color: #fff; }
+
+    /* Wave clip at hero bottom */
+    .wave-hero {
+      position: absolute; bottom: -1px; left: 0; right: 0;
+      line-height: 0;
+    }
+    .wave-hero svg { display: block; width: 100%; }
+
+    /* ── BUTTONS ───────────────────────────────────────── */
+    .btn { display: inline-flex; align-items: center; gap: 0.5rem; font-family: 'Work Sans', sans-serif; font-weight: 400; font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase; text-decoration: none; padding: 0.85rem 2.2rem; border: 1px solid var(--sea); color: var(--sea); background: transparent; border-radius: 2px; transition: all 0.22s; cursor: pointer; }
+    .btn:hover { background: var(--sea); color: var(--teal); }
+    .btn-solid { background: var(--sea); color: var(--teal); }
+    .btn-solid:hover { background: var(--sea-l); border-color: var(--sea-l); }
+    .btn-coral { background: var(--coral); color: #fff; border-color: var(--coral); }
+    .btn-coral:hover { background: transparent; color: var(--coral); }
+    .btn-cream { border-color: var(--cream); color: var(--cream); }
+    .btn-cream:hover { background: var(--cream); color: var(--teal); }
+
+    /* ── ABOUT — full-width single column ─────────────── */
+    .about {
+      background: var(--cream);
+      padding: 6rem 2rem 5rem;
+      position: relative;
+    }
+    .about-inner {
+      max-width: 720px; margin: 0 auto;
+      text-align: center;
+    }
+    .label { font-size: 0.6rem; letter-spacing: 0.4em; text-transform: uppercase; color: var(--sea); display: block; margin-bottom: 0.85rem; }
+    h2 { font-family: 'Fraunces', serif; font-weight: 300; font-size: clamp(2rem, 4.5vw, 3rem); line-height: 1.15; }
+    .about h2 { font-size: clamp(2rem, 5vw, 3.5rem); margin-bottom: 1.5rem; }
+    .about p { font-size: 1.05rem; line-height: 1.85; color: var(--mid); margin-bottom: 1rem; }
+    .about-divider { width: 4rem; height: 2px; background: var(--sea); margin: 1.5rem auto; border-radius: 2px; }
+
+    /* Wave clip at about bottom */
+    .wave-about { position: absolute; bottom: -1px; left: 0; right: 0; line-height: 0; }
+    .wave-about svg { display: block; width: 100%; }
+
+    /* ── LOCATION ──────────────────────────────────────── */
+    .location { background: var(--teal-m); color: var(--cream); text-align: center; padding: 5rem 2rem 6rem; position: relative; }
+    .loc-label { font-size: 0.58rem; letter-spacing: 0.5em; text-transform: uppercase; color: var(--sea); margin-bottom: 0.75rem; opacity: 0.8; }
+    .loc-city { font-family: 'Fraunces', serif; font-weight: 300; font-size: clamp(3rem, 9vw, 6rem); color: var(--cream); line-height: 1; margin-bottom: 0.25rem; }
+    .loc-region { font-size: 0.62rem; letter-spacing: 0.5em; text-transform: uppercase; color: var(--sea-l); opacity: 0.6; margin-bottom: 2rem; }
+    .loc-contacts { display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap; }
+    .loc-contact { font-size: 0.8rem; letter-spacing: 0.1em; color: rgba(254,249,240,0.55); }
+    .loc-contact a { color: var(--sea-l); text-decoration: none; transition: color 0.2s; }
+    .loc-contact a:hover { color: #fff; }
+    .wave-loc { position: absolute; bottom: -1px; left: 0; right: 0; line-height: 0; }
+    .wave-loc svg { display: block; width: 100%; }
+
+    /* ── SERVICES — flowing list, NOT cards ──────────────── */
+    .services { background: var(--warm); padding: 6rem 2rem 5rem; position: relative; }
+    .services .container { max-width: 900px; margin: 0 auto; }
+    .services-header { text-align: center; margin-bottom: 4rem; }
+    .services-header h2 { color: var(--teal); margin-bottom: 0.5rem; }
+    .services-header p { font-family: 'Fraunces', serif; font-style: italic; font-size: 1.1rem; color: var(--mid); }
+    .services-list { display: flex; flex-direction: column; gap: 0; }
+    .service-row {
+      display: grid; grid-template-columns: 5rem 1fr;
+      align-items: start; padding: 2rem 0;
+      border-bottom: 1px solid rgba(79,189,186,0.15);
+      transition: background 0.2s;
+    }
+    .service-row:first-child { border-top: 1px solid rgba(79,189,186,0.15); }
+    .service-row:hover { background: rgba(79,189,186,0.04); margin: 0 -1rem; padding: 2rem 1rem; }
+    .service-n {
+      font-family: 'Fraunces', serif; font-weight: 100;
+      font-size: 3.5rem; line-height: 1;
+      color: rgba(79,189,186,0.25);
+      padding-top: 0.25rem;
+    }
+    .service-content h3 { font-family: 'Fraunces', serif; font-weight: 300; font-size: 1.55rem; color: var(--teal); margin-bottom: 0.35rem; }
+    .service-content p { font-size: 0.88rem; color: var(--mid); line-height: 1.75; }
+    .wave-services { position: absolute; bottom: -1px; left: 0; right: 0; line-height: 0; }
+    .wave-services svg { display: block; width: 100%; }
+
+    /* ── INSTAGRAM ─────────────────────────────────────── */
+    .instagram { background: var(--teal); text-align: center; padding: 5rem 2rem 6rem; position: relative; }
+    .instagram h2 { color: var(--cream); }
+    .insta-head { display: flex; align-items: center; justify-content: center; gap: 0.65rem; margin-bottom: 0.4rem; }
+    .ig-icon { width: 2rem; height: 2rem; flex-shrink: 0; }
+    .insta-handle { display: inline-block; font-size: 0.7rem; letter-spacing: 0.2em; color: var(--sea); text-decoration: none; margin-bottom: 0.75rem; }
+    .insta-sub { font-family: 'Fraunces', serif; font-style: italic; font-size: 1.05rem; color: rgba(254,249,240,0.5); margin-bottom: 2rem; }
+    .insta-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-bottom: 2.5rem; max-width: 700px; margin-left: auto; margin-right: auto; }
+    .insta-cell { aspect-ratio: 1; background: rgba(255,255,255,0.05); position: relative; overflow: hidden; border-radius: 4px; }
+    .insta-cell:nth-child(even) { background: rgba(79,189,186,0.08); }
+    .insta-cell-inner { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: rgba(79,189,186,0.3); }
+    .insta-cell-inner svg { width: 1.8rem; height: 1.8rem; }
+    .wave-insta { position: absolute; bottom: -1px; left: 0; right: 0; line-height: 0; }
+    .wave-insta svg { display: block; width: 100%; }
+
+    /* ── AFTERPAY ──────────────────────────────────────── */
+    .afterpay { background: var(--cream); padding: 5rem 2rem; }
+    .afterpay .container { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
+    .ap-brand { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1.25rem; }
+    .ap-wordmark { background: var(--teal); color: #b2fce4; font-family: 'Work Sans', sans-serif; font-weight: 500; font-size: 1rem; padding: 0.35rem 0.85rem; border-radius: 3px; }
+    .ap-badge { background: #b2fce4; color: #000; font-size: 0.58rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; padding: 0.2rem 0.6rem; border-radius: 3px; }
+    .afterpay-left h2 { margin-bottom: 0.75rem; }
+    .afterpay-left p { color: var(--mid); font-size: 0.9rem; line-height: 1.85; margin-bottom: 1rem; }
+    .ap-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin: 1.5rem 0; }
+    .ap-step { background: var(--warm); border: 1px solid rgba(79,189,186,0.2); padding: 1rem 0.5rem; text-align: center; border-radius: 4px; position: relative; }
+    .ap-step::after { content: ''; position: absolute; top: 50%; right: -0.5rem; transform: translateY(-50%); border: 4px solid transparent; border-left-color: var(--sea); }
+    .ap-step:last-child::after { display: none; }
+    .ap-step-n { font-family: 'Fraunces', serif; font-size: 1.5rem; color: var(--teal); line-height: 1; margin-bottom: 0.35rem; }
+    .ap-step p { font-size: 0.68rem; color: var(--mid); line-height: 1.4; margin: 0; }
+    .ap-notice { background: #f0fdf8; border: 1px solid #a8f0d4; border-left: 3px solid #00c896; padding: 0.9rem 1.1rem; font-size: 0.8rem; color: #1a5c44; line-height: 1.7; border-radius: 0 4px 4px 0; }
+    .afterpay-right h3 { font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 300; margin-bottom: 0.5rem; }
+    .afterpay-right .intro { font-size: 0.82rem; color: var(--mid); line-height: 1.7; margin-bottom: 1rem; }
+    .req-details { margin-bottom: 1.25rem; }
+    .req-details details { border-bottom: 1px solid rgba(0,0,0,0.06); }
+    .req-details details:first-of-type { border-top: 1px solid rgba(0,0,0,0.06); }
+    .req-details summary { list-style: none; display: flex; align-items: center; justify-content: space-between; padding: 0.8rem 0; cursor: pointer; font-size: 0.82rem; color: var(--teal); font-weight: 400; user-select: none; gap: 1rem; }
+    .req-details summary::-webkit-details-marker { display: none; }
+    .req-details summary::marker { content: none; }
+    .req-icon { flex-shrink: 0; width: 1.4rem; height: 1.4rem; border: 1px solid var(--sea); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--sea); font-size: 0.85rem; transition: background 0.2s, color 0.2s; line-height: 1; }
+    .req-details details[open] summary .req-icon { background: var(--sea); color: var(--teal); }
+    .req-plus { display: block; } .req-minus { display: none; }
+    .req-details details[open] .req-plus { display: none; } .req-details details[open] .req-minus { display: block; }
+    .details-body { font-size: 0.8rem; color: var(--mid); line-height: 1.8; padding: 0 0 1rem 0; }
+    .details-body p { margin-bottom: 0.5rem; } .details-body a { color: var(--teal-m); text-decoration: none; }
+    .details-body strong { color: var(--teal); font-weight: 500; }
+    .draft-policy { background: var(--warm); border-left: 2px solid var(--sea); padding: 0.75rem 1rem; margin-top: 0.5rem; font-style: italic; font-size: 0.78rem; color: var(--mid); }
+    .ap-answer { font-size: 0.8rem; color: var(--mid); line-height: 1.75; background: var(--warm); border: 1px solid rgba(0,0,0,0.06); padding: 1rem 1.1rem; border-radius: 3px; }
+    .ap-answer strong { color: var(--teal); font-weight: 500; }
+
+    /* ── FOOTER ────────────────────────────────────────── */
+    footer { background: var(--teal); color: rgba(168,222,221,0.45); padding: 2rem; }
+    .footer-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    .footer-logo-text { font-family: 'Fraunces', serif; font-style: italic; font-size: 1.1rem; color: var(--sea-l); }
+    footer img { height: 2.2rem; width: auto; opacity: 0.5; }
+    footer p { font-size: 0.7rem; }
+    .footer-links { display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap; }
+    footer a { color: var(--sea); text-decoration: none; font-size: 0.7rem; letter-spacing: 0.08em; }
+    footer a:hover { color: #fff; }
+
+    /* ── TICKER ────────────────────────────────────────── */
+    .ticker { background: var(--coral); padding: 0.75rem 2rem; overflow: hidden; white-space: nowrap; }
+    .ticker-inner { display: inline-flex; gap: 3rem; animation: tick 28s linear infinite; }
+    .ticker span { font-family: 'Fraunces', serif; font-size: 0.95rem; font-style: italic; letter-spacing: 0.06em; color: rgba(255,255,255,0.9); white-space: nowrap; }
+    @keyframes tick { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      nav { width: 90%; padding: 0.65rem 1.5rem; }
+      .afterpay .container { grid-template-columns: 1fr; gap: 2rem; }
+      .ap-steps { grid-template-columns: repeat(2, 1fr); }
+      .ap-step::after { display: none; }
+      .insta-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 700px) {
+      nav { top: 0.75rem; }
+      .nav-links a { font-size: 0.6rem; }
+      .nav-links li + li::before { margin: 0 0.65rem; }
+      .service-row { grid-template-columns: 3.5rem 1fr; }
+      .service-n { font-size: 2.5rem; }
+      .ticker { position: fixed; bottom: env(safe-area-inset-bottom, 0); left: 0; right: 0; z-index: 90; }
+      body { padding-bottom: 2.8rem; }
+    }
+    @media (max-width: 480px) {
+      nav { padding: 0.6rem 1rem; }
+      .nav-links a { font-size: 0.58rem; letter-spacing: 0.14em; }
+      .nav-links li + li::before { margin: 0 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav id="nav">
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#instagram">Gallery</a></li>
+      <li><a href="#afterpay">Afterpay</a></li>
+    </ul>
+  </nav>
+
+  <section class="hero" id="top">
+    <div class="hero-bg-text" aria-hidden="true">CHALLEN</div>
+    <p class="hero-eyebrow">Napier City &bull; Hawke's Bay</p>
+    <h1>Hair by<br><em>Challen</em></h1>
+    <p class="hero-tagline">Where every detail matters.</p>
+    <div class="hero-cta-row">
+      <a href="https://www.instagram.com/hairbychallen/" target="_blank" rel="noopener noreferrer" class="btn btn-solid">Get in touch</a>
+      <a href="tel:+6427777156" class="hero-phone">+64 27 777 7156</a>
+    </div>
+    <div class="wave-hero" aria-hidden="true">
+      <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,40 C240,80 480,0 720,40 C960,80 1200,0 1440,40 L1440,80 L0,80 Z" fill="#fef9f0"/>
+      </svg>
+    </div>
+  </section>
+
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-inner">
+      <span>Colour &amp; Highlights</span><span>&bull;</span>
+      <span>Balayage</span><span>&bull;</span>
+      <span>Cuts &amp; Style</span><span>&bull;</span>
+      <span>Treatments</span><span>&bull;</span>
+      <span>Napier City</span><span>&bull;</span>
+      <span>Afterpay Available</span><span>&bull;</span>
+      <span>Hair by Challen</span><span>&bull;</span>
+      <span>Colour &amp; Highlights</span><span>&bull;</span>
+      <span>Balayage</span><span>&bull;</span>
+      <span>Cuts &amp; Style</span><span>&bull;</span>
+      <span>Treatments</span><span>&bull;</span>
+      <span>Napier City</span><span>&bull;</span>
+      <span>Afterpay Available</span><span>&bull;</span>
+      <span>Hair by Challen</span><span>&bull;</span>
+    </div>
+  </div>
+
+  <section class="about" id="about">
+    <div class="about-inner">
+      <span class="label">About</span>
+      <h2>Crafted with care,<br><em style="font-style:italic">worn with confidence.</em></h2>
+      <div class="about-divider"></div>
+      <p>Hi, I'm Challen &mdash; a passionate hairstylist dedicated to making you feel your absolute best. From precision cuts to stunning colour transformations, every appointment is a personal experience tailored entirely to you.</p>
+      <p>Whether you're after a bold new look or a beautiful refresh, I'm here to listen, collaborate, and deliver results you'll love.</p>
+      <a href="https://www.instagram.com/hairbychallen/" target="_blank" rel="noopener noreferrer" class="btn btn-coral" style="margin-top:2rem">Follow on Instagram</a>
+    </div>
+    <div class="wave-about" aria-hidden="true">
+      <svg viewBox="0 0 1440 70" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,35 C360,70 720,0 1080,35 C1260,52 1350,28 1440,35 L1440,70 L0,70 Z" fill="#1a5c60"/>
+      </svg>
+    </div>
+  </section>
+
+  <div class="location" id="location">
+    <p class="loc-label">Find us in</p>
+    <p class="loc-city">Napier City</p>
+    <p class="loc-region">Hawke's Bay &bull; New Zealand</p>
+    <div class="loc-contacts">
+      <span class="loc-contact"><a href="tel:+6427777156">+64 27 777 7156</a></span>
+      <span class="loc-contact"><a href="https://www.instagram.com/hairbychallen/" target="_blank" rel="noopener noreferrer">@hairbychallen</a></span>
+    </div>
+    <div class="wave-loc" aria-hidden="true">
+      <svg viewBox="0 0 1440 70" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,20 C180,55 360,0 540,30 C720,60 900,10 1080,35 C1260,60 1350,20 1440,30 L1440,70 L0,70 Z" fill="#f5ede0"/>
+      </svg>
+    </div>
+  </div>
+
+  <section class="services" id="services">
+    <div class="container">
+      <div class="services-header">
+        <span class="label">What I offer</span>
+        <h2>Services</h2>
+        <p>Every service, personalised to you.</p>
+      </div>
+      <div class="services-list">
+        <div class="service-row"><div class="service-n">01</div><div class="service-content"><h3>Colour &amp; Highlights</h3><p>From sun-kissed tones to rich, vibrant colour &mdash; precision work tailored to your skin tone and lifestyle.</p></div></div>
+        <div class="service-row"><div class="service-n">02</div><div class="service-content"><h3>Balayage</h3><p>Hand-painted, lived-in colour that grows out beautifully. The ultimate low-maintenance, high-impact look.</p></div></div>
+        <div class="service-row"><div class="service-n">03</div><div class="service-content"><h3>Cuts &amp; Style</h3><p>Shape, texture, and movement crafted for your face and your routine.</p></div></div>
+        <div class="service-row"><div class="service-n">04</div><div class="service-content"><h3>Toning &amp; Glossing</h3><p>Refresh your colour and restore shine with a custom gloss treatment.</p></div></div>
+        <div class="service-row"><div class="service-n">05</div><div class="service-content"><h3>Treatments</h3><p>Nourishing in-salon treatments designed to repair, strengthen, and revive.</p></div></div>
+        <div class="service-row"><div class="service-n">06</div><div class="service-content"><h3>Occasion Styling</h3><p>Weddings, events, special moments &mdash; a look that photographs beautifully.</p></div></div>
+      </div>
+    </div>
+    <div class="wave-services" aria-hidden="true">
+      <svg viewBox="0 0 1440 70" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,50 C360,10 720,65 1080,30 C1260,12 1350,55 1440,40 L1440,70 L0,70 Z" fill="#0d3b3e"/>
+      </svg>
+    </div>
+  </section>
+
+  <section class="instagram" id="instagram">
+    <div class="container" style="max-width:700px;margin:0 auto;">
+      <div class="insta-head">
+        <svg class="ig-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="ig6" cx="30%" cy="107%" r="150%"><stop offset="0%" stop-color="#fdf497"/><stop offset="45%" stop-color="#fd5949"/><stop offset="60%" stop-color="#d6249f"/><stop offset="90%" stop-color="#285AEB"/></radialGradient></defs><rect x="0" y="0" width="24" height="24" rx="5.5" fill="url(#ig6)"/><rect x="2" y="2" width="20" height="20" rx="4" fill="none" stroke="white" stroke-width="1.6"/><circle cx="12" cy="12" r="4.5" fill="none" stroke="white" stroke-width="1.6"/><circle cx="17.6" cy="6.4" r="1.1" fill="white"/></svg>
+        <h2>Follow the work</h2>
+      </div>
+      <a href="https://www.instagram.com/hairbychallen/" target="_blank" rel="noopener noreferrer" class="insta-handle">@hairbychallen</a>
+      <p class="insta-sub">Real results. Real people. Real transformations.</p>
+      <div class="insta-grid" aria-hidden="true">
+        <div class="insta-cell"><div class="insta-cell-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></div></div>
+        <div class="insta-cell"><div class="insta-cell-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></div></div>
+        <div class="insta-cell"><div class="insta-cell-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></div></div>
+        <div class="insta-cell"><div class="insta-cell-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></div></div>
+      </div>
+      <a href="https://www.instagram.com/hairbychallen/" target="_blank" rel="noopener noreferrer" class="btn btn-cream">View on Instagram</a>
+    </div>
+    <div class="wave-insta" aria-hidden="true">
+      <svg viewBox="0 0 1440 70" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,30 C240,65 480,5 720,40 C960,75 1200,15 1440,45 L1440,70 L0,70 Z" fill="#fef9f0"/>
+      </svg>
+    </div>
+  </section>
+
+  <section class="afterpay" id="afterpay">
+    <div class="container">
+      <div class="afterpay-left">
+        <div class="ap-brand"><span class="ap-wordmark">Afterpay</span><span class="ap-badge">In-Salon</span></div>
+        <h2>Pay in 4.<br>Look amazing now.</h2>
+        <p>Split your appointment into 4 fortnightly, interest-free instalments.</p>
+        <div class="ap-steps">
+          <div class="ap-step"><div class="ap-step-n">1</div><p>Book</p></div>
+          <div class="ap-step"><div class="ap-step-n">2</div><p>Choose Afterpay</p></div>
+          <div class="ap-step"><div class="ap-step-n">3</div><p>First payment</p></div>
+          <div class="ap-step"><div class="ap-step-n">4</div><p>3 more</p></div>
+        </div>
+        <div class="ap-notice"><strong>Coming soon.</strong> <a href="https://www.afterpay.com/en-NZ" target="_blank" rel="noopener noreferrer">Learn more</a>.</div>
+      </div>
+      <div class="afterpay-right">
+        <h3>Afterpay NZ merchant setup</h3>
+        <p class="intro">Required to apply:</p>
+        <div class="req-details">
+          <details><summary>NZ registered business &amp; NZBN<span class="req-icon"><span class="req-plus">+</span><span class="req-minus">&minus;</span></span></summary><div class="details-body"><p>Register at <a href="https://www.nzbn.govt.nz" target="_blank" rel="noopener noreferrer">nzbn.govt.nz</a>.</p></div></details>
+          <details><summary>NZ business bank account<span class="req-icon"><span class="req-plus">+</span><span class="req-minus">&minus;</span></span></summary><div class="details-body"><p>A dedicated NZ business account is required.</p></div></details>
+          <details><summary>An established website<span class="req-icon"><span class="req-plus">+</span><span class="req-minus">&minus;</span></span></summary><div class="details-body"><p><strong>This website satisfies this requirement.</strong></p></div></details>
+          <details><summary>Privacy policy<span class="req-icon"><span class="req-plus">+</span><span class="req-minus">&minus;</span></span></summary><div class="details-body"><p>Generate one free at <a href="https://www.iubenda.com" target="_blank" rel="noopener noreferrer">iubenda.com</a>.</p></div></details>
+          <details><summary>Cancellation &amp; refund policy<span class="req-icon"><span class="req-plus">+</span><span class="req-minus">&minus;</span></span></summary><div class="details-body"><div class="draft-policy"><strong>Draft:</strong> 24 hours notice required. Late cancellations 50% fee. No-shows charged in full.</div></div></details>
+          <details><summary>Apply at merchants.afterpay.com<span class="req-icon"><span class="req-plus">+</span><span class="req-minus">&minus;</span></span></summary><div class="details-body"><p>Visit <a href="https://merchants.afterpay.com" target="_blank" rel="noopener noreferrer">merchants.afterpay.com</a>. Customers pay via QR code.</p></div></details>
+        </div>
+        <div class="ap-answer"><strong>Do you need a website?</strong> Yes &mdash; this page satisfies Afterpay's requirement.</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-inner">
+      <span class="footer-logo-text">Hair by Challen</span>
+      <img src="logosml.png" alt="Hair By Challen" />
+      <p>&copy; 2026 Hair by Challen &mdash; Napier City</p>
+      <div class="footer-links">
+        <a href="tel:+6427777156">+64 27 777 7156</a>
+        <a href="https://www.instagram.com/hairbychallen/" target="_blank" rel="noopener noreferrer">@hairbychallen</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 60));
+  </script>
+</body>
+</html>

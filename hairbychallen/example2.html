@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hair by Challen | Napier City, Hawke's Bay</title>
+  <meta name="description" content="Hair by Challen — professional hairstyling in Napier City, Hawke's Bay." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --rose:      #c8806c;
+      --rose-pale: #edc8bc;
+      --rose-dark: #9a5a48;
+      --cream:     #fdfaf7;
+      --warm:      #f5ede6;
+      --dark:      #2b1f1a;
+      --mid:       #9a8a82;
+      --border:    rgba(200,128,108,0.2);
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Lato', sans-serif; font-weight: 300; background: var(--cream); color: var(--dark); font-size: 16px; line-height: 1.7; overflow-x: hidden; }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: center;
+      padding: 1rem 1.5rem;
+      background: transparent; border-bottom: 1px solid transparent;
+      transition: background 0.4s, border-color 0.4s;
+    }
+    nav.scrolled { background: rgba(43,31,26,0.96); backdrop-filter: blur(10px); border-bottom-color: rgba(200,128,108,0.15); }
+    .nav-links { display: flex; gap: 0; list-style: none; flex-wrap: wrap; justify-content: center; align-items: center; }
+    .nav-links li { display: flex; align-items: center; }
+    .nav-links a { font-family: 'Lato', sans-serif; font-weight: 400; font-size: 0.68rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--dark); text-decoration: none; transition: color 0.2s; }
+    nav.scrolled .nav-links a { color: var(--rose-pale); }
+    .nav-links a:hover { color: var(--rose); }
+    .nav-links li + li::before { content: ''; display: block; width: 3px; height: 3px; background: var(--rose); border-radius: 50%; opacity: 0.5; margin: 0 1.1rem; flex-shrink: 0; }
+    nav.scrolled .nav-links li + li::before { background: var(--rose-pale); }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh; min-height: 100dvh;
+      background: var(--cream);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 6rem 2rem 3rem;
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 70% 50% at 50% 50%, rgba(200,128,108,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-sub {
+      font-size: 0.65rem; letter-spacing: 0.45em; text-transform: uppercase;
+      color: var(--rose); margin-bottom: 1.5rem;
+    }
+    .hero h1 {
+      font-family: 'Playfair Display', serif; font-weight: 400;
+      font-size: clamp(3.5rem, 10vw, 7rem); line-height: 1.05;
+      color: var(--dark); letter-spacing: 0.01em; margin-bottom: 0.2em;
+    }
+    .hero h1 em { font-style: italic; color: var(--rose); }
+    .hero-tagline {
+      font-family: 'Playfair Display', serif; font-style: italic;
+      font-size: clamp(1rem, 2.5vw, 1.35rem);
+      color: var(--mid); letter-spacing: 0.04em;
+      margin-top: 0.5rem; margin-bottom: 2.5rem;
+    }
+    .hero-ctas { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .hero-scroll {
+      position: absolute;
+      bottom: calc(2.5rem + env(safe-area-inset-bottom, 0px));
+      left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+    }
+    .hero-scroll span { font-size: 0.58rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--mid); }
+    .scroll-line { width: 1px; height: 3rem; background: linear-gradient(to bottom, var(--rose), transparent); animation: pulse 2s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+
+    /* BUTTONS */
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-family: 'Lato', sans-serif; font-weight: 400; font-size: 0.7rem;
+      letter-spacing: 0.2em; text-transform: uppercase; text-decoration: none;
+      padding: 0.9rem 2.2rem; border: 1px solid var(--rose);
+      color: var(--rose); background: transparent;
+      transition: background 0.22s, color 0.22s; cursor: pointer;
+    }
+    .btn:hover { background: var(--rose); color: #fff; }
+    .btn-filled { background: var(--rose); color: #fff; }
+    .btn-filled:hover { background: var(--rose-dark); border-color: var(--rose-dark); }
+    .btn-dark { background: var(--dark); color: var(--cream); border-color: var(--dark); }
+    .btn-dark:hover { background: transparent; color: var(--dark); }
+
+    /* BASE */
+    section { padding: 4rem 2rem; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .label { font-size: 0.62rem; letter-spacing: 0.35em; text-transform: uppercase; color: var(--rose); display: block; margin-bottom: 0.85rem; }
+    h2 { font-family: 'Playfair Display', serif; font-weight: 400; font-size: clamp(1.8rem, 4.5vw, 3rem); line-height: 1.15; }
+    .divider { width: 3rem; height: 1px; background: var(--rose); margin: 1.25rem 0; }
+
+    /* TICKER */
+    .ticker { background: var(--rose); padding: 0.75rem 2rem; overflow: hidden; white-space: nowrap; }
+    .ticker-inner { display: inline-flex; gap: 3.5rem; animation: tick 30s linear infinite; }
+    .ticker span { font-family: 'Playfair Display', serif; font-size: 0.9rem; font-style: italic; letter-spacing: 0.06em; color: #fff; white-space: nowrap; }
+    @keyframes tick { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+    /* ABOUT */
+    .about { background: var(--cream); }
+    .about .container { max-width: 700px; margin: 0 auto; }
+    .about-img { aspect-ratio: 4/5; background: var(--warm); position: relative; overflow: hidden; border-radius: 2px; }
+    .about-img::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(200,128,108,0.15) 0%, transparent 60%); }
+    .about-img-letter { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 7rem; font-style: italic; color: rgba(200,128,108,0.2); }
+    .about-content p { color: var(--mid); font-size: 0.95rem; line-height: 1.9; margin-bottom: 1rem; }
+    .about-content h2 { margin-bottom: 0.5rem; color: var(--dark); }
+
+    /* LOCATION */
+    .location { background: var(--dark); color: var(--cream); text-align: center; padding: 3.5rem 2rem; }
+    .location-label { font-size: 0.58rem; letter-spacing: 0.5em; text-transform: uppercase; color: rgba(237,200,188,0.55); margin-bottom: 1rem; }
+    .location-rule { display: flex; align-items: center; justify-content: center; gap: 0.6rem; margin: 0.75rem auto; }
+    .location-rule-line { height: 1px; width: 5rem; background: linear-gradient(90deg, transparent, var(--rose)); }
+    .location-rule-line.r { background: linear-gradient(90deg, var(--rose), transparent); }
+    .location-diamond { width: 5px; height: 5px; background: var(--rose); transform: rotate(45deg); flex-shrink: 0; }
+    .location-city { font-family: 'Playfair Display', serif; font-size: clamp(2.2rem, 6vw, 4rem); font-style: italic; color: var(--rose); line-height: 1; margin-bottom: 0.2rem; }
+    .location-region { font-size: 0.62rem; letter-spacing: 0.5em; text-transform: uppercase; color: rgba(237,200,188,0.4); }
+    .location-details { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 1.5rem; margin-top: 1.5rem; }
+    .location-detail { display: flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; letter-spacing: 0.08em; color: rgba(237,200,188,0.6); }
+    .location-detail a { color: var(--rose-pale); text-decoration: none; }
+    .location-detail a:hover { color: #fff; }
+
+    /* SERVICES */
+    .services { background: var(--warm); }
+    .services-header { text-align: center; margin-bottom: 3rem; }
+    .services-header h2 { color: var(--dark); margin-bottom: 0.5rem; }
+    .services-header p { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.05rem; color: var(--mid); }
+    .services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+    .service-card { background: var(--cream); padding: 2.25rem 2rem; border-top: 2px solid var(--rose-pale); transition: border-color 0.25s, box-shadow 0.25s; }
+    .service-card:hover { border-top-color: var(--rose); box-shadow: 0 4px 24px rgba(200,128,108,0.1); }
+    .service-num { font-size: 0.6rem; letter-spacing: 0.3em; color: var(--rose); margin-bottom: 0.85rem; display: block; }
+    .service-card h3 { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--dark); margin-bottom: 0.5rem; }
+    .service-card p { font-size: 0.85rem; color: var(--mid); line-height: 1.75; }
+
+    /* INSTAGRAM */
+    .instagram { background: var(--cream); text-align: center; }
+    .insta-head { display: flex; align-items: center; justify-content: center; gap: 0.65rem; margin-bottom: 0.4rem; }
+    .ig-icon { width: 2rem; height: 2rem; flex-shrink: 0; }
+    .insta-handle { display: inline-block; font-size: 0.7rem; letter-spacing: 0.2em; color: var(--rose-dark); text-decoration: none; margin-bottom: 0.75rem; }
+    .insta-sub { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.05rem; color: var(--mid); margin-bottom: 2rem; }
+    .insta-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-bottom: 2rem; }
+    .insta-cell { aspect-ratio: 1; background: var(--warm); position: relative; overflow: hidden; }
+    .insta-cell:nth-child(even) { background: #f0e0d8; }
+    .insta-cell-inner { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: rgba(200,128,108,0.3); }
+    .insta-cell-inner svg { width: 2rem; height: 2rem; }
+
+    /* AFTERPAY */
+    .afterpay { background: var(--warm); padding: 4rem 2rem; }
+    .afterpay .container { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
+    .ap-brand { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1.25rem; }
+    .ap-wordmark { background: var(--dark); color: #b2fce4; font-family: 'Lato', sans-serif; font-weight: 700; font-size: 1rem; letter-spacing: 0.05em; padding: 0.35rem 0.85rem; }
+    .ap-badge { background: #b2fce4; color: #000; font-size: 0.58rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; padding: 0.2rem 0.6rem; }
+    .afterpay-left h2 { margin-bottom: 0.75rem; }
+    .afterpay-left p { color: var(--mid); font-size: 0.9rem; line-height: 1.85; margin-bottom: 1rem; }
+    .ap-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin: 1.5rem 0; }
+    .ap-step { background: var(--cream); border: 1px solid rgba(200,128,108,0.15); padding: 1rem 0.5rem; text-align: center; position: relative; }
+    .ap-step::after { content: ''; position: absolute; top: 50%; right: -0.5rem; transform: translateY(-50%); border: 4px solid transparent; border-left-color: var(--rose-pale); }
+    .ap-step:last-child::after { display: none; }
+    .ap-step-n { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--dark); line-height: 1; margin-bottom: 0.3rem; }
+    .ap-step p { font-size: 0.68rem; color: var(--mid); line-height: 1.4; margin: 0; }
+    .ap-notice { background: #f0fdf8; border: 1px solid #a8f0d4; border-left: 3px solid #00c896; padding: 0.9rem 1.1rem; font-size: 0.8rem; color: #1a5c44; line-height: 1.7; }
+    .afterpay-right h3 { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 400; margin-bottom: 0.5rem; }
+    .afterpay-right .intro { font-size: 0.82rem; color: var(--mid); line-height: 1.7; margin-bottom: 1rem; }
+    .req-details { margin-bottom: 1.25rem; }
+    .req-details details { border-bottom: 1px solid rgba(0,0,0,0.06); }
+    .req-details details:first-of-type { border-top: 1px solid rgba(0,0,0,0.06); }
+    .req-details summary { list-style: none; display: flex; align-items: center; justify-content: space-between; padding: 0.8rem 0; cursor: pointer; font-size: 0.82rem; color: var(--dark); font-weight: 400; user-select: none; gap: 1rem; }
+    .req-details summary::-webkit-details-marker { display: none; }
+    .req-details summary::marker { content: none; }
+    .req-icon { flex-shrink: 0; width: 1.4rem; height: 1.4rem; border: 1px solid var(--rose); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--rose); font-size: 0.85rem; transition: background 0.2s, color 0.2s; line-height: 1; }
+    .req-details details[open] summary .req-icon { background: var(--rose); color: #fff; }
+    .req-plus { display: block; } .req-minus { display: none; }
+    .req-details details[open] .req-plus { display: none; } .req-details details[open] .req-minus { display: block; }
+    .details-body { font-size: 0.8rem; color: var(--mid); line-height: 1.8; padding: 0 0 1rem 0; }
+    .details-body p { margin-bottom: 0.5rem; } .details-body p:last-child { margin-bottom: 0; }
+    .details-body a { color: var(--rose-dark); text-decoration: none; }
+    .details-body strong { color: var(--dark); font-weight: 700; }
+    .draft-policy { background: var(--cream); border-left: 2px solid var(--rose); padding: 0.75rem 1rem; margin-top: 0.5rem; font-style: italic; font-size: 0.78rem; color: var(--mid); }
+    .ap-answer { font-size: 0.8rem; color: var(--mid); line-height: 1.75; background: var(--cream); border: 1px solid rgba(0,0,0,0.06); padding: 1rem 1.1rem; }
+    .ap-answer strong { color: var(--dark); }
+
+    /* FOOTER */
+    footer { background: var(--dark); color: rgba(237,200,188,0.5); padding: 2rem 2rem; }
+    .footer-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    .footer-logo-text { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.1rem; color: var(--rose-pale); }
+    footer img { height: 2.4rem; width: auto; opacity: 0.7; }
+    footer p { font-size: 0.7rem; }
+    .footer-links { display: flex; gap: 1.25rem; align-items: center; flex-wrap: wrap; }
+    footer a { color: var(--rose); text-decoration: none; font-size: 0.7rem; letter-spacing: 0.08em; }
+    footer a:hover { color: #fff; }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      nav { padding: 0.75rem 1rem; }
+      .about .container { grid-template-columns: 1fr; }
+      .about-img { display: none; }
+      .services-grid { grid-template-columns: 1fr 1fr; }
+      .afterpay .container { grid-template-columns: 1fr; gap: 2rem; }
+      .ap-steps { grid-template-columns: repeat(2, 1fr); }
+      .ap-step::after { display: none; }
+      .insta-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 700px) {
+      .nav-links a { font-size: 0.62rem; }
+      .nav-links li + li::before { margin: 0 0.7rem; }
+      .ticker { position: fixed; bottom: env(safe-area-inset-bottom, 0); left: 0; right: 0; z-index: 90; }
+      body { padding-bottom: 2.8rem; }
+    }
+    @media (max-width: 580px) {
+      .services-grid { grid-template-columns: 1fr; }
+      .footer-inner { flex-direction: column; text-align: center; }
+      .footer-links { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+  <nav id="nav">
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#instagram">Gallery</a></li>
+      <li><a href="#afterpay">Afterpay</a></li>
+    </ul>
+  </nav>
+
+  <section class="hero" id="top">
+    <p class="hero-sub">Professional Hairstyling</p>
+    <h1>Hair by<br><em>Challen</em></h1>
+    <p class="hero-tagline">Where every detail matters.</p>
+    <div class="hero-ctas">
+      <a href="https://www.instagram.com/hairbychallen/" target="_blank" rel="noopener noreferrer" class="btn btn-filled">Get in touch</a>
+    </div>
+    <div class="hero-scroll">
+      <div class="scroll-line"></div>
+      <span>Scroll</span>
+    </div>
+  </section>
+
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-inner">
+      <span>Colour &amp; Highlights</span><span>&bull;</span>
+      <span>Cuts &amp; Style</span><span>&bull;</span>
+      <span>Balayage</span><span>&bull;</span>
+      <span>Treatments</span><span>&bull;</span>
+      <span>Napier City</span><span>&bull;</span>
+      <span>Afterpay Available</span><span>&bull;</span>
+      <span>Hair by Challen</span><span>&bull;</span>
+      <span>Colour &amp; Highlights</span><span>&bull;</span>
+      <span>Cuts &amp; Style</span><span>&bull;</span>
+      <span>Balayage</span><span>&bull;</span>
+      <span>Treatments</span><span>&bull;</span>
+      <span>Napier City</span><span>&bull;</span>
+      <span>Afterpay Available</span><span>&bull;</span>
+      <span>Hair by Challen</span><span>&bull;</span>
+    </div>
+  </div>
+
+  <section class="about" id="about">
+    <div class="container">
+      <div class="about-content">
+        <span class="label">About</span>
+        <h2>Crafted with care,<br>worn with confidence.</h2>
+        <div class="divider"></div>
+        <p>Hi, I'm Challen &mdash; a passionate hairstylist dedicated to making you feel your absolute best. From precision cuts to stunning colour transformations, every appointment is a personal experience tailored entirely to you.</p>
+        <p>Whether you're after a bold new look or a beautiful refresh, I'm here to listen, collaborate, and deliver results you'll love.</p>
+        <a href="https://www.instagram.com/hairbychallen/" target="_blank" rel="noopener noreferrer" class="btn" style="margin-top:1.25rem">Follow on Instagram</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="location" id="location">
+    <p class="location-label">Find us in</p>
+    <div class="location-rule"><div class="location-rule-line"></div><div class="location-diamond"></div><div class="location-rule-line r"></div></div>
+    <p class="location-city">Napier City</p>
+    <p class="location-region">Hawke's Bay &bull; New Zealand</p>
+    <div class="location-rule"><div class="location-rule-line"></div><div class="location-diamond"></div><div class="location-rule-line r"></div></div>
+    <div class="location-details">
+      <div class="location-detail"><span>Napier City, Hawke's Bay</span></div>
+      <div class="location-detail"><a href="tel:+6427777156">+64 27 777 7156</a></div>
+      <div class="location-detail"><a href="https://www.instagram.com/hairbychallen/" target="_blank" rel="noopener noreferrer">@hairbychallen</a></div>
+    </div>
+  </div>
+
+  <section class="services" id="services">
+    <div class="container">
+      <div class="services-header">
+        <span class="label">What I offer</span>
+        <h2>Services</h2>
+        <p>Every service, personalised to you.</p>
+      </div>
+      <div class="services-grid">
+        <div class="service-card"><span class="service-num">01</span><h3>Colour &amp; Highlights</h3><p>From sun-kissed tones to rich, vibrant colour &mdash; precision work tailored to your skin tone and lifestyle.</p></div>
+        <div class="service-card"><span class="service-num">02</span><h3>Balayage</h3><p>Hand-painted, lived-in colour that grows out beautifully. Low-maintenance, high-impact.</p></div>
+        <div class="service-card"><span class="service-num">03</span><h3>Cuts &amp; Style</h3><p>Shape, texture, and movement crafted for your face and your routine.</p></div>
+        <div class="service-card"><span class="service-num">04</span><h3>Toning &amp; Glossing</h3><p>Refresh your colour and restore shine with a custom gloss treatment.</p></div>
+        <div class="service-card"><span class="service-num">05</span><h3>Treatments</h3><p>Nourishing in-salon treatments designed to repair, strengthen, and revive.</p></div>
+        <div class="service-card"><span class="service-num">06</span><h3>Occasion Styling</h3><p>Weddings, events &mdash; a look that photographs beautifully and lasts all day.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="instagram" id="instagram">
+    <div class="container">
+      <div class="insta-head">
+        <svg class="ig-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="ig2" cx="30%" cy="107%" r="150%"><stop offset="0%" stop-color="#fdf497"/><stop offset="45%" stop-color="#fd5949"/><stop offset="60%" stop-color="#d6249f"/><stop offset="90%" stop-color="#285AEB"/></radialGradient></defs><rect x="0" y="0" width="24" height="24" rx="5.5" fill="url(#ig2)"/><rect x="2" y="2" width="20" height="20" rx="4" fill="none" stroke="white" stroke-width="1.6"/><circle cx="12" cy="12" r="4.5" fill="none" stroke="white" stroke-width="1.6"/><circle cx="17.6" cy="6.4" r="1.1" fill="white"/></svg>
+        <h2>Follow the work</h2>
+      </div>
+      <a href="https://www.instagram.com/hairbychallen/" target="_blank" rel="noopener noreferrer" class="insta-handle">@hairbychallen</a>
+      <p class="insta-sub">Real results. Real people. Real transformations.</p>
+      <div class="insta-grid" aria-hidden="true">
+        <div class="insta-cell"><div class="insta-cell-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></div></div>
+        <div class="insta-cell"><div class="insta-cell-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></div></div>
+        <div class="insta-cell"><div class="insta-cell-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></div></div>
+        <div class="insta-cell"><div class="insta-cell-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></div></div>
+      </div>
+      <a href="https://www.instagram.com/hairbychallen/" target="_blank" rel="noopener noreferrer" class="btn">View on Instagram</a>
+    </div>
+  </section>
+
+  <section class="afterpay" id="afterpay">
+    <div class="container">
+      <div class="afterpay-left">
+        <div class="ap-brand"><span class="ap-wordmark">Afterpay</span><span class="ap-badge">In-Salon</span></div>
+        <h2>Pay in 4.<br>Look amazing now.</h2>
+        <p>Split your appointment into 4 fortnightly, interest-free instalments &mdash; no surprises, no stress.</p>
+        <div class="ap-steps">
+          <div class="ap-step"><div class="ap-step-n">1</div><p>Book your appointment</p></div>
+          <div class="ap-step"><div class="ap-step-n">2</div><p>Choose Afterpay</p></div>
+          <div class="ap-step"><div class="ap-step-n">3</div><p>Pay first instalment</p></div>
+          <div class="ap-step"><div class="ap-step-n">4</div><p>3 more fortnightly payments</p></div>
+        </div>
+        <div class="ap-notice"><strong>Afterpay coming soon.</strong> We are completing our merchant setup. <a href="https://www.afterpay.com/en-NZ" target="_blank" rel="noopener noreferrer">Learn more at afterpay.com</a>.</div>
+      </div>
+      <div class="afterpay-right">
+        <h3>Afterpay NZ merchant setup</h3>
+        <p class="intro">To apply as an Afterpay merchant in New Zealand, the following are required. Click each to learn more:</p>
+        <div class="req-details">
+          <details><summary>NZ registered business &amp; NZBN number<span class="req-icon"><span class="req-plus">+</span><span class="req-minus">&minus;</span></span></summary><div class="details-body"><p>Register at <a href="https://www.nzbn.govt.nz" target="_blank" rel="noopener noreferrer">nzbn.govt.nz</a>. Sole traders may use their IRD number.</p></div></details>
+          <details><summary>NZ business bank account<span class="req-icon"><span class="req-plus">+</span><span class="req-minus">&minus;</span></span></summary><div class="details-body"><p>A dedicated NZ business account is required. Personal accounts are not accepted.</p></div></details>
+          <details><summary>An established website<span class="req-icon"><span class="req-plus">+</span><span class="req-minus">&minus;</span></span></summary><div class="details-body"><p><strong>This website satisfies this requirement</strong> &mdash; it shows your business name, services, contact details, and location.</p></div></details>
+          <details><summary>A published privacy policy<span class="req-icon"><span class="req-plus">+</span><span class="req-minus">&minus;</span></span></summary><div class="details-body"><p>Use a free generator at <a href="https://www.iubenda.com" target="_blank" rel="noopener noreferrer">iubenda.com</a> or adapt a draft. Hair by Challen collects personal information solely for appointment purposes.</p></div></details>
+          <details><summary>A cancellation &amp; refund policy<span class="req-icon"><span class="req-plus">+</span><span class="req-minus">&minus;</span></span></summary><div class="details-body"><div class="draft-policy"><strong>Draft:</strong> 24 hours notice required. Late cancellations may incur a 50% fee. No-shows charged in full. Services are non-refundable once completed.</div></div></details>
+          <details><summary>Apply at merchants.afterpay.com<span class="req-icon"><span class="req-plus">+</span><span class="req-minus">&minus;</span></span></summary><div class="details-body"><p>Visit <a href="https://merchants.afterpay.com" target="_blank" rel="noopener noreferrer">merchants.afterpay.com</a>. Once approved, customers pay in-store via QR code in the Afterpay app.</p></div></details>
+        </div>
+        <div class="ap-answer"><strong>Do you need a website?</strong> Yes &mdash; Afterpay reviews your online presence to verify your business. This page satisfies that requirement.</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-inner">
+      <span class="footer-logo-text">Hair by Challen</span>
+      <img src="logosml.png" alt="Hair By Challen" />
+      <p>&copy; 2026 Hair by Challen &mdash; Napier City, Hawke's Bay</p>
+      <div class="footer-links">
+        <a href="tel:+6427777156">+64 27 777 7156</a>
+        <a href="https://www.instagram.com/hairbychallen/" target="_blank" rel="noopener noreferrer">@hairbychallen</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 60));
+  </script>
+</body>
+</html>
