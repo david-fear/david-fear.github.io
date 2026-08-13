@@ -596,26 +596,72 @@
       margin-bottom: 0.5rem;
     }
     .afterpay-right .intro { font-size: 0.82rem; color: var(--mid); line-height: 1.7; margin-bottom: 1rem; }
-    .req-list { list-style: none; margin-bottom: 1.25rem; }
-    .req-list li {
+
+    /* expandable requirements */
+    .req-details { margin-bottom: 1.25rem; }
+    .req-details details {
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    .req-details details:first-of-type { border-top: 1px solid rgba(0,0,0,0.06); }
+    .req-details summary {
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.8rem 0;
+      cursor: pointer;
       font-size: 0.83rem;
-      color: var(--mid);
-      padding: 0.4rem 0 0.4rem 1.2rem;
-      border-bottom: 1px solid rgba(0,0,0,0.05);
-      position: relative;
-      line-height: 1.5;
+      color: var(--black);
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      user-select: none;
+      gap: 1rem;
     }
-    .req-list li::before {
-      content: '';
-      position: absolute;
-      left: 0; top: 50%;
-      transform: translateY(-50%);
-      width: 5px; height: 5px;
-      background: var(--gold);
+    .req-details summary::-webkit-details-marker { display: none; }
+    .req-details summary::marker { content: none; }
+    .req-details .req-icon {
+      flex-shrink: 0;
+      width: 1.4rem;
+      height: 1.4rem;
+      border: 1px solid var(--gold);
       border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gold);
+      font-size: 0.85rem;
+      font-weight: 300;
+      transition: background 0.2s, color 0.2s;
+      flex-direction: column;
+      line-height: 1;
     }
-    .req-list a { color: var(--gold-dark); text-decoration: none; }
-    .req-list a:hover { color: var(--black); }
+    .req-details details[open] summary .req-icon {
+      background: var(--gold);
+      color: var(--black);
+    }
+    .req-details .req-plus  { display: block; }
+    .req-details .req-minus { display: none; }
+    .req-details details[open] .req-plus  { display: none; }
+    .req-details details[open] .req-minus { display: block; }
+    .req-details .details-body {
+      font-size: 0.8rem;
+      color: var(--mid);
+      line-height: 1.8;
+      padding: 0 0 1rem 0;
+    }
+    .req-details .details-body p { margin-bottom: 0.5rem; }
+    .req-details .details-body p:last-child { margin-bottom: 0; }
+    .req-details .details-body a { color: var(--gold-dark); text-decoration: none; }
+    .req-details .details-body a:hover { color: var(--black); }
+    .req-details .details-body strong { color: var(--black); font-weight: 500; }
+    .req-details .draft-policy {
+      background: var(--off-white);
+      border-left: 2px solid var(--gold);
+      padding: 0.75rem 1rem;
+      margin-top: 0.5rem;
+      font-style: italic;
+      font-size: 0.78rem;
+    }
     .ap-answer {
       font-size: 0.8rem;
       color: var(--mid);
@@ -752,7 +798,7 @@
   <!-- LOCATION — ART DECO -->
   <div class="location" id="location">
     <div class="location-inner">
-      <p class="location-eyebrow">Find us in</p>
+      <p class="location-eyebrow">Find me in</p>
       <div class="deco-rule">
         <div class="deco-rule-line"></div>
         <div class="deco-dot"></div><div class="deco-diamond"></div><div class="deco-dot"></div>
@@ -969,15 +1015,92 @@
 
       <div class="afterpay-right">
         <h3>About Afterpay NZ merchant setup</h3>
-        <p class="intro">To apply as an Afterpay merchant in New Zealand, the following are required:</p>
-        <ul class="req-list">
-          <li>NZ registered business and NZBN number</li>
-          <li>NZ business bank account</li>
-          <li>An established website showing your services and contact details (this page satisfies this)</li>
-          <li>A published privacy policy</li>
-          <li>A cancellation / refund policy</li>
-          <li>Apply at <a href="https://merchants.afterpay.com" target="_blank" rel="noopener noreferrer">merchants.afterpay.com</a></li>
-        </ul>
+        <p class="intro">To apply as an Afterpay merchant in New Zealand, the following are required. Click each to learn more:</p>
+        <div class="req-details">
+
+          <details>
+            <summary>
+              NZ registered business &amp; NZBN number
+              <span class="req-icon" aria-hidden="true"><span class="req-plus">+</span><span class="req-minus">&minus;</span></span>
+            </summary>
+            <div class="details-body">
+              <p>You need to be operating as a registered business in New Zealand &mdash; this can be a sole trader, partnership, or company.</p>
+              <p>Your <strong>NZBN (New Zealand Business Number)</strong> is a free, unique 13-digit identifier issued to every NZ business. If you don't have one, register at <a href="https://www.nzbn.govt.nz" target="_blank" rel="noopener noreferrer">nzbn.govt.nz</a> &mdash; it only takes a few minutes.</p>
+              <p>Sole traders operating under their own name may also be accepted using their IRD number as supporting documentation. Afterpay will confirm what's needed during the application.</p>
+            </div>
+          </details>
+
+          <details>
+            <summary>
+              NZ business bank account
+              <span class="req-icon" aria-hidden="true"><span class="req-plus">+</span><span class="req-minus">&minus;</span></span>
+            </summary>
+            <div class="details-body">
+              <p>Afterpay pays your settlement amounts directly to a NZ bank account, so you'll need one in your business name.</p>
+              <p>Most major NZ banks (ANZ, ASB, BNZ, Kiwibank, Westpac) offer low-cost or free business accounts for sole traders. You'll need your <strong>account number and proof of account ownership</strong> when you apply.</p>
+              <p>A personal account is not accepted &mdash; even if you're a sole trader, it needs to be a dedicated business account.</p>
+            </div>
+          </details>
+
+          <details>
+            <summary>
+              An established website showing services &amp; contact details
+              <span class="req-icon" aria-hidden="true"><span class="req-plus">+</span><span class="req-minus">&minus;</span></span>
+            </summary>
+            <div class="details-body">
+              <p>Afterpay reviews your website to confirm you're a legitimate, active business before approving a merchant account.</p>
+              <p>They look for: your <strong>business name clearly displayed</strong>, a list of services or products, contact information (phone, location or email), and working pages throughout the site.</p>
+              <p><strong>This website satisfies this requirement.</strong> It includes your name, full service list, phone number, location, booking form, and Instagram link.</p>
+            </div>
+          </details>
+
+          <details>
+            <summary>
+              A published privacy policy
+              <span class="req-icon" aria-hidden="true"><span class="req-plus">+</span><span class="req-minus">&minus;</span></span>
+            </summary>
+            <div class="details-body">
+              <p>A privacy policy tells customers how their personal data is collected and used. Afterpay requires one to be published on your website.</p>
+              <p>For a small salon, it can be a short, simple page. You can use a free generator at <a href="https://www.iubenda.com" target="_blank" rel="noopener noreferrer">iubenda.com</a> or <a href="https://www.termsfeed.com" target="_blank" rel="noopener noreferrer">termsfeed.com</a>, or adapt the following draft:</p>
+              <div class="draft-policy">
+                <strong>Draft &mdash; Privacy Policy</strong><br /><br />
+                Hair by Challen collects personal information (name, phone, email) solely for the purpose of booking and confirming appointments. Your information is never sold or shared with third parties. You may request deletion of your data at any time by contacting us directly. By submitting our booking form, you consent to being contacted regarding your appointment.
+              </div>
+            </div>
+          </details>
+
+          <details>
+            <summary>
+              A cancellation &amp; refund policy
+              <span class="req-icon" aria-hidden="true"><span class="req-plus">+</span><span class="req-minus">&minus;</span></span>
+            </summary>
+            <div class="details-body">
+              <p>Afterpay requires merchants to have a clear cancellation and refund policy so customers know what to expect if plans change.</p>
+              <p>For a hair salon, this is typically short and straightforward. Here's a draft you can publish on this site:</p>
+              <div class="draft-policy">
+                <strong>Draft &mdash; Cancellation &amp; Refund Policy</strong><br /><br />
+                We kindly ask for at least <strong>24 hours notice</strong> if you need to cancel or reschedule your appointment. Cancellations with less than 24 hours notice may incur a fee of 50% of the booked service value. No-shows will be charged in full.<br /><br />
+                As hair services are personalised and time is reserved exclusively for you, <strong>refunds are not offered</strong> once a service has been completed. If you are unhappy with your result, please contact us within 48 hours and we will work with you to make it right.
+              </div>
+            </div>
+          </details>
+
+          <details>
+            <summary>
+              Apply at merchants.afterpay.com
+              <span class="req-icon" aria-hidden="true"><span class="req-plus">+</span><span class="req-minus">&minus;</span></span>
+            </summary>
+            <div class="details-body">
+              <p>Once you have everything above in place, you can apply directly through Afterpay's merchant portal.</p>
+              <p><strong>Steps:</strong></p>
+              <p>1. Visit <a href="https://merchants.afterpay.com" target="_blank" rel="noopener noreferrer">merchants.afterpay.com</a> and click <em>Get Started</em>.</p>
+              <p>2. Complete the application with your business details, NZBN, bank account, and website URL.</p>
+              <p>3. Afterpay will review your application &mdash; this typically takes a few business days.</p>
+              <p>4. Once approved, you'll receive merchant credentials and access to the Afterpay portal, where you can set up <strong>in-store payments via QR code</strong> &mdash; no hardware or e-commerce integration required.</p>
+            </div>
+          </details>
+
+        </div>
         <div class="ap-answer">
           <strong>Do you need a website?</strong> Effectively yes. Afterpay reviews your online presence as part of the merchant application to verify your business is legitimate and active. For <em>in-salon</em> payments, customers simply open their Afterpay app and scan a barcode at the point of sale &mdash; no online checkout is needed. However, having this website strengthens your application significantly.
         </div>
