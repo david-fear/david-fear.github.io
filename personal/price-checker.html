@@ -534,7 +534,10 @@
       </label>
       <button onclick="addItem()">+ Add &amp; Fetch</button>
     </div>
-    <div id="add-status" style="font-size:12px; color:#888; min-height:16px;"></div>
+    <div style="font-size:12px; min-height:16px; display:flex; gap:16px; flex-wrap:wrap; align-items:center;">
+      <span id="add-status" style="color:#888;"></span>
+      <span id="refresh-status"></span>
+    </div>
     <div style="display:flex; gap:20px; align-items:flex-start; flex-wrap:wrap; margin-top:0px;">
       <div style="flex:1; min-width:200px;">
     <details class="support-info" style="margin-top:0; margin-bottom:0;">
@@ -630,7 +633,6 @@
     </details>
       </div>
       <div class="top-actions" style="margin:0; flex-shrink:0; flex-direction:column; align-items:flex-start;">
-        <span id="refresh-status"></span>
         <button onclick="refreshAll()">↻ Refresh today's prices</button>
       </div>
     </div>
@@ -1689,15 +1691,15 @@
     const statusEl  = document.getElementById('add-status');
 
     const url = urlInput.value.trim();
-    if (!url) { statusEl.textContent = 'Please enter a URL.'; return; }
+    if (!url) { statusEl.style.color = '#888'; statusEl.textContent = 'Please enter a URL.'; return; }
 
     let urlObj;
     try { urlObj = new URL(url); } catch {
-      statusEl.textContent = 'Invalid URL — please paste the full product URL including https://';
+      statusEl.style.color = '#888'; statusEl.textContent = 'Invalid URL — please paste the full product URL including https://';
       return;
     }
     if (!['http:', 'https:'].includes(urlObj.protocol)) {
-      statusEl.textContent = 'URL must start with https://';
+      statusEl.style.color = '#888'; statusEl.textContent = 'URL must start with https://';
       return;
     }
 
@@ -1707,12 +1709,13 @@
     const custName     = nameInput.value.trim();
 
     if (needsStoreId(store) && !storeId) {
-      statusEl.textContent = `${store} requires a Store ID — see 'How it works' above for how to find it.`;
+      statusEl.style.color = '#888'; statusEl.textContent = `${store} requires a Store ID — see 'How it works' above for how to find it.`;
       return;
     }
 
     const data = loadData();
     if (data.items.some(i => i.url === url)) {
+      statusEl.style.color = '#ffcc00';
       statusEl.textContent = 'This URL is already being tracked.';
       return;
     }
@@ -1736,7 +1739,7 @@
     nameInput.value = '';
     if (storeIdInput) storeIdInput.value = '';
     document.getElementById('storeid-row').style.display = 'none';
-    statusEl.textContent = '';
+    statusEl.style.color = '#888'; statusEl.textContent = '';
 
     render();
     await refreshItem(newItem.id, true);
