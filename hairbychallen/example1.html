@@ -431,26 +431,24 @@
        LANDING TICKER
     ───────────────────────────────────────────── */
 
-    .tagline-strip {
+    .ticker {
       background: var(--gold);
 
       padding: 0.8rem 2rem;
 
       overflow: hidden;
-      position: relative;
       white-space: nowrap;
     }
 
-    .tagline-strip-inner {
+    .ticker-inner {
       display: inline-flex;
 
       gap: 3rem;
 
-      animation:
-        ticker 28s linear infinite;
+      animation: tick 28s linear infinite;
     }
 
-    .tagline-strip span {
+    .ticker span {
       font-family: 'Cormorant Garamond', serif;
 
       font-size: 0.95rem;
@@ -464,15 +462,9 @@
       white-space: nowrap;
     }
 
-    @keyframes ticker {
-
-      0% {
-        transform: translateX(0);
-      }
-
-      100% {
-        transform: translateX(-50%);
-      }
+    @keyframes tick {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
     }
 
 
@@ -1458,10 +1450,11 @@
         width: 3px;
       }
 
-      .tagline-strip {
-        position: relative;
-
-        z-index: 2;
+      .ticker {
+        position: fixed;
+        bottom: env(safe-area-inset-bottom, 0);
+        left: 0; right: 0;
+        z-index: 90;
       }
 
       .location-inner {
@@ -1575,7 +1568,6 @@
         scroll-behavior: auto;
       }
 
-      .tagline-strip-inner,
       .scroll-line {
         animation: none;
       }
@@ -1679,58 +1671,7 @@
        LANDING PAGE TICKER
   ═══════════════════════════════════════════════ -->
 
-  <div
-    class="tagline-strip"
-    aria-hidden="true"
-  >
-
-    <div class="tagline-strip-inner">
-
-      <span>Colour &amp; Highlights</span>
-      <span>&bull;</span>
-
-      <span>Cuts &amp; Style</span>
-      <span>&bull;</span>
-
-      <span>Balayage</span>
-      <span>&bull;</span>
-
-      <span>Treatments</span>
-      <span>&bull;</span>
-
-      <span>Napier City</span>
-      <span>&bull;</span>
-
-      <span>Afterpay Available</span>
-      <span>&bull;</span>
-
-      <span>Hair by Challen</span>
-      <span>&bull;</span>
-
-      <span>Colour &amp; Highlights</span>
-      <span>&bull;</span>
-
-      <span>Cuts &amp; Style</span>
-      <span>&bull;</span>
-
-      <span>Balayage</span>
-      <span>&bull;</span>
-
-      <span>Treatments</span>
-      <span>&bull;</span>
-
-      <span>Napier City</span>
-      <span>&bull;</span>
-
-      <span>Afterpay Available</span>
-      <span>&bull;</span>
-
-      <span>Hair by Challen</span>
-      <span>&bull;</span>
-
-    </div>
-
-  </div>
+  <div class="ticker" aria-hidden="true"><div class="ticker-inner"><span>Colour &amp; Highlights</span><span>&bull;</span><span>Cuts &amp; Style</span><span>&bull;</span><span>Balayage</span><span>&bull;</span><span>Treatments</span><span>&bull;</span><span>Napier City</span><span>&bull;</span><span>Afterpay Available</span><span>&bull;</span><span>Hair by Challen</span><span>&bull;</span><span>Colour &amp; Highlights</span><span>&bull;</span><span>Cuts &amp; Style</span><span>&bull;</span><span>Balayage</span><span>&bull;</span><span>Treatments</span><span>&bull;</span><span>Napier City</span><span>&bull;</span><span>Afterpay Available</span><span>&bull;</span><span>Hair by Challen</span><span>&bull;</span></div></div>
 
 
   <!-- ═══════════════════════════════════════════════
