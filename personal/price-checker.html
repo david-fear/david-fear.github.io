@@ -1238,7 +1238,6 @@
         <span class="group-name-badge">⊞ ${esc(group.name)}</span>
         <div class="card-actions">
           <button onclick="renameGroup('${esc(group.id)}')" title="Rename group">✎ Rename</button>
-          <button class="btn-remove" onclick="ungroupAll('${esc(group.id)}')" title="Dissolve group">↩ Ungroup all</button>
         </div>
       </div>
       <table class="group-table">
@@ -1639,18 +1638,36 @@
       return;
     }
 
-    let fetched = 0;
-    let errors  = 0;
-    for (let i = 0; i < pending.length; i++) {
-      status.textContent = `Fetching ${i + 1} of ${pending.length}…`;
-      await refreshItem(pending[i].id, false);
-      const fresh = loadData().items.find(x => x.id === pending[i].id);
-      if (fresh?.error) errors++;
-      else fetched++;
-      if (i < pending.length - 1)
-        await new Promise(r => setTimeout(r, 200));
+    // Group by domain — stagger within a domain, run domains concurrently
+    const byDomain = {};
+    for (const item of pending) {
+      let domain;
+      try { domain = new URL(item.url).hostname; } catch { domain = 'unknown'; }
+      if (!byDomain[domain]) byDomain[domain] = [];
+      byDomain[domain].push(item);
     }
 
+    let fetched = 0;
+    let errors  = 0;
+    let done    = 0;
+    const total = pending.length;
+
+    const domainPromises = Object.values(byDomain).map(items =>
+      items.reduce((chain, item, idx) =>
+        chain.then(async () => {
+          if (idx > 0) await new Promise(r => setTimeout(r, 600));
+          await refreshItem(item.id, false);
+          const fresh = loadData().items.find(x => x.id === item.id);
+          if (fresh?.error) errors++; else fetched++;
+          done++;
+          status.style.color = '#ffcc00';
+          status.textContent = `Fetching ${done} of ${total}\u2026`;
+        }), Promise.resolve())
+    );
+
+    await Promise.all(domainPromises);
+
+    status.style.color = '';
     const parts = [];
     if (fetched)      parts.push(`${fetched} price${fetched !== 1 ? 's' : ''} fetched`);
     if (alreadyDone)  parts.push(`${alreadyDone} already up to date`);
@@ -1663,18 +1680,36 @@
     const data   = loadData();
     const status = document.getElementById('refresh-status');
     if (!data.items.length) return;
-    const all = data.items;
+
+    const byDomain = {};
+    for (const item of data.items) {
+      let domain;
+      try { domain = new URL(item.url).hostname; } catch { domain = 'unknown'; }
+      if (!byDomain[domain]) byDomain[domain] = [];
+      byDomain[domain].push(item);
+    }
+
     let fetched = 0;
     let errors  = 0;
-    for (let i = 0; i < all.length; i++) {
-      status.textContent = `Fetching ${i + 1} of ${all.length}…`;
-      await refreshItem(all[i].id, true);
-      const fresh = loadData().items.find(x => x.id === all[i].id);
-      if (fresh?.error) errors++;
-      else fetched++;
-      if (i < all.length - 1)
-        await new Promise(r => setTimeout(r, 200));
-    }
+    let done    = 0;
+    const total = data.items.length;
+
+    const domainPromises = Object.values(byDomain).map(items =>
+      items.reduce((chain, item, idx) =>
+        chain.then(async () => {
+          if (idx > 0) await new Promise(r => setTimeout(r, 600));
+          await refreshItem(item.id, true);
+          const fresh = loadData().items.find(x => x.id === item.id);
+          if (fresh?.error) errors++; else fetched++;
+          done++;
+          status.style.color = '#ffcc00';
+          status.textContent = `Fetching ${done} of ${total}\u2026`;
+        }), Promise.resolve())
+    );
+
+    await Promise.all(domainPromises);
+
+    status.style.color = '';
     const parts = [];
     if (fetched) parts.push(`${fetched} updated`);
     if (errors)  parts.push(`${errors} error${errors !== 1 ? 's' : ''}`);

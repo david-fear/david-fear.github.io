@@ -151,11 +151,6 @@
     .ig-icon { width: 2rem; height: 2rem; flex-shrink: 0; }
     .insta-handle { display: inline-block; font-size: 0.7rem; letter-spacing: 0.2em; color: var(--rose-dark); text-decoration: none; margin-bottom: 0.75rem; }
     .insta-sub { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.05rem; color: var(--mid); margin-bottom: 2rem; }
-    .insta-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-bottom: 2rem; }
-    .insta-cell { aspect-ratio: 1; background: var(--warm); position: relative; overflow: hidden; }
-    .insta-cell:nth-child(even) { background: #f0e0d8; }
-    .insta-cell-inner { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: rgba(200,128,108,0.3); }
-    .insta-cell-inner svg { width: 2rem; height: 2rem; }
 
     /* AFTERPAY */
     .afterpay { background: var(--warm); padding: 4rem 2rem; }
@@ -211,7 +206,6 @@
       .afterpay .container { grid-template-columns: 1fr; gap: 2rem; }
       .ap-steps { grid-template-columns: repeat(2, 1fr); }
       .ap-step::after { display: none; }
-      .insta-grid { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 700px) {
       .nav-links a { font-size: 0.62rem; }
@@ -320,12 +314,6 @@
       </div>
       <a href="https://www.instagram.com/hairbychallen/" target="_blank" rel="noopener noreferrer" class="insta-handle">@hairbychallen</a>
       <p class="insta-sub">Real results. Real people. Real transformations.</p>
-      <div class="insta-grid" aria-hidden="true">
-        <div class="insta-cell"><div class="insta-cell-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></div></div>
-        <div class="insta-cell"><div class="insta-cell-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></div></div>
-        <div class="insta-cell"><div class="insta-cell-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></div></div>
-        <div class="insta-cell"><div class="insta-cell-inner"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></div></div>
-      </div>
       <a href="https://www.instagram.com/hairbychallen/" target="_blank" rel="noopener noreferrer" class="btn">View on Instagram</a>
     </div>
   </section>
