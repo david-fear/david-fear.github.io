@@ -1614,43 +1614,58 @@
   // ── Actions ────────────────────────────────────────────────────────────────
 
   async function refreshItem(id, force = true) {
-    const data = loadData();
-    const item = data.items.find(i => i.id === id);
+    // ── Initial check ────────────────────────────────────────────────────────
+    let data = loadData();
+    let item = data.items.find(i => i.id === id);
     if (!item) return;
 
     const todayStr = today();
     const hasToday = !!(item.history || []).find(h => h.date === todayStr);
-    if (!force && (hasToday || item.checkedDate === todayStr)) return;  // already have today's price or already attempted today
+    if (!force && (hasToday || item.checkedDate === todayStr)) return;
+
+    // Mark loading — snapshot the fields needed for the fetch before going async
+    const fetchUrl     = item.url;
+    const fetchStore   = item.store;
+    const fetchStoreId = item.storeId;
+    const fetchCustom  = item.customName;
 
     item.status = 'loading';
     item.error  = null;
     saveData(data);
     render();
 
+    // ── Fetch ─────────────────────────────────────────────────────────────────
+    let price = null;
+    let name  = null;
+    let fetchError = null;
+
     try {
-      const { price, name } = await fetchCurrentPrice(item);
-
-      if (!item.history) item.history = [];
-
-      if (price != null) {
-        const existing = item.history.find(h => h.date === todayStr);
-        if (existing) {
-          existing.price = price;
-        } else {
-          item.history.push({ date: todayStr, price });
-        }
-      }
-
-      if (name && !item.customName) item.name = name;
-      item.status      = null;
-      item.checkedDate = todayStr;
-      item.error       = (price == null) ? 'Price not found in page. Site may have bot protection or structure has changed.' : null;
-
+      const result = await fetchCurrentPrice({ url: fetchUrl, store: fetchStore, storeId: fetchStoreId });
+      price = result.price;
+      name  = result.name;
     } catch (e) {
-      item.status      = null;
-      item.checkedDate = todayStr;
-      item.error       = e.message;
+      fetchError = e.message;
     }
+
+    // ── Write results onto FRESH data to avoid overwriting concurrent saves ───
+    data = loadData();
+    item = data.items.find(i => i.id === id);
+    if (!item) return;
+
+    if (!item.history) item.history = [];
+    if (price != null) {
+      const existing = item.history.find(h => h.date === todayStr);
+      if (existing) {
+        existing.price = price;
+      } else {
+        item.history.push({ date: todayStr, price });
+      }
+    }
+
+    if (name && !fetchCustom) item.name = name;
+    item.status      = null;
+    item.checkedDate = todayStr;
+    item.error       = fetchError ?? (price == null ? 'Price not found in page. Site may have bot protection or structure has changed.' : null);
 
     saveData(data);
     render();
