@@ -282,7 +282,7 @@
 
     <!-- F1 2026 Points Table & Chart -->
     <section>
-      <h2>F1 2026 Cumulative Points Chart</h2>
+      <h2>F1 2026 Driver Cumulative Points Chart</h2>
       <div style="position:relative; height:500px; min-height:500px; max-height:500px; width:100%;">
         <canvas id="pointsChart"></canvas>
       </div>
@@ -651,25 +651,40 @@
         'Alonso':    'ALO', 'Stroll':    'STR'
       };
 
-      // First pass: determine solid vs dotted by CSV row order within each team
+      /* Merge multi-team drivers so chart totals match the table */
+      const mergedMap = {};
+      const mergedOrder = [];
+      data.forEach(row => {
+        if (!mergedMap[row.driver]) {
+          mergedMap[row.driver] = Object.assign({}, row, { _lastConstructor: row.constructor });
+          mergedOrder.push(row.driver);
+        } else {
+          races.forEach(r => {
+            mergedMap[row.driver][r] = (mergedMap[row.driver][r] || 0) + (row[r] || 0);
+          });
+          mergedMap[row.driver]._lastConstructor = row.constructor;
+        }
+      });
+      const mergedData = mergedOrder.map(name => mergedMap[name]);
+
+      // Solid = 1st driver listed per team, dotted = 2nd
       const teamCount = {};
       const driverDash = {};
-      data.forEach(row => {
-        const team = row.constructor;
-        if (!teamCount[team]) teamCount[team] = 0;
-        teamCount[team]++;
+      mergedData.forEach(row => {
+        const team = row._lastConstructor;
+        teamCount[team] = (teamCount[team] || 0) + 1;
         driverDash[row.driver] = teamCount[team] === 1 ? [] : [2, 4];
       });
 
-      // Sort drivers by total points descending
-      const sortedData = data.slice().sort((a, b) => {
+      // Sort merged drivers by total points descending
+      const sortedData = mergedData.slice().sort((a, b) => {
         const totalA = races.reduce((s, r) => s + (a[r] || 0), 0);
         const totalB = races.reduce((s, r) => s + (b[r] || 0), 0);
         return totalB - totalA;
       });
 
       const datasets = sortedData.map((driver, index) => {
-        const color = teamColors[driver.constructor] || '#888888';
+        const color = teamColors[driver._lastConstructor] || '#888888';
         let cumulative = 0;
         const points = races.map(r => {
           cumulative += driver[r] || 0;
@@ -763,7 +778,7 @@
                 legend.chart.update('none');
               }
             },
-            title: { display: true, text: 'F1 2026 Cumulative Points' }
+            title: { display: true, text: 'F1 2026 Driver Cumulative Points' }
           },
           onHover: function(event, elements, chart) {
             if (elements && elements.length > 0) {
