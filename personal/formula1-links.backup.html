@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -579,26 +578,10 @@
       const thead = document.querySelector('#f1Table thead');
       const tbody = document.querySelector('#f1Table tbody');
 
-      /* Merge rows for drivers who switched teams mid-season */
-      const mergedMap = {};
-      const mergedOrder = [];
-      data.forEach(row => {
-        if (!mergedMap[row.driver]) {
-          mergedMap[row.driver] = Object.assign({}, row, { _constructors: [row.constructor] });
-          mergedOrder.push(row.driver);
-        } else {
-          races.forEach(r => {
-            mergedMap[row.driver][r] = (mergedMap[row.driver][r] || 0) + (row[r] || 0);
-          });
-          mergedMap[row.driver]._constructors.push(row.constructor);
-        }
-      });
-      const tableData = mergedOrder.map(name => mergedMap[name]);
-
-      /* Find max points per race across merged totals */
+      /* Find max points per race across all drivers */
       const maxPerRace = {};
       races.forEach(r => {
-        maxPerRace[r] = Math.max(...tableData.map(row => row[r] || 0));
+        maxPerRace[r] = Math.max(...data.map(row => row[r] || 0));
       });
 
       // Build header row
@@ -609,10 +592,9 @@
 
       // Build body rows
       let bodyHTML = '';
-      tableData.forEach(row => {
+      data.forEach(row => {
         let total = 0;
-        const constructorLabel = row._constructors.join(' / ');
-        let rowHTML = `<tr><td>${row.driver}</td><td>${constructorLabel}</td>`;
+        let rowHTML = `<tr><td>${row.driver}</td><td>${row.constructor}</td>`;
         races.forEach(r => {
           const val = row[r] || 0;
           total += val;
