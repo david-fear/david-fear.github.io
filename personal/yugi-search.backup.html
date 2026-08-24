@@ -320,9 +320,6 @@
   <main>
     <section>
       <div class="search-header">
-        <div style="background:#7a6000; color:#ffe066; border:1px solid #ffe066; padding:7px 12px; font-size:12px; margin-bottom:8px; text-align:center;">
-          ⚠ Some stores may show as unavailable — the CORS proxy provider changed its rules. A fix using a different proxy is in progress.
-        </div>
         <h3>NZ Yu-Gi-Oh Card Search</h3>
         <div class="search-row">
           <input id="q" placeholder="Card name or code, e.g. DUPO-EN017" value="" title="Card name or code"
@@ -469,7 +466,7 @@
       return '$' + (isCents ? (n / 100) : n).toFixed(2);
     }
 
-    const PROXY = 'https://api.allorigins.win/raw?url=';
+    const PROXY = 'https://corsproxy.io/?';
 
     /* Remove external asset tags from fetched HTML so parser never follows vendor CSS/JS/image URLs. */
     function stripExternalAssets(html) {
@@ -487,28 +484,14 @@
       return tokens.every(t => haystack.includes(t));
     }
 
-    /* Fetch JSON with abort timeout; retries next proxy on non-timeout failure */
+    /* Fetch JSON with abort timeout */
     function fetchJSON(url) {
-      const proxyList = [
-        'https://api.allorigins.win/raw?url=',
-        'https://api.codetabs.com/v1/proxy?quest=',
-      ];
-      async function tryNext(i) {
-        if (i >= proxyList.length) throw new Error('all proxies failed');
-        const ctrl = new AbortController();
-        const tid = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
-        try {
-          const r = await fetch(proxyList[i] + encodeURIComponent(url), { signal: ctrl.signal });
-          clearTimeout(tid);
-          if (!r.ok) throw new Error(r.status);
-          return await r.json();
-        } catch (e) {
-          clearTimeout(tid);
-          if (e.name === 'AbortError') throw e;
-          return tryNext(i + 1);
-        }
-      }
-      return tryNext(0);
+      const ctrl = new AbortController();
+      const tid = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+      const proxied = PROXY + encodeURIComponent(url);
+      return fetch(proxied, { signal: ctrl.signal })
+        .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+        .finally(() => clearTimeout(tid));
     }
 
     /* Query one Shopify store via suggest.json */
@@ -1123,7 +1106,7 @@
       let done = 0;
       const promises = STORES.map((store, i) => {
         if (store.link) return Promise.resolve();
-        return new Promise(r => setTimeout(r, i * 50))
+        return Promise.resolve()
           .then(() => (store.scraper ? store.scraper(store, q, limit, exact) : searchStore(store, q, limit, exact)))
           .catch(() => ({ ok: false, reason: 'unavailable', href: `https://${store.d}/search?q=${encodeURIComponent(q)}` }))
           .then(result => {
