@@ -712,6 +712,12 @@
     url => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url),
     url => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(url),
   ];
+  // Sites running on Cloudflare that block worker egress IPs — skip the worker
+  const PROXIES_NO_WORKER = [
+    url => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url),
+    url => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(url),
+  ];
+  const CF_HOSTED = ['thewarehouse.co.nz', 'warehousestationery.co.nz'];
   const STORE_KEY  = 'pricetracker_v1';
   const TIMEOUT_MS = 10000;
 
@@ -1006,7 +1012,10 @@
     if (store === "Pak'nSave" || store === 'New World') {
       return await fetchPakNSavePrice(item);
     }
-    return await fetchHTMLPrice(item);
+    let hostname = '';
+    try { hostname = new URL(item.url).hostname.replace(/^www\./, ''); } catch {}
+    const proxies = CF_HOSTED.some(h => hostname.includes(h)) ? PROXIES_NO_WORKER : PROXIES;
+    return await fetchHTMLPrice(item, proxies);
   }
 
   // ── Render ─────────────────────────────────────────────────────────────────
