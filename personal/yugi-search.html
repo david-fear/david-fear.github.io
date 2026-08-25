@@ -4,13 +4,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>NZ TCG Card Price Search | Yu-Gi-Oh, Pokemon, Magic, Flesh and Blood, One Piece, Lorcana</title>
+  <title>NZ TCG Card Price Search | Yu-Gi-Oh, Pokemon, Magic, Flesh and Blood, One Piece, Lorcana, Warhammer</title>
   <meta name="description" content="Search trading cards across New Zealand online stores. Compare prices and stock for Yu-Gi-Oh, Pokemon, Magic: The Gathering, Flesh and Blood, One Piece, Lorcana and more at Card Merchant, Card Spot, TCG Culture, TCG Collector NZ and other NZ TCG shops." />
-  <meta name="keywords" content="TCG cards NZ, trading cards New Zealand, Yu-Gi-Oh cards NZ, YGO cards NZ, Pokemon cards NZ, Magic The Gathering NZ, Flesh and Blood NZ, One Piece TCG NZ, Lorcana NZ, card prices New Zealand, card merchant NZ, TCG price compare NZ, buy trading cards NZ" />
+  <meta name="keywords" content="TCG cards NZ, trading cards New Zealand, Yu-Gi-Oh cards NZ, YGO cards NZ, Pokemon cards NZ, Warhammer, Magic The Gathering NZ, Flesh and Blood NZ, One Piece TCG NZ, Lorcana NZ, card prices New Zealand, card merchant NZ, TCG price compare NZ, buy trading cards NZ" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="https://david-fear.github.io/personal/yugi-search.html" />
-  <meta property="og:title" content="NZ TCG Card Price Search | Yu-Gi-Oh, Pokemon, Magic, Flesh and Blood, One Piece, Lorcana" />
-  <meta property="og:description" content="Compare trading card prices across NZ online stores. Covers Yu-Gi-Oh, Pokemon, Magic: The Gathering, Flesh and Blood, One Piece, Lorcana and more." />
+  <meta property="og:title" content="NZ TCG Card Price Search | Yu-Gi-Oh, Pokemon, Magic, Flesh and Blood, One Piece, Lorcana, Warhamer" />
+  <meta property="og:description" content="Compare trading card prices across NZ online stores. Covers Yu-Gi-Oh, Pokemon, Magic: The Gathering, Flesh and Blood, One Piece, Lorcana, Warhammer and more." />
   <meta property="og:url" content="https://david-fear.github.io/personal/yugi-search.html" />
   <meta property="og:type" content="website" />
   <link rel="stylesheet" href="https://david-fear.github.io/stylesheet.css" />
@@ -321,9 +321,9 @@
     <section>
       <div class="search-header">
         <div style="background:#7a6000; color:#ffe066; border:1px solid #ffe066; padding:7px 12px; font-size:12px; margin-bottom:8px; text-align:center;">
-          ⚠ Some stores may show as unavailable — the CORS proxy provider changed its rules. A fix using a different proxy is in progress.
+          &#9888; Some stores may not return results while proxy changes are in development. The previous proxy provider (corsproxy.io) dropped support for anonymous requests from public domains, requiring a migration to a self-hosted proxy.
         </div>
-        <h3>NZ Yu-Gi-Oh Card Search</h3>
+        <h3>NZ TCG Search (Search entire TCG Stores)</h3>
         <div class="search-row">
           <input id="q" placeholder="Card name or code, e.g. DUPO-EN017" value="" title="Card name or code"
             autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" autofocus />
@@ -372,6 +372,10 @@
             <span style="color:#666;font-size:10px;">Lorcana</span>
             <a href="#" onclick="document.getElementById('q').value='elsa fifth spirit'; search(false); return false;">Elsa Fifth Spirit</a> ,
             <a href="#" onclick="document.getElementById('q').value='moana motunui'; search(false); return false;">Moana of Motunui</a>
+            <br />
+            <span style="color:#666;font-size:10px;">Warhammer</span>
+            <a href="#" onclick="document.getElementById('q').value='40k'; search(false); return false;">40k</a> ,
+            <a href="#" onclick="document.getElementById('q').value='40,000'; search(false); return false;">40,000</a>
             <br />
             <span style="color:#666;font-size:10px;">Accessories</span>
             <a href="#" onclick="document.getElementById('q').value='dragonshield'; search(true); return false;">Dragonshield</a> ,
@@ -469,7 +473,7 @@
       return '$' + (isCents ? (n / 100) : n).toFixed(2);
     }
 
-    const PROXY = 'https://api.allorigins.win/raw?url=';
+    const PROXY = 'https://df-proxy.david-fear.workers.dev/?url=';
 
     /* Remove external asset tags from fetched HTML so parser never follows vendor CSS/JS/image URLs. */
     function stripExternalAssets(html) {
@@ -487,9 +491,10 @@
       return tokens.every(t => haystack.includes(t));
     }
 
-    /* Fetch JSON with abort timeout; retries next proxy on non-timeout failure */
+    /* Fetch JSON; falls back to public proxies if the worker fails */
     function fetchJSON(url) {
       const proxyList = [
+        'https://df-proxy.david-fear.workers.dev/?url=',
         'https://api.allorigins.win/raw?url=',
         'https://api.codetabs.com/v1/proxy?quest=',
       ];
@@ -1123,7 +1128,7 @@
       let done = 0;
       const promises = STORES.map((store, i) => {
         if (store.link) return Promise.resolve();
-        return new Promise(r => setTimeout(r, i * 50))
+        return Promise.resolve()
           .then(() => (store.scraper ? store.scraper(store, q, limit, exact) : searchStore(store, q, limit, exact)))
           .catch(() => ({ ok: false, reason: 'unavailable', href: `https://${store.d}/search?q=${encodeURIComponent(q)}` }))
           .then(result => {

@@ -531,7 +531,7 @@
 <header>
   <h1>NZ Price Tracker</h1>
   <div style="background:#7a6000; color:#ffe066; border:1px solid #ffe066; padding:7px 12px; font-size:12px; margin-bottom:8px; text-align:center;">
-    ⚠ Price fetching may fail for some sites — the CORS proxy provider changed its rules. A fix using a different proxy is in progress.
+    &#9888; Price fetching may not work for some sites while proxy changes are in development. The previous proxy provider (corsproxy.io) dropped support for anonymous requests from public domains, requiring a migration to a self-hosted proxy.
   </div>
   <p>Track product prices over time from NZ retail sites. History stored in your browser.</p>
 </header>
@@ -705,9 +705,9 @@
 
   // Proxies tried in order; next is used on 413 (size limit) or 403 (IP blocked)
   const PROXIES = [
+    url => 'https://df-proxy.david-fear.workers.dev/?url=' + encodeURIComponent(url),
     url => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url),
     url => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(url),
-    url => 'https://corsproxy.io/?' + encodeURIComponent(url),
   ];
   const STORE_KEY  = 'pricetracker_v1';
   const TIMEOUT_MS = 10000;
