@@ -333,7 +333,7 @@
           <div class="ctrl-col"><button onclick="search(true);window.goatcounter&&goatcounter.count({path:'search-exact',event:true})">Exact Search</button></div>
           <div class="ctrl-col"><button class="btn-fuzzy" onclick="search(false);window.goatcounter&&goatcounter.count({path:'search-fuzzy',event:true})"><span>Fuzzy Search</span></button></div>
           <div class="ctrl-col">
-            <label style="font-size:13px; color:#888; cursor:pointer; user-select:none; display:inline-flex; align-items:center; gap:7px;">
+            <label style="font-size:10px; color:#888; cursor:pointer; user-select:none; display:inline-flex; align-items:center; gap:7px;">
               <input type="checkbox" id="same-tab-toggle" style="width:16px; height:16px; cursor:pointer; accent-color:#888;"> open in same tab
             </label>
           </div>
@@ -406,7 +406,7 @@
 
     const STORES = [
       // ── Shopify (live API results) ───────────────────────────
-      { d: "cardspotnz.com", nameOnly: true, note: " ** card name search only; data model differs **" },
+      { d: "cardspotnz.com", nameOnly: true, note: " ** card name search only (in text order) **" },
       { d: "www.theslyfox.nz", scraper: searchSlyFox },
       { d: "www.shuffleandcutgames.co.nz" },
       { d: "tcgcollectornz.com" },
