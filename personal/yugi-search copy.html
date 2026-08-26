@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NZ TCG Card Price Search | Yu-Gi-Oh, Pokemon, Magic, Flesh and Blood, One Piece, Lorcana, Warhammer</title>
+  <meta name="description" content="Search trading cards across New Zealand online stores. Compare prices and stock for Yu-Gi-Oh, Pokemon, Magic: The Gathering, Flesh and Blood, One Piece, Lorcana and more at Card Merchant, Card Spot, TCG Culture, TCG Collector NZ and other NZ TCG shops." />
+  <meta name="keywords" content="TCG cards NZ, trading cards New Zealand, Yu-Gi-Oh cards NZ, YGO cards NZ, Pokemon cards NZ, Warhammer, Magic The Gathering NZ, Flesh and Blood NZ, One Piece TCG NZ, Lorcana NZ, card prices New Zealand, card merchant NZ, TCG price compare NZ, buy trading cards NZ" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://david-fear.github.io/personal/yugi-search.html" />
+  <meta property="og:title" content="NZ TCG Card Price Search | Yu-Gi-Oh, Pokemon, Magic, Flesh and Blood, One Piece, Lorcana, Warhamer" />
+  <meta property="og:description" content="Compare trading card prices across NZ online stores. Covers Yu-Gi-Oh, Pokemon, Magic: The Gathering, Flesh and Blood, One Piece, Lorcana, Warhammer and more." />
+  <meta property="og:url" content="https://david-fear.github.io/personal/yugi-search.html" />
+  <meta property="og:type" content="website" />
+  <link rel="stylesheet" href="https://david-fear.github.io/stylesheet.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" />
+  <script data-goatcounter="https://davidthegoat.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+  <style>
+    .search-header {
+      display: block;
+      text-align: center;
+    }
+
+    .search-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .search-controls {
+      display: grid;
+      grid-template-columns: auto auto auto;
+      gap: 4px 12px;
+      align-items: center;
+      justify-content: center;
+      margin-top: 4px;
+    }
+
+    .ctrl-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+
+    .search-controls button {
+      padding: 10px 12px;
+      font-size: 12px;
+      white-space: nowrap;
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .search-examples {
+      margin-top: 8px;
+      font-size: 11px;
+      color: #aaa;
+      text-align: left;
+      padding-left: 8px;
+    }
+
+    .search-examples summary {
+      cursor: pointer;
+      color: #d0d0d0;
+      font-weight: bold;
+      user-select: none;
+      letter-spacing: 0.3px;
+      text-align: center;
+    }
+
+    .search-examples a {
+      color: var(--primary);
+    }
+
+    .search-examples div {
+      border-left: 2px solid #d0d0d0;
+      border-right: 2px solid #d0d0d0;
+      margin-top: 5px;
+      line-height: 1.9;
+      text-align: center;
+      width: 100%;
+    }
+
+    .btn-fuzzy span {
+      display: inline-block;
+      transition: filter 0.2s ease, text-shadow 0.2s ease;
+    }
+
+    .btn-fuzzy:hover span,
+    .btn-fuzzy:active span {
+      filter: blur(0.7px);
+      text-shadow:
+        0 0 2px rgba(255, 255, 255, 0.7),
+        0 0 4px rgba(255, 255, 255, 0.4);
+    }
+
+
+    .legend {
+      font-size: 12px;
+      color: #ccc;
+      display: flex;
+      flex-direction: row;
+      gap: 14px;
+      margin-top: 8px;
+      white-space: nowrap;
+      justify-content: center;
+    }
+
+    .legend-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 5px;
+      vertical-align: middle;
+    }
+
+    input {
+      padding: 5px 7px;
+      font-size: 16px;
+      background: #222;
+      color: #eee;
+      border: 1px solid #444;
+    }
+
+    #q {
+      flex: 1;
+      min-width: 160px;
+    }
+
+    #query {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #ffd700;
+    }
+
+    #status {
+      margin-top: 4px;
+      font-size: 11px;
+      color: #00ffcc;
+    }
+
+    .stores {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    @media (min-width: 1081px) {
+      .stores {
+        grid-template-columns: repeat(3, minmax(360px, 1fr));
+      }
+    }
+
+    @media (max-width: 1080px) {
+      .stores {
+        grid-template-columns: repeat(2, minmax(360px, 1fr));
+      }
+    }
+
+    @media (max-width: 740px) {
+      .stores {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .store {
+      min-width: 0;
+      padding: 7px 9px;
+      border: 1px solid #2a2a2a;
+      background: #181818;
+    }
+
+    .store-name {
+      font-weight: bold;
+      font-size: 12px;
+      color: #aaa;
+      margin-bottom: 5px;
+      border-bottom: 1px solid #2a2a2a;
+      padding-bottom: 3px;
+    }
+
+    .item {
+      position: relative;
+      margin: 3px 0;
+      font-size: 11px;
+    }
+
+    .item a {
+      display: block;
+      text-decoration: none;
+      padding-right: 66px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-family: 'Roboto Condensed', Arial Narrow, Arial, sans-serif;
+      line-height: 1.3;
+      letter-spacing: -0.2px;
+      border-bottom: 1px dashed #333;
+    }
+
+    .item a:hover {
+      text-decoration: underline;
+      text-shadow: 0 0 5px rgba(255,255,255,0.18);
+    }
+
+    .price {
+      position: absolute;
+      right: 0;
+      top: 0;
+      color: #7dff7d;
+      font-weight: bold;
+      white-space: nowrap;
+      font-size: 11px;
+      text-shadow: 0 0 6px rgba(125,255,125,0.5);
+      background: linear-gradient(to right, transparent, #181818 22%);
+      padding-left: 10px;
+    }
+
+    .no-price {
+      position: absolute;
+      right: 0;
+      top: 0;
+      color: #888;
+      font-size: 10px;
+      white-space: nowrap;
+      background: #181818;
+    }
+
+    .sold-out {
+      position: absolute;
+      right: 0;
+      top: 0;
+      color: #ff4444;
+      font-weight: bold;
+      white-space: nowrap;
+      font-size: 11px;
+      background: linear-gradient(to right, transparent, #181818 22%);
+      padding-left: 10px;
+    }
+
+    .muted {
+      font-size: 12px;
+      color: #808080;
+      font-style: italic;
+      letter-spacing: 0.2px;
+    }
+
+    .muted a {
+      font-style: italic;
+    }
+
+    .json-link {
+      font-size: 9px;
+      font-weight: normal;
+      margin-left: 6px;
+    }
+
+    .store-note {
+      font-size: 10px;
+      color: #b0b0b0;
+      font-style: italic;
+      margin-left: 6px;
+    }
+
+    .section-header {
+      grid-column: 1 / -1;
+      font-size: 10px;
+      color: #888;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      padding: 6px 2px 2px;
+      border-top: 1px solid #1a1a1a;
+      margin-top: 4px;
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- Dynamic sidebar menu START - right after BODY tag -->
+  <div id="menu-container"></div>
+  <script>
+    fetch('https://david-fear.github.io/components/menu.html')
+      .then(response => response.text())
+      .then(data => {
+        const container = document.getElementById('menu-container');
+        container.innerHTML = data;
+
+        // Now attach event listeners because the elements exist
+        const toggle = document.getElementById('menu-toggle');
+        const menu = document.getElementById('menu-nav');
+
+        toggle.addEventListener('click', () => {
+          const expanded = toggle.getAttribute('aria-expanded') === 'true';
+          toggle.setAttribute('aria-expanded', String(!expanded));
+          if (menu.hasAttribute('hidden')) {
+            menu.removeAttribute('hidden');
+          } else {
+            menu.setAttribute('hidden', '');
+          }
+        });
+
+        toggle.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggle.click();
+          }
+        });
+      })
+      .catch(e => console.error('Failed to load menu:', e));
+  </script>
+  <!-- Dynamic sidebar menu END -->
+
+  <main>
+    <section>
+      <div class="search-header">
+        <div style="background:#7a6000; color:#ffe066; border:1px solid #ffe066; padding:7px 12px; font-size:12px; margin-bottom:8px; text-align:center;">
+          &#9989; Proxy switchover completed. If any stores are not returning results, please let me know via the buymeacoffee link below =). Replaced corsproxy.io 25/08/2026 as they dropped support for anonymous requests
+        </div>
+        <h3>NZ TCG Search (Search entire TCG Stores)</h3>
+        <div class="search-row">
+          <input id="q" placeholder="Card name or code, e.g. DUPO-EN017" value="" title="Card name or code"
+            autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" autofocus />
+          <input id="limit" type="number" min="1" max="10" value="10" style="width:50px;" title="Results per site (Shopify API hard cap is 10; higher values only apply to non-Shopify scrapers)" />
+        </div>
+        <div class="search-controls">
+          <div class="ctrl-col"><button onclick="search(true);window.goatcounter&&goatcounter.count({path:'search-exact',event:true})">Exact Search</button></div>
+          <div class="ctrl-col"><button class="btn-fuzzy" onclick="search(false);window.goatcounter&&goatcounter.count({path:'search-fuzzy',event:true})"><span>Fuzzy Search</span></button></div>
+          <div class="ctrl-col">
+            <label style="font-size:10px; color:#888; cursor:pointer; user-select:none; display:inline-flex; align-items:center; gap:7px;">
+              <input type="checkbox" id="same-tab-toggle" style="width:16px; height:16px; cursor:pointer; accent-color:#888;"> open in same tab
+            </label>
+          </div>
+        </div>
+        <details class="search-examples">
+          <summary>Search Examples</summary>
+          <div>
+            <span style="color:#666;font-size:10px;">Yu-Gi-Oh</span>
+            <a href="#" onclick="document.getElementById('q').value='DUPO-EN017'; search(true); return false;">DUPO-EN017</a> ,
+            <a href="#" onclick="document.getElementById('q').value='ash blossom quarter century'; search(false); return false;">Ash Blossom Quarter Century</a> ,
+            <a href="#" onclick="document.getElementById('q').value='red eyes ghost'; search(false); return false;">Red Eyes Ghost</a> ,
+            <a href="#" onclick="document.getElementById('q').value='chocolate magician gold'; search(false); return false;">Chocolate Magician Gold</a> ,
+            <a href="#" onclick="document.getElementById('q').value='blue eyes white dragon'; search(false); return false;">Blue-Eyes White Dragon</a>
+            <br />
+            <span style="color:#666;font-size:10px;">Pokemon</span>
+            <a href="#" onclick="document.getElementById('q').value='charizard ex'; search(false); return false;">Charizard ex</a> ,
+            <a href="#" onclick="document.getElementById('q').value='umbreon vmax'; search(false); return false;">Umbreon VMAX</a> ,
+            <a href="#" onclick="document.getElementById('q').value='pikachu vmax'; search(false); return false;">Pikachu VMAX</a>
+            <br />
+            <span style="color:#666;font-size:10px;">Magic: The Gathering</span>
+            <a href="#" onclick="document.getElementById('q').value='rhystic study'; search(false); return false;">Rhystic Study</a> ,
+            <a href="#" onclick="document.getElementById('q').value='smothering tithe'; search(false); return false;">Smothering Tithe</a> ,
+            <a href="#" onclick="document.getElementById('q').value='sol ring'; search(false); return false;">Sol Ring</a> ,
+            <a href="#" onclick="document.getElementById('q').value='cyclonic rift'; search(false); return false;">Cyclonic Rift</a>
+            <br />
+            <span style="color:#666;font-size:10px;">Flesh and Blood</span>
+            <a href="#" onclick="document.getElementById('q').value='fyendal spring tunic'; search(false); return false;">Fyendal's Spring Tunic</a> ,
+            <a href="#" onclick="document.getElementById('q').value='aether wildfire'; search(false); return false;">Aether Wildfire</a> ,
+            <a href="#" onclick="document.getElementById('q').value='luminaris'; search(false); return false;">Luminaris</a>
+            <br />
+            <span style="color:#666;font-size:10px;">One Piece</span>
+            <a href="#" onclick="document.getElementById('q').value='monkey luffy secret'; search(false); return false;">Monkey D. Luffy Secret Rare</a> ,
+            <a href="#" onclick="document.getElementById('q').value='roronoa zoro'; search(false); return false;">Roronoa Zoro</a> ,
+            <a href="#" onclick="document.getElementById('q').value='shanks'; search(false); return false;">Shanks</a>
+            <br />
+            <span style="color:#666;font-size:10px;">Lorcana</span>
+            <a href="#" onclick="document.getElementById('q').value='elsa fifth spirit'; search(false); return false;">Elsa Fifth Spirit</a> ,
+            <a href="#" onclick="document.getElementById('q').value='moana motunui'; search(false); return false;">Moana of Motunui</a>
+            <br />
+            <span style="color:#666;font-size:10px;">Warhammer</span>
+            <a href="#" onclick="document.getElementById('q').value='40k'; search(false); return false;">40k</a> ,
+            <a href="#" onclick="document.getElementById('q').value='40,000'; search(false); return false;">40,000</a>
+            <br />
+            <span style="color:#666;font-size:10px;">Accessories</span>
+            <a href="#" onclick="document.getElementById('q').value='dragonshield'; search(true); return false;">Dragonshield</a> ,
+            <a href="#" onclick="document.getElementById('q').value='game mat'; search(true); return false;">Game Mat</a>
+          </div>
+        </details>
+        <details class="search-examples" id="available-sites-details">
+          <summary>Available sites to search across</summary>
+          <div id="available-sites-list"></div>
+        </details>
+        <div class="legend">
+          <span><span class="legend-dot" style="background:#7dff7d"></span>In stock</span>
+          <span><span class="legend-dot" style="background:#ff4444"></span>Sold out</span>
+          <span><span class="legend-dot" style="background:#555"></span>No price</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="query"></div>
+  <div id="status"></div>
+  <div class="stores" id="results"></div>
+
+  <script>
+
+    let linkTarget = location.hash === '#sametab' ? '_self' : '_blank';
+    let ygoPanelNode = null;
+
+    const STORES = [
+      // ── Shopify (live API results) ───────────────────────────
+      { d: "cardspotnz.com", nameOnly: true, note: " ** card name search only (in text order) **" },
+      { d: "www.theslyfox.nz", scraper: searchSlyFox },
+      { d: "www.shuffleandcutgames.co.nz" },
+      { d: "tcgcollectornz.com" },
+      { d: "tcgculture.com" },
+      { d: "cardbard.co.nz" },
+      { d: "spellboundgames.co.nz" },
+      { d: "valkyrie-games-nz.myshopify.com" },
+      { d: "www.baydragon.co.nz", scraper: searchBayDragon },
+      { d: "otakumart.co.nz" },
+      { d: "goblingames.nz" },
+      { d: "hobbymaster.co.nz", scraper: searchHobbymaster },
+      { d: "gamersrevelationtcg.co.nz", scraper: searchGamersRevelation },
+      { d: "www.cardtopia.co.nz" },
+      { d: "iconix-comics-games.co.nz", scraper: searchIconix },
+      { d: "cgstore.co.nz", scraper: searchCGStore },
+      { d: "cardmasters.co.nz" },
+      { d: "cardmerchant.co.nz" },
+      { d: "cardmerchanthamilton.co.nz" },
+      { d: "www.cardmerchanttakapuna.co.nz" },
+      { d: "cardmerchantnelson.co.nz" },
+      { d: "www.cardmerchantwhangarei.co.nz" },
+      { d: "cardmerchantchristchurch.co.nz" },
+      { d: "cardmerchantponsonby.co.nz" },
+      { d: "cardmerchanttaupo.co.nz" },
+      { d: "thegametree.co.nz" },
+      { d: "magicreddragon.co.nz" },
+      // ── Link-only (non-Shopify — opens search page) ──────────
+    ];
+
+    /* Stores that can't be live-scraped (Cloudflare-protected etc.) — shown as a link-only group */
+    const LINK_STORES = [
+      { d: 'mtgsingles.co.nz (direct card code lookup)', url: q => `https://www.mtgsingles.co.nz/card/${encodeURIComponent(q)}` },
+      { d: 'tcgplayer.com (USD — international market price)', url: q => `https://www.tcgplayer.com/search/all/product?q=${encodeURIComponent(q)}&view=grid` },
+      { d: 'collectr.com (USD — international market price)', url: q => `https://app.getcollectr.com/?query=${encodeURIComponent(q)}` },
+      { d: 'vagabond.co.nz',  url: q => `https://vagabond.co.nz/search.php?search_query=${encodeURIComponent(q)}&section=product` },
+      { d: 'trademe.co.nz',  url: q => `https://www.trademe.co.nz/a/marketplace/gaming/trading-cards/search?search_string=${encodeURIComponent(q)}` },
+      { d: 'www.hobbylords.co.nz', url: q => `https://www.hobbylords.co.nz/shop/shop-all/search?product_keyword=${encodeURIComponent(q)}&p=1` },
+      { d: 'novagames.co.nz', url: q => `https://novagames.co.nz/search?type=product&options[prefix]=last&q=${encodeURIComponent(q)}` },
+    ];
+
+    /* Stores that are coming soon — shown as a preview section */
+    const COMING_SOON_STORES = [
+      { d: 'rawr.cards', url: 'https://www.rawr.cards/' },
+    ];
+
+    const TIMEOUT_MS = 6000;
+    const ENABLE_ALLORIGINS_FALLBACK = false;
+
+    /* Escape user/API text before inserting into HTML */
+    function esc(s) {
+      return String(s ?? '')
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    /* Normalise Shopify price — handles "$10.99", "10.99", "1099" (cents) */
+    function fmtPrice(raw) {
+      if (raw == null || raw === '') return '';
+      const digits = String(raw).replace(/[^0-9.]/g, '');
+      const n = parseFloat(digits);
+      if (!n) return '';
+      /* Shopify suggest.json returns cents as an integer string with no decimal */
+      const isCents = !String(raw).includes('.') && n > 200;
+      return '$' + (isCents ? (n / 100) : n).toFixed(2);
+    }
+
+    const PROXY = 'https://df-proxy.david-fear.workers.dev/?url=';
+
+    /* Remove external asset tags from fetched HTML so parser never follows vendor CSS/JS/image URLs. */
+    function stripExternalAssets(html) {
+      return String(html || '')
+        .replace(/<link\b[^>]*>/gi, '')
+        .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '')
+        .replace(/<img\b[^>]*>/gi, '')
+        .replace(/<iframe\b[^>]*>[\s\S]*?<\/iframe>/gi, '');
+    }
+
+    /* Return true if every token in the query appears in the product title or handle */
+    function matchesQuery(product, query) {
+      const haystack = (product.title + ' ' + (product.handle || '')).toLowerCase();
+      const tokens = query.toLowerCase().split(/[\s\-]+/).filter(Boolean);
+      return tokens.every(t => haystack.includes(t));
+    }
+
+    /* Fetch JSON; falls back to public proxies if the worker fails */
+    function fetchJSON(url) {
+      const proxyList = [
+        'https://df-proxy.david-fear.workers.dev/?url=',
+        'https://api.allorigins.win/raw?url=',
+        'https://api.codetabs.com/v1/proxy?quest=',
+      ];
+      async function tryNext(i) {
+        if (i >= proxyList.length) throw new Error('all proxies failed');
+        const ctrl = new AbortController();
+        const tid = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+        try {
+          const r = await fetch(proxyList[i] + encodeURIComponent(url), { signal: ctrl.signal });
+          clearTimeout(tid);
+          if (!r.ok) throw new Error(r.status);
+          return await r.json();
+        } catch (e) {
+          clearTimeout(tid);
+          if (e.name === 'AbortError') throw e;
+          return tryNext(i + 1);
+        }
+      }
+      return tryNext(0);
+    }
+
+    /* Query one Shopify store via suggest.json */
+    async function searchStore(store, query, limit, exact) {
+      const domain = store.d;
+      const fallback = `https://${domain}/search?q=${encodeURIComponent(query)}`;
+      const apiUrl = `https://${domain}/search/suggest.json?q=${encodeURIComponent(query)}&resources[type]=product&resources[limit]=${limit}`;
+      try {
+        const data = await fetchJSON(apiUrl);
+        const products = data?.resources?.results?.products;
+        if (products?.length) {
+          const matched = exact ? products.filter(p => matchesQuery(p, query)) : products;
+          if (matched.length) {
+            return {
+              ok: true,
+              apiUrl,
+              href: fallback,
+              items: matched.map(p => ({
+                title: p.title + (domain === 'cardspotnz.com' && p.type ? ` (${p.type})` : ''),
+                link: `https://${domain}/products/${p.handle}`,
+                price: fmtPrice(p.price_max),
+                soldOut: p.available === false
+              }))
+            };
+          }
+        }
+        return { ok: false, reason: 'empty', href: fallback, apiUrl };
+      } catch (e) {
+        return { ok: false, reason: e.name === 'AbortError' ? 'timeout' : 'unavailable', href: fallback, apiUrl };
+      }
+    }
+
+    /* Query hobbymaster.co.nz in-stock YGO singles via jqGrid JSON endpoint
+       cell: [0]=name, [1]=set, [8]=rarity, [9]=condition, [10]=price, [12]=qty, id=card ID
+       All rows returned by this endpoint are in-stock. */
+    async function searchHobbymaster(store, query, limit, exact) {
+      const domain = 'hobbymaster.co.nz';
+      const fallback = `https://${domain}/search?search=${encodeURIComponent(query)}`;
+      const rows = 99999
+      const apiUrl = `https://${domain}/cards/get-cards?lang=&game=3&foil=&_search=false&nd=${Date.now()}&rows=${rows}&page=1&sidx=price&sord=asc&searchField=name&searchString=${encodeURIComponent(query)}&searchOper=cn`;
+      const ctrl = new AbortController();
+      const tid = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+      try {
+        const proxied = PROXY + encodeURIComponent(apiUrl);
+        const resp = await fetch(proxied, { signal: ctrl.signal });
+        clearTimeout(tid);
+        if (!resp.ok) throw new Error(resp.status);
+        const data = await resp.json();
+        const rawRows = data?.rows;
+        if (!rawRows?.length) return { ok: false, reason: 'empty', href: fallback, apiUrl };
+        const matched = exact
+          ? rawRows.filter(r => matchesQuery({ title: r.cell[0] || '', handle: '' }, query))
+          : rawRows;
+        if (!matched.length) return { ok: false, reason: 'empty', href: fallback, apiUrl };
+        const items = matched.slice(0, limit).map(r => {
+          const c = r.cell;
+          const name = c[0] || '';
+          const rarity = c[8] || '';
+          return {
+            title: rarity ? `${name} (${rarity})` : name,
+            link: `https://${domain}/cards/card/${r.id}`,
+            price: c[10] || '',
+            soldOut: false  // endpoint only returns in-stock items
+          };
+        });
+        return { ok: true, items, apiUrl, href: fallback };
+      } catch (e) {
+        clearTimeout(tid);
+        return { ok: false, reason: e.name === 'AbortError' ? 'timeout' : 'unavailable', href: fallback, apiUrl };
+      }
+    }
+
+    /* Query gamersrevelationtcg.co.nz via BigCommerce HTML scrape */
+    async function searchGamersRevelation(store, query, limit, exact) {
+      const domain = 'gamersrevelationtcg.co.nz';
+      const fallback = `https://${domain}/search.php?search_query=${encodeURIComponent(query)}`;
+      const ctrl = new AbortController();
+      const tid = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+      try {
+        const proxied = PROXY + encodeURIComponent(fallback);
+        const resp = await fetch(proxied, { signal: ctrl.signal });
+        clearTimeout(tid);
+        if (!resp.ok) throw new Error(resp.status);
+        const html = stripExternalAssets(await resp.text());
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const cards = [...doc.querySelectorAll('article.card')];
+        if (!cards.length) return { ok: false, reason: 'empty', href: fallback };
+        const matched = exact
+          ? cards.filter(c => {
+              const a = c.querySelector('.card-title a, h4 a');
+              return a && matchesQuery({ title: a.textContent.trim(), handle: '' }, query);
+            })
+          : cards;
+        if (!matched.length) return { ok: false, reason: 'empty', href: fallback };
+        const items = matched.slice(0, limit).map(card => {
+          const titleEl = card.querySelector('.card-title a, h4 a');
+          const title = titleEl ? titleEl.textContent.trim() : '';
+          let link = titleEl ? titleEl.getAttribute('href') : fallback;
+          if (link && !link.startsWith('http')) link = `https://${domain}${link}`;
+          try { const u = new URL(link); u.searchParams.delete('searchid'); u.searchParams.delete('search_query'); link = u.toString(); } catch {}
+          const priceEl = card.querySelector('[data-product-price-with-tax], [data-product-price-without-tax], .price--withTax, .price--main, .price');
+          const price = priceEl ? priceEl.textContent.trim() : '';
+          const soldOut = !!card.querySelector('.button--soldOut, [data-button-state="soldOut"]');
+          return { title, link, price, soldOut };
+        });
+        return { ok: true, items, href: fallback };
+      } catch (e) {
+        clearTimeout(tid);
+        return { ok: false, reason: e.name === 'AbortError' ? 'timeout' : 'unavailable', href: fallback };
+      }
+    }
+
+    /* Query iconix-comics-games.co.nz via eDIY platform HTML scrape.
+       Tries corsproxy.io first, falls back to allorigins.win if blocked.
+       Price: data-amt attribute is in units of 1/10000 NZD (80000 = $8.00).
+       Stock: span.preorder-date contains "N available now" when in stock. */
+    async function searchIconix(store, query, limit, exact) {
+      const domain = 'www.iconix-comics-games.co.nz';
+      const targetUrl = `https://${domain}/?q=${encodeURIComponent(query)}`;
+      const ctrl = new AbortController();
+      const tid = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+      const proxies = [PROXY + encodeURIComponent(targetUrl)];
+      if (ENABLE_ALLORIGINS_FALLBACK) {
+        proxies.push(`https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`);
+      }
+      try {
+        let html = null;
+        for (const proxied of proxies) {
+          try {
+            const resp = await fetch(proxied, { signal: ctrl.signal });
+            if (!resp.ok) continue;
+            const text = await resp.text();
+            if (text.includes('product-item-box')) { html = text; break; }
+          } catch (e2) {
+            if (e2.name === 'AbortError') throw e2;
+          }
+        }
+        clearTimeout(tid);
+        if (!html) return { ok: false, reason: 'unavailable', href: targetUrl };
+        const doc = new DOMParser().parseFromString(stripExternalAssets(html), 'text/html');
+        const cards = [...doc.querySelectorAll('div.product-item-box')];
+        if (!cards.length) return { ok: false, reason: 'empty', href: targetUrl };
+        const matched = exact
+          ? cards.filter(c => {
+              const a = c.querySelector('a.plname');
+              return a && matchesQuery({ title: a.textContent.trim(), handle: '' }, query);
+            })
+          : cards;
+        if (!matched.length) return { ok: false, reason: 'empty', href: targetUrl };
+        const items = matched.slice(0, limit).map(card => {
+          const titleEl = card.querySelector('a.plname');
+          const title = titleEl ? titleEl.textContent.trim() : '';
+          let link = titleEl ? titleEl.getAttribute('href') : targetUrl;
+          if (link && !link.startsWith('http')) link = `https://${domain}${link}`;
+          const priceEl = card.querySelector('span.price[data-amt]');
+          const priceAmt = priceEl ? parseInt(priceEl.getAttribute('data-amt'), 10) : 0;
+          const price = priceAmt ? `$${(priceAmt / 10000).toFixed(2)}` : '';
+          const availEl = card.querySelector('span.preorder-date');
+          const soldOut = !availEl || !/available\s+now/i.test(availEl.textContent);
+          return { title, link, price, soldOut };
+        });
+        return { ok: true, items, href: targetUrl };
+      } catch (e) {
+        clearTimeout(tid);
+        return { ok: false, reason: e.name === 'AbortError' ? 'timeout' : 'unavailable', href: targetUrl };
+      }
+    }
+
+    /* Query www.baydragon.co.nz via AJAX autocomplete (names only — no prices).
+       Deduplicates by title; each result links to the full HTML search for that name.
+       result.pricingHref triggers a "show with pricing" footer link in renderStore. */
+    async function searchBayDragon(store, query, limit, exact) {
+      const domain = 'www.baydragon.co.nz';
+      const fallback = `https://${domain}/search/category/01?searchType=single&searchString=${encodeURIComponent(query)}`;
+      const apiUrl = `https://${domain}/searchajaxsingles/category/01?userInput=${encodeURIComponent(query)}`;
+      const ctrl = new AbortController();
+      const tid = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+      try {
+        const proxied = PROXY + encodeURIComponent(apiUrl);
+        const resp = await fetch(proxied, { signal: ctrl.signal });
+        clearTimeout(tid);
+        if (!resp.ok) throw new Error(resp.status);
+        const data = await resp.json();
+        if (!Array.isArray(data) || !data.length) return { ok: false, reason: 'empty', href: fallback, apiUrl };
+        const matched = exact
+          ? data.filter(r => matchesQuery({ title: (r.value || '').trim(), handle: '' }, query))
+          : data;
+        if (!matched.length) return { ok: false, reason: 'empty', href: fallback, apiUrl };
+        const seen = new Set();
+        const items = [];
+        for (const r of matched) {
+          const title = (r.value || r.label || '').replace(/^ygo\s*-\s*/i, '').trim();
+          if (seen.has(title)) continue;
+          seen.add(title);
+          const link = `https://${domain}/search/category/01?searchType=single&searchString=${encodeURIComponent(title)}`;
+          items.push({ title, link, price: '', soldOut: false });
+          if (items.length >= limit) break;
+        }
+        return { ok: true, items, apiUrl, href: fallback, pricingHref: fallback };
+      } catch (e) {
+        clearTimeout(tid);
+        return { ok: false, reason: e.name === 'AbortError' ? 'timeout' : 'unavailable', href: fallback };
+      }
+    }
+
+    /* Query cgstore.co.nz (Cerberus Games Wellington) via BigCommerce HTML scrape */
+    async function searchCGStore(store, query, limit, exact) {
+      const domain = 'cgstore.co.nz';
+      const fallback = `https://${domain}/search.php?search_query=${encodeURIComponent(query)}`;
+      const ctrl = new AbortController();
+      const tid = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+      try {
+        const proxied = PROXY + encodeURIComponent(fallback);
+        const resp = await fetch(proxied, { signal: ctrl.signal });
+        clearTimeout(tid);
+        if (!resp.ok) throw new Error(resp.status);
+        const html = stripExternalAssets(await resp.text());
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const cards = [...doc.querySelectorAll('article.card')];
+        if (!cards.length) return { ok: false, reason: 'empty', href: fallback };
+        const matched = exact
+          ? cards.filter(c => {
+              const a = c.querySelector('.card-title a, h4 a');
+              return a && matchesQuery({ title: a.textContent.trim(), handle: '' }, query);
+            })
+          : cards;
+        if (!matched.length) return { ok: false, reason: 'empty', href: fallback };
+        const items = matched.slice(0, limit).map(card => {
+          const titleEl = card.querySelector('.card-title a, h4 a');
+          const title = titleEl ? titleEl.textContent.trim() : '';
+          let link = titleEl ? titleEl.getAttribute('href') : fallback;
+          if (link && !link.startsWith('http')) link = `https://${domain}${link}`;
+          try { const u = new URL(link); u.searchParams.delete('searchid'); u.searchParams.delete('search_query'); link = u.toString(); } catch {}
+          const priceEl = card.querySelector('[data-product-price-with-tax], [data-product-price-without-tax], .price--withTax, .price--main, .price');
+          const price = priceEl ? priceEl.textContent.trim() : '';
+          const soldOut = !!card.querySelector('.button--soldOut, [data-button-state="soldOut"]');
+          return { title, link, price, soldOut };
+        });
+        return { ok: true, items, href: fallback };
+      } catch (e) {
+        clearTimeout(tid);
+        return { ok: false, reason: e.name === 'AbortError' ? 'timeout' : 'unavailable', href: fallback };
+      }
+    }
+
+    /* Query theslyfox.nz via its JSON ajax search endpoint */
+    async function searchSlyFox(store, query, limit, exact) {
+      const domain = 'www.theslyfox.nz';
+      const fallback = `https://${domain}/apps/search?q=${encodeURIComponent(query)}#/`;
+      const apiUrl = `https://${domain}/ajax/apps/search.php?q=${encodeURIComponent(query)}`;
+      try {
+        const proxyUrls = [
+          PROXY + encodeURIComponent(apiUrl),
+          `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}`
+        ];
+
+        let data = null;
+        for (const proxied of proxyUrls) {
+          const ctrl = new AbortController();
+          const tid = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+          try {
+            const resp = await fetch(proxied, { signal: ctrl.signal });
+            clearTimeout(tid);
+            if (!resp.ok) continue;
+
+            const text = await resp.text();
+            try {
+              data = JSON.parse(text);
+            } catch {
+              continue;
+            }
+            if (data && Array.isArray(data.documents)) break;
+          } catch (e2) {
+            clearTimeout(tid);
+            if (e2.name === 'AbortError') continue;
+          }
+        }
+
+        if (!data || !Array.isArray(data.documents)) {
+          return { ok: false, reason: 'unavailable', href: fallback, apiUrl };
+        }
+        const docs = Array.isArray(data?.documents) ? data.documents : [];
+        if (!docs.length) return { ok: false, reason: 'empty', href: fallback, apiUrl };
+
+        const productDocs = docs.filter(d => d?.type === 'product' && d?.name && d?.path);
+        const matched = exact
+          ? productDocs.filter(d => matchesQuery({ title: d.name || '', handle: d.path || '' }, query))
+          : productDocs;
+        if (!matched.length) return { ok: false, reason: 'empty', href: fallback, apiUrl };
+
+        const items = matched.slice(0, limit).map(d => {
+          const low = Number(d.lowprice);
+          const high = Number(d.highprice);
+          const priceNum = Number.isFinite(low) && low > 0 ? low : (Number.isFinite(high) && high > 0 ? high : NaN);
+          const price = Number.isFinite(priceNum) ? `$${priceNum.toFixed(2)}` : '';
+          const soldOut = d.out_of_stock === true || Number(d.num_found_skus) === 0;
+          let path = String(d.path || '');
+          if (!path.startsWith('/')) path = '/' + path;
+          return {
+            title: String(d.name || '').trim(),
+            link: `https://${domain}${path}`,
+            price,
+            soldOut
+          };
+        });
+
+        return { ok: true, items, href: fallback, apiUrl };
+      } catch (e) {
+        return { ok: false, reason: e.name === 'AbortError' ? 'timeout' : 'unavailable', href: fallback, apiUrl };
+      }
+    }
+
+    /* Build the HTML for one store card */
+    function renderStore(store, result, query) {
+      const domain = store.d;
+      const noteHtml = store.note
+        ? ` <span class="store-note">${esc(store.note)}</span>`
+        : '';
+      const viewHref = result.apiUrl || result.href || '';
+      const viewLabel = result.apiUrl ? 'view JSON' : 'view website';
+      let jsonLink = viewHref
+        ? ` <a class="json-link" href="${esc(viewHref)}" target="_blank" rel="noopener">[${viewLabel}]</a>`
+        : '';
+      if (result.apiUrl && result.href) {
+        jsonLink += ` <a class="json-link" href="${esc(result.href)}" target="_blank" rel="noopener">[open site]</a>`;
+      }
+      jsonLink += noteHtml;
+      let inner = '';
+      if (result.ok) {
+        inner = result.items.map(r => {
+          const badge = r.soldOut
+            ? `<span class="sold-out">${r.price ? r.price : '—'}</span>`
+            : r.price
+              ? `<span class="price">${esc(r.price)}</span>`
+              : `<span class="no-price">—</span>`;
+          return `<div class="item"><a href="${esc(r.link)}" target="${linkTarget}" rel="noopener">${esc(r.title)}</a>${badge}</div>`;
+        }).join('');
+        if (result.pricingHref) {
+          inner += `<div class="muted" style="margin-top:4px;"><a href="${esc(result.pricingHref)}" target="${linkTarget}" rel="noopener">→ show HTML search with pricing</a></div>`;
+        }
+      } else if (result.reason === 'link') {
+        inner = `<div class="muted"><a href="${esc(result.href)}" target="${linkTarget}" rel="noopener">[not implemented yet - open site search →]</a></div>`;
+      } else {
+        const label = result.reason === 'empty' ? 'no results' : result.reason;
+        inner = `<div class="muted">${label} → <a href="${esc(result.href)}" target="${linkTarget}" rel="noopener">open site</a></div>`;
+      }
+      return `<div class="store"><div class="store-name">${esc(domain)}${jsonLink}</div>${inner}</div>`;
+    }
+
+    // ── YGOPRODeck card lookup ───────────────────────────────────────────────
+
+    const YGO_CODE_RE = /^[A-Z][A-Z0-9]{1,7}-[A-Z]{2}\d{3,}$/i;
+    let _cardSetsCache = null;
+
+    async function fetchCardSets() {
+      if (_cardSetsCache) return _cardSetsCache;
+      const r = await fetch('https://db.ygoprodeck.com/api/v7/cardsets.php');
+      if (!r.ok) throw new Error('cardsets unavailable');
+      _cardSetsCache = await r.json();
+      return _cardSetsCache;
+    }
+
+    function renderYGOPanel(card, matchCode) {
+      const img    = card.card_images?.[0];
+      const imgUrl = img?.image_url || '';
+      const isLink = /link/i.test(card.type || '');
+
+      const statParts = [];
+      if (/monster/i.test(card.type || '')) {
+        const levelLabel = /xyz/i.test(card.type) ? 'Rank' : isLink ? 'Link' : 'Level';
+        const levelVal   = card.level ?? card.linkval;
+        if (levelVal != null) statParts.push(`${levelLabel} ${levelVal}`);
+        if (card.attribute) statParts.push(card.attribute);
+        if (card.atk != null) statParts.push(isLink ? `ATK ${card.atk}` : `ATK ${card.atk} / DEF ${card.def}`);
+      }
+
+      const setsRows = (card.card_sets || []).map(s => {
+        const hi    = matchCode && s.set_code.toUpperCase() === matchCode.toUpperCase();
+        const priceVal = parseFloat(s.set_price);
+        const price = !isNaN(priceVal) && priceVal > 0 ? '$' + priceVal.toFixed(2) : '\u2014';
+        return `<tr style="${hi ? 'background:#262200; border-left:2px solid #ffd700;' : ''}">
+          <td style="padding:2px 4px;color:#aaa;word-break:break-word;" title="${esc(s.set_name)}">${esc(s.set_name)}</td>
+          <td style="padding:2px 6px;font-family:monospace;font-size:10px;"><a href="javascript:void(0)" onclick="ygoSearchCode('${esc(s.set_code)}')" style="color:${hi ? '#ffd700' : '#88aaff'};text-decoration:underline;cursor:pointer;font-family:monospace;font-size:10px;">${esc(s.set_code)}</a></td>
+          <td style="padding:2px 6px;color:#aaa;">${esc(s.set_rarity)}</td>
+          <td style="padding:2px 6px;color:#ffe066;white-space:nowrap;"><span style="display:inline-flex;flex-direction:column;align-items:flex-start;line-height:1.2;"><span>${esc(price)}</span><span style="color:#555;font-size:8px;">USD</span></span></td>
+        </tr>`;
+      }).join('');
+
+      const setsSection = card.card_sets?.length ? `
+        <details style="margin-top:6px;" open>
+          <summary style="cursor:pointer;font-size:11px;color:#888;user-select:none;">
+            ${card.card_sets.length} print${card.card_sets.length !== 1 ? 's' : ''} across sets <span style="color:#555;font-size:10px;">— tap code to reinitiate search </span>
+          </summary>
+          <div style="overflow-x:auto;margin-top:6px;">
+            <table style="border-collapse:collapse;font-size:10px;width:100%;">
+              <thead><tr style="color:#777;text-align:left;">
+                <th style="padding:2px 6px;border-bottom:1px solid #1e1e1e;">Set</th>
+                <th style="padding:2px 6px;border-bottom:1px solid #1e1e1e;">Code</th>
+                <th style="padding:2px 6px;border-bottom:1px solid #1e1e1e;">Rarity</th>
+                <th style="padding:2px 6px;border-bottom:1px solid #1e1e1e;">~Price</th>
+              </tr></thead>
+              <tbody>${setsRows}</tbody>
+            </table>
+          </div>
+        </details>` : '';
+
+      const konamiId = card.misc_info?.[0]?.konami_id;
+      const ygoUrl = konamiId
+        ? `https://www.db.yugioh-card.com/yugiohdb/card_search.action?cid=${konamiId}&ope=2&request_locale=en`
+        : `https://db.ygoprodeck.com/card/?id=${card.id}`;
+      const jsonSection = `
+        <details style="margin-top:6px;">
+          <summary style="cursor:pointer;font-size:10px;color:#555;user-select:none;">view JSON</summary>
+          <pre style="font-size:9px;color:#666;background:#0a0a0a;border:1px solid #1a1a1a;padding:6px;overflow-x:auto;margin-top:4px;white-space:pre-wrap;word-break:break-all;max-height:260px;overflow-y:auto;">${esc(JSON.stringify(card, null, 2))}</pre>
+        </details>`;
+      return `
+        <div style="background:#131310;border:1px solid #3a3510;padding:7px;min-width:0;max-width:100%;box-sizing:border-box;">
+          <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start;">
+            ${imgUrl ? `<div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:5px;">
+              <img src="${esc(imgUrl)}" alt="${esc(card.name)}" style="width:80px;height:auto;border:1px solid #2a2a1a;" loading="lazy" />
+              <a href="${esc(ygoUrl)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="font-size:10px;font-weight:bold;color:#fff;text-decoration:none;background:var(--primary);width:56px;text-align:center;padding:3px 0;box-sizing:border-box;white-space:nowrap;margin-top:6px;display:inline-block;">&#8599; Open</a>
+              <a href="https://db.ygoprodeck.com/api/v7/cardinfo.php?id=${card.id}&misc=yes" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="font-size:10px;font-weight:bold;color:#fff;text-decoration:none;background:var(--primary);width:56px;text-align:center;padding:3px 0;box-sizing:border-box;white-space:nowrap;margin-top:3px;display:inline-block;">JSON</a>
+            </div>` : ''}
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:14px;font-weight:bold;color:#ffd700;margin-bottom:4px;word-break:break-word;">${esc(card.name)}</div>
+              <div style="font-size:11px;color:#888;margin-bottom:3px;">${esc(card.type || '')}${card.race ? ' &middot; ' + esc(card.race) : ''}</div>
+              ${statParts.length ? `<div style="font-size:11px;color:#aaa;display:flex;gap:10px;flex-wrap:wrap;margin-bottom:4px;">${statParts.map(p => `<span>${esc(p)}</span>`).join('')}</div>` : ''}
+              <div style="font-size:11px;color:#bbb;line-height:1.6;border-top:1px solid #1e1e1e;padding-top:5px;white-space:pre-line;word-break:break-word;">${esc(card.desc || '')}</div>
+            </div>
+          </div>
+          ${setsSection}
+          ${jsonSection}
+        </div>
+        <div style="font-size:9px;color:#252510;text-align:right;margin-top:1px;">via YGOPRODeck API${matchCode ? ' &middot; ' + esc(matchCode) : ''}</div>`;
+    }
+
+    function ygoSearchCode(code) {
+      document.getElementById('q').value = code;
+      window.scrollTo(0, 0);
+      search(true);
+      setTimeout(() => window.scrollTo(0, 0), 150);
+    }
+
+    async function lookupYGOCard(query, onResult) {
+      const YGO_TIMEOUT_MS = 5000;
+      try {
+        const trimmed = query.trim();
+        let card = null;
+        let matchCode = null;
+        let ygoStatus = 'not_found'; // 'found' | 'multiple' | 'not_found'
+        const ctrl = new AbortController();
+        const tid = setTimeout(() => ctrl.abort(), YGO_TIMEOUT_MS);
+
+        if (YGO_CODE_RE.test(trimmed)) {
+          matchCode = trimmed.toUpperCase();
+          const setCode = matchCode.match(/^([A-Z][A-Z0-9]+)-/)[1];
+          const sets    = await fetchCardSets();
+          const setInfo = sets.find(s => s.set_code.toUpperCase() === setCode);
+          if (setInfo) {
+            const r = await fetch(`https://db.ygoprodeck.com/api/v7/cardinfo.php?cardset=${encodeURIComponent(setInfo.set_name)}&misc=yes`, { signal: ctrl.signal });
+            if (r.ok) {
+              const d = await r.json();
+              card = (d.data || []).find(c => (c.card_sets || []).some(s => s.set_code.toUpperCase() === matchCode)) || null;
+              if (card) ygoStatus = 'found';
+            }
+          }
+        } else {
+          const r = await fetch(`https://db.ygoprodeck.com/api/v7/cardinfo.php?name=${encodeURIComponent(trimmed)}&misc=yes`, { signal: ctrl.signal });
+          if (r.ok) {
+            const d = await r.json();
+            if (d.data?.length === 1) { card = d.data[0]; ygoStatus = 'found'; }
+            else if (d.data?.length > 1) ygoStatus = 'multiple';
+          }
+        }
+        clearTimeout(tid);
+
+        const node = document.createElement('div');
+        if (ygoStatus === 'found') {
+        node.style.cssText = 'grid-column: 1 / -1; border: 1px solid #b8860b; background: #1a1500; box-shadow: 0 0 18px rgba(255,200,0,0.35), 0 0 34px rgba(255,200,0,0.15), inset 0 0 0 1px rgba(255,200,0,0.18); margin-bottom: 2px; max-width:100%; min-width:0; box-sizing:border-box; overflow-x:auto;';
+          node.innerHTML = `<details open>
+            <summary style="cursor:pointer; padding:5px 12px; font-size:13px; font-weight:bold; color:#ffd700; user-select:none; text-shadow:0 0 10px rgba(255,200,0,0.5);">
+              &#9733; YGOPRODeck: ${esc(card.name)}
+            </summary>
+            <div style="padding:0 8px 8px;">${renderYGOPanel(card, matchCode)}</div>
+          </details>`;
+        } else {
+          node.style.cssText = 'grid-column: 1 / -1; border: 1px solid #1e1e1e; background: #111; padding: 6px 14px; font-size: 10px; color: #777; letter-spacing: 0.3px;';
+          node.textContent = ygoStatus === 'multiple'
+            ? '\u22ef YGOPRODeck: multiple results \u2014 try exact card name or use a set code (e.g. DUPO-EN017)'
+            : '\u22ef YGOPRODeck: not returned for this query';
+        }
+        onResult(node);
+      } catch (e) {
+        console.warn('YGO lookup:', e);
+      }
+    }
+
+    async function search(exact = true) {
+      const q = document.getElementById('q').value.trim();
+      if (!q) return;
+
+      const fetchStores = STORES.filter(s => !s.link);
+      const limit = Math.max(1, Math.min(20, parseInt(document.getElementById('limit').value) || 10));
+      const queryEl = document.getElementById('query');
+      queryEl.innerHTML = (exact ? 'Exact search: ' : 'Fuzzy search: ') + '<b>' + esc(q) + '</b>';
+      document.getElementById('status').textContent = `Querying ${fetchStores.length} stores…`;
+
+      const resultsEl = document.getElementById('results');
+      resultsEl.innerHTML = '';
+      ygoPanelNode = null;
+      lookupYGOCard(q, node => { ygoPanelNode = node; reorderStoreCards(); });
+      let linkGroupNode = null;
+
+      // Section header nodes (managed by reorderStoreCards)
+      const hitHeaderNode = document.createElement('div');
+      hitHeaderNode.className = 'section-header';
+      hitHeaderNode.textContent = '\u2713 Results Found';
+      const linksHeaderNode = document.createElement('div');
+      linksHeaderNode.className = 'section-header';
+      linksHeaderNode.textContent = '\u2197 External Links';
+      const missHeaderNode = document.createElement('div');
+      missHeaderNode.className = 'section-header';
+      missHeaderNode.textContent = '\u2717 Not Found / No Results';
+
+      /* Render all slots — link-only stores populate immediately, Shopify show placeholder */
+      const slots = STORES.map(store => {
+        const div = document.createElement('div');
+        div.className = 'store';
+        div.dataset.resultState = 'pending';
+        div.dataset.storeDomain = store.d;
+        if (store.link) {
+          div.innerHTML = renderStore(store, { ok: false, reason: 'link', href: store.link(q) }, q)
+            .replace(/^<div class="store">/, '').replace(/<\/div>$/, '');
+        } else {
+          div.innerHTML = `<div class="store-name">${esc(store.d)}</div><div class="muted">searching…</div>`;
+        }
+        resultsEl.appendChild(div);
+        return div;
+      });
+
+      /* Render the links-only group immediately; fetch live USD→NZD rate in parallel */
+      if (LINK_STORES.length) {
+        const linkDiv = document.createElement('div');
+        linkDiv.className = 'store';
+        linkDiv.style.cssText = 'border-color:#6a6a6a; background:#242424; box-shadow: 0 0 18px rgba(255,255,255,0.18), 0 0 34px rgba(255,255,255,0.08), inset 0 0 0 1px rgba(255,255,255,0.08);';
+        linkDiv.innerHTML =
+          `<div class="store-name" style="color:#f1f1f1; border-bottom-color:#4a4a4a; text-shadow:0 0 8px rgba(255,255,255,0.18);">external links &amp; reference prices (unattainable APIs)</div>` +
+          LINK_STORES.map(s =>
+            `<div class="item" style="font-size:12px;"><a href="${esc(s.url(q))}" target="${linkTarget}" rel="noopener" style="color:#f0f0f0; text-shadow:0 0 6px rgba(255,255,255,0.12);">${esc(s.d)}</a></div>`
+          ).join('');
+        resultsEl.appendChild(linkDiv);
+        linkGroupNode = linkDiv;
+      }
+
+      /* Render coming-soon group — inserted between YGO panel and external links */
+      let comingSoonNode = null;
+      if (COMING_SOON_STORES.length) {
+        const csDiv = document.createElement('div');
+        csDiv.className = 'store';
+        csDiv.style.cssText = 'border-color:#006655; background:#001a14; box-shadow: 0 0 18px rgba(0,220,200,0.22), 0 0 34px rgba(0,220,200,0.10), inset 0 0 0 1px rgba(0,220,200,0.12);';
+        csDiv.innerHTML =
+          `<div class="store-name" style="color:#00dcc8; border-bottom-color:#004d44; text-shadow:0 0 8px rgba(0,220,200,0.4);">🔜 coming soon</div>` +
+          COMING_SOON_STORES.map(s =>
+            `<div class="item" style="font-size:12px;"><a href="${esc(s.url)}" target="${linkTarget}" rel="noopener" style="color:#00dcc8; text-shadow:0 0 6px rgba(0,220,200,0.25);">${esc(s.d)}</a></div>`
+          ).join('');
+        comingSoonNode = csDiv;
+        resultsEl.appendChild(csDiv);
+      }
+
+      function reorderStoreCards() {
+        const stateRank = { hit: 0, pending: 1, miss: 2 };
+        const ordered = slots
+          .map((node, index) => ({
+            node,
+            index,
+            state: node.dataset.resultState || 'pending',
+            domain: node.dataset.storeDomain || STORES[index].d,
+            hasInStock: node.dataset.resultState === 'hit' && node.querySelector('.price') !== null
+          }))
+          .sort((a, b) => {
+            // Prioritize in-stock hits at the very top
+            if (a.state === 'hit' && b.state === 'hit') {
+              if (a.hasInStock !== b.hasInStock) return a.hasInStock ? -1 : 1;
+            }
+            
+            const rankDiff = (stateRank[a.state] ?? 1) - (stateRank[b.state] ?? 1);
+            if (rankDiff !== 0) return rankDiff;
+            if (a.state === 'miss' && b.state === 'miss') {
+              const aCardSpot = a.domain === 'cardspotnz.com';
+              const bCardSpot = b.domain === 'cardspotnz.com';
+              if (aCardSpot !== bCardSpot) return aCardSpot ? -1 : 1;
+            }
+            return a.index - b.index;
+          });
+
+        [hitHeaderNode, ygoPanelNode, comingSoonNode, linksHeaderNode, linkGroupNode, missHeaderNode]
+          .forEach(n => n?.parentNode && n.remove());
+
+        const hitStores = ordered.filter(e => e.state === 'hit');
+        const notHitStores = ordered.filter(e => e.state !== 'hit');
+
+        if (hitStores.length) resultsEl.appendChild(hitHeaderNode);
+        hitStores.forEach(entry => resultsEl.appendChild(entry.node));
+        if (ygoPanelNode) resultsEl.appendChild(ygoPanelNode);
+        resultsEl.appendChild(linksHeaderNode);
+        if (comingSoonNode) resultsEl.appendChild(comingSoonNode);
+        if (linkGroupNode) resultsEl.appendChild(linkGroupNode);
+        if (notHitStores.length) resultsEl.appendChild(missHeaderNode);
+        notHitStores.forEach(entry => resultsEl.appendChild(entry.node));
+      }
+
+      let done = 0;
+      const promises = STORES.map((store, i) => {
+        if (store.link) return Promise.resolve();
+        return Promise.resolve()
+          .then(() => (store.scraper ? store.scraper(store, q, limit, exact) : searchStore(store, q, limit, exact)))
+          .catch(() => ({ ok: false, reason: 'unavailable', href: `https://${store.d}/search?q=${encodeURIComponent(q)}` }))
+          .then(result => {
+          const safeResult = result && typeof result === 'object'
+            ? result
+            : { ok: false, reason: 'unavailable', href: `https://${store.d}/search?q=${encodeURIComponent(q)}` };
+          const fresh = document.createElement('div');
+          fresh.className = 'store';
+          fresh.dataset.resultState = safeResult.ok ? 'hit' : 'miss';
+          fresh.dataset.storeDomain = store.d;
+          fresh.innerHTML = renderStore(store, safeResult, q)
+            .replace(/^<div class="store">/, '').replace(/<\/div>$/, '');
+          slots[i].replaceWith(fresh);
+          slots[i] = fresh;
+          done++;
+          document.getElementById('status').textContent = `${done} / ${fetchStores.length} done`;
+          reorderStoreCards();
+        });
+      });
+
+      await Promise.all(promises);
+      reorderStoreCards();
+
+      queryEl.innerHTML += ` - ${STORES.length} stores searched`;
+      document.getElementById('status').textContent = '';
+      document.getElementById('q').focus();
+    }
+
+    let lastSearchTime = 0;
+    document.getElementById('q').addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        const now = Date.now();
+        if (now - lastSearchTime < 500) return;
+        lastSearchTime = now;
+        search(true);
+      }
+    });
+    document.getElementById('limit').addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        const now = Date.now();
+        if (now - lastSearchTime < 500) return;
+        lastSearchTime = now;
+        search(true);
+        document.getElementById('q').focus();
+      }
+    });
+
+    // Initialise same-tab toggle from URL hash; persist choice in hash
+    (function () {
+      const cb = document.getElementById('same-tab-toggle');
+      cb.checked = linkTarget === '_self';
+      cb.addEventListener('change', () => {
+        linkTarget = cb.checked ? '_self' : '_blank';
+        location.hash = cb.checked ? 'sametab' : 'newtab';
+        document.querySelectorAll('#results a:not(.json-link)').forEach(a => { a.target = linkTarget; });
+      });
+    })();
+
+    // Populate available sites list
+    (function () {
+      const el = document.getElementById('available-sites-list');
+      if (!el) return;
+      const sep = '<span style="color:#2a2a2a;"> · </span>';
+      const liveHtml = STORES.map(s => {
+        const tag = s.nameOnly ? '<sup style="color:#ffd700;font-size:8px;letter-spacing:0;"> +name</sup>' : '';
+        return `<span style="white-space:nowrap;">${esc(s.d)}${tag}</span>`;
+      }).join(sep);
+      const linkHtml = LINK_STORES.map(s =>
+        `<span style="color:#888;white-space:nowrap;">${esc(s.d.replace(/ \(.*/, ''))}</span>`
+      ).join(sep);
+      el.innerHTML =
+        `<span style="color:#555;font-size:10px;">live API &middot; ${STORES.length} stores:</span><br />${liveHtml}` +
+        `<br /><span style="color:#555;font-size:10px;margin-top:5px;display:inline-block;">link only &middot; ${LINK_STORES.length} sites:</span><br />${linkHtml}` +
+        `<br /><span style="color:#555;font-size:9px;font-style:italic;margin-top:4px;display:inline-block;"><sup style="color:#ffd700;">+name</sup> = name search only; set codes like DUPO-EN017 not supported</span>`;
+    })();
+
+  </script>
+
+  <!-- Footer placeholder -->
+  <div id="footer-container"></div>
+  <script>
+    fetch('https://david-fear.github.io/components/footer.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('footer-container').innerHTML = data;
+      })
+      .catch(error => {
+        console.error('Failed to load footer:', error);
+      });
+  </script>
+
+</body>
+
+</html>
