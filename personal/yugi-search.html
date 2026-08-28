@@ -320,10 +320,7 @@
   <main>
     <section>
       <div class="search-header">
-        <div style="background:#7a6000; color:#ffe066; border:1px solid #ffe066; padding:7px 12px; font-size:12px; margin-bottom:8px; text-align:center;">
-          &#9989; Switched corsproxy (disabled anon use) to CloudFlare Proxy 25 Aug. If any issues, please lemme know via buymeacoffee below so i can resolve - thnx =)
-        </div>
-        <h3>NZ TCG Search (Search entire TCG Stores)</h3>
+        <h3>NZ TCG Store Search</h3>
         <div class="search-row">
           <input id="q" placeholder="Card name or code, e.g. DUPO-EN017" value="" title="Card name or code"
             autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" autofocus />
@@ -339,7 +336,7 @@
           </div>
         </div>
         <details class="search-examples">
-          <summary>Search Examples</summary>
+          <summary>Search Examples + Legend</summary>
           <div>
             <span style="color:#666;font-size:10px;">Yu-Gi-Oh</span>
             <a href="#" onclick="document.getElementById('q').value='DUPO-EN017'; search(true); return false;">DUPO-EN017</a> ,
@@ -371,26 +368,29 @@
             <br />
             <span style="color:#666;font-size:10px;">Lorcana</span>
             <a href="#" onclick="document.getElementById('q').value='elsa fifth spirit'; search(false); return false;">Elsa Fifth Spirit</a> ,
-            <a href="#" onclick="document.getElementById('q').value='moana motunui'; search(false); return false;">Moana of Motunui</a>
+            <a href="#" onclick="document.getElementById('q').value='moana motunui'; search(false); return false;">Moana of Motunui</a> ,
+            <a href="#" onclick="document.getElementById('q').value='hunny wizard'; search(false); return false;">Hunny Wizard</a>
             <br />
             <span style="color:#666;font-size:10px;">Warhammer</span>
             <a href="#" onclick="document.getElementById('q').value='40k'; search(false); return false;">40k</a> ,
-            <a href="#" onclick="document.getElementById('q').value='40,000'; search(false); return false;">40,000</a>
+            <a href="#" onclick="document.getElementById('q').value='40,000'; search(false); return false;">40,000</a> ,
+            <a href="#" onclick="document.getElementById('q').value='chaos space marines'; search(false); return false;">Chaos Space Marines</a> ,
+            <a href="#" onclick="document.getElementById('q').value='blood angels'; search(false); return false;">Blood Angels</a>
             <br />
             <span style="color:#666;font-size:10px;">Accessories</span>
             <a href="#" onclick="document.getElementById('q').value='dragonshield'; search(true); return false;">Dragonshield</a> ,
             <a href="#" onclick="document.getElementById('q').value='game mat'; search(true); return false;">Game Mat</a>
+          </div>
+          <div class="legend" style="justify-content:center; margin-top:6px;">
+            <span><span class="legend-dot" style="background:#7dff7d"></span>In stock</span>
+            <span><span class="legend-dot" style="background:#ff4444"></span>Sold out</span>
+            <span><span class="legend-dot" style="background:#555"></span>No price</span>
           </div>
         </details>
         <details class="search-examples" id="available-sites-details">
           <summary>Available sites to search across</summary>
           <div id="available-sites-list"></div>
         </details>
-        <div class="legend">
-          <span><span class="legend-dot" style="background:#7dff7d"></span>In stock</span>
-          <span><span class="legend-dot" style="background:#ff4444"></span>Sold out</span>
-          <span><span class="legend-dot" style="background:#555"></span>No price</span>
-        </div>
       </div>
     </section>
   </main>
