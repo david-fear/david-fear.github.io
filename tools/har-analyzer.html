@@ -2,57 +2,78 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="stylesheet" href="https://david-fear.github.io/stylesheet.css" />
 <title>HAR Analyzer</title>
 <style>
-  #dropzone { border: 2px dashed #999; padding: 20px; text-align: center; cursor: pointer; margin-bottom: 20px; }
+  #dropzone {
+    border: 2px dashed var(--primary);
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    margin-bottom: 20px;
+    color: var(--text);
+    background: #1a1a1a;
+    border-radius: 8px;
+    transition: background 0.2s;
+  }
   #results {
     overflow-x: auto;
     max-width: 100%;
-    border: 1px solid #ccc;
+    border: 1px solid #333;
+    border-radius: 8px;
+    margin-top: 16px;
   }
   table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
-    table-layout: auto; /* allow flexible column widths */
+    table-layout: auto;
   }
   th, td {
-    border: 1px solid #ccc;
-    padding: 4px;
+    border: 1px solid #333;
+    padding: 4px 6px;
     font-size: 10px;
-    vertical-align: top
+    vertical-align: top;
     word-break: break-all;
+    color: var(--text);
   }
   th {
-    background: #f4f4f4;
+    background: #2b2b2b;
+    color: var(--primary);
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    position: sticky;
+    top: 0;
   }
+  tr:hover:not(.payload-row) td { background-color: #222; }
   #summary {
-    margin-top: 20px;
+    margin-top: 16px;
     font-size: 14px;
+    padding: 12px 16px;
+    background: #1e1e1e;
+    border: 1px solid #333;
+    border-radius: 8px;
+    color: var(--text);
+    line-height: 1.8;
   }
   pre {
-    background: #f5f5f5;
+    background: #111;
+    border: 1px solid #2a2a2a;
     padding: 10px;
     overflow: auto;
     font-size: 12px;
     white-space: pre-wrap;
     word-break: break-word;
+    color: #c8d0da;
+    border-radius: 4px;
+    margin-top: 8px;
   }
-  button {
-    cursor: pointer;
-    background-color: #007acc;
-    color: white;
-    border: none;
-    padding: 4px 8px;
-    border-radius: 3px;
+  table button {
+    padding: 2px 8px;
     font-size: 11px;
   }
-  button:hover {
-    background-color: #005fa3;
-  }
   tr.payload-row td {
-    background-color: #fafafa;
+    background-color: #111;
     font-family: monospace;
   }
 </style>
@@ -94,6 +115,7 @@
 
   <header>
     <h1>HAR Analyzer</h1>
+    <p>Drop a HAR file to inspect requests, timings, and payloads. Nothing is uploaded &mdash; all processing is local.</p>
   </header>
 
 <main>
@@ -114,8 +136,8 @@ const resultsDiv = document.getElementById("results");
 const rawJson = document.getElementById("rawJson");
 
 dropzone.addEventListener("click", () => fileInput.click());
-dropzone.addEventListener("dragover", e => { e.preventDefault(); dropzone.style.background = "#eee"; });
-dropzone.addEventListener("dragleave", () => dropzone.style.background = "" );
+dropzone.addEventListener("dragover", e => { e.preventDefault(); dropzone.style.background = "#222"; });
+dropzone.addEventListener("dragleave", () => dropzone.style.background = "#1a1a1a" );
 dropzone.addEventListener("drop", e => {
     e.preventDefault();
     dropzone.style.background = "";
@@ -124,15 +146,15 @@ dropzone.addEventListener("drop", e => {
 fileInput.addEventListener("change", e => handleFile(e.target.files[0]));
 
 function timeColor(ms) {
-    if (ms < 100) return "background-color:#c6f6c6";        // green
-    if (ms < 1000) return "background-color:#ffe9b3";       // orange
-    return "background-color:#ffb3b3";                      // red
+    if (ms < 100) return "background-color:#0d2b0d;color:#7dff7d";    // fast
+    if (ms < 1000) return "background-color:#2b2200;color:#ffcc00";   // medium
+    return "background-color:#2b0d0d;color:#ff6666";                   // slow
 }
   
 function statusColor(status) {
-    if (status === 200) return "background-color:#c6f6c6";   // bright green (light)
-    if (status >= 201 && status < 300) return "background-color:#a6d6a6"; // darker green
-    return "background-color:#ffb3b3";                       // red
+    if (status === 200) return "background-color:#0d2b0d;color:#7dff7d";
+    if (status >= 201 && status < 300) return "background-color:#0d2b0d;color:#a0e8a0";
+    return "background-color:#2b0d0d;color:#ff6666";
 }
   
 function handleFile(file) {

@@ -115,7 +115,7 @@ nav ul,
 
 nav ul li,
 #menu-nav ul li {
-  margin-bottom: 0.2rem;
+  margin-bottom: 0.1rem;
 }
 
 nav ul li a,
@@ -123,7 +123,7 @@ nav ul li a,
   text-decoration: none;
   color: var(--primary);
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 0.85rem;
 }
 
 nav ul li a:hover,
