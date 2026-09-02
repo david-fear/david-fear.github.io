@@ -137,6 +137,13 @@
       color: #ffd700;
     }
 
+    #code-warning {
+      margin-top: 4px;
+      font-size: 11px;
+      color: #ffd700;
+      font-style: italic;
+    }
+
     #status {
       margin-top: 4px;
       font-size: 11px;
@@ -322,7 +329,7 @@
       <div class="search-header">
         <h3>NZ TCG Store Search</h3>
         <div class="search-row">
-          <input id="q" placeholder="Card name or code, e.g. DUPO-EN017" value="" title="Card name or code"
+          <input id="q" placeholder="Card name/code, e.g. MAMO-EN003" value="" title="Card name or code"
             autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" autofocus />
           <input id="limit" type="number" min="1" max="10" value="10" style="width:50px;" title="Results per site (Shopify API hard cap is 10; higher values only apply to non-Shopify scrapers)" />
         </div>
@@ -340,6 +347,7 @@
           <div>
             <span style="color:#666;font-size:10px;">Yu-Gi-Oh</span>
             <a href="#" onclick="document.getElementById('q').value='DUPO-EN017'; search(true); return false;">DUPO-EN017</a> ,
+            <a href="#" onclick="document.getElementById('q').value='MAMO-EN'; search(true); return false;">MAMO-EN</a> ,
             <a href="#" onclick="document.getElementById('q').value='ash blossom quarter century'; search(false); return false;">Ash Blossom Quarter Century</a> ,
             <a href="#" onclick="document.getElementById('q').value='red eyes ghost'; search(false); return false;">Red Eyes Ghost</a> ,
             <a href="#" onclick="document.getElementById('q').value='chocolate magician gold'; search(false); return false;">Chocolate Magician Gold</a> ,
@@ -396,6 +404,7 @@
   </main>
 
   <div id="query"></div>
+  <div id="code-warning"></div>
   <div id="status"></div>
   <div class="stores" id="results"></div>
 
@@ -482,6 +491,16 @@
         .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '')
         .replace(/<img\b[^>]*>/gi, '')
         .replace(/<iframe\b[^>]*>[\s\S]*?<\/iframe>/gi, '');
+    }
+
+    /* Warn on truncated set codes (e.g. MAMO-EN0): store search engines match whole
+       tokens, so a partial card number matches nothing. Full code or set prefix only. */
+    function partialSetCodeWarning(query) {
+      const m = /^([a-z0-9]{2,5})-([a-z]{2})(\d{1,2})$/i.exec(query.trim());
+      if (!m) return '';
+      const set = m[1].toUpperCase(), region = m[2].toUpperCase();
+      return `⚠ Partial card numbers don't work — store search engines match whole codes. ` +
+        `Try <b>${esc(set)}-${esc(region)}</b> (whole set) or the full number like <b>${esc(set)}-${esc(region)}017</b>.`;
     }
 
     /* Return true if every token in the query appears in the product title or handle */
@@ -1019,6 +1038,7 @@
       const limit = Math.max(1, Math.min(20, parseInt(document.getElementById('limit').value) || 10));
       const queryEl = document.getElementById('query');
       queryEl.innerHTML = (exact ? 'Exact search: ' : 'Fuzzy search: ') + '<b>' + esc(q) + '</b>';
+      document.getElementById('code-warning').innerHTML = partialSetCodeWarning(q);
       document.getElementById('status').textContent = `Querying ${fetchStores.length} stores…`;
 
       const resultsEl = document.getElementById('results');
