@@ -442,21 +442,21 @@
       { d: "cardmerchanttaupo.co.nz" },
       { d: "thegametree.co.nz" },
       { d: "magicreddragon.co.nz" },
-      // ── Link-only (non-Shopify — opens search page) ──────────
+      // ── Link-only (non-Shopify - opens search page) ──────────
     ];
 
-    /* Stores that can't be live-scraped (Cloudflare-protected etc.) — shown as a link-only group */
+    /* Stores that can't be live-scraped (Cloudflare-protected etc.) - shown as a link-only group */
     const LINK_STORES = [
       { d: 'mtgsingles.co.nz (direct card code lookup)', url: q => `https://www.mtgsingles.co.nz/card/${encodeURIComponent(q)}` },
-      { d: 'tcgplayer.com (USD — international market price)', url: q => `https://www.tcgplayer.com/search/all/product?q=${encodeURIComponent(q)}&view=grid` },
-      { d: 'collectr.com (USD — international market price)', url: q => `https://app.getcollectr.com/?query=${encodeURIComponent(q)}` },
+      { d: 'tcgplayer.com (USD - international market price)', url: q => `https://www.tcgplayer.com/search/all/product?q=${encodeURIComponent(q)}&view=grid` },
+      { d: 'collectr.com (USD - international market price)', url: q => `https://app.getcollectr.com/?query=${encodeURIComponent(q)}` },
       { d: 'vagabond.co.nz',  url: q => `https://vagabond.co.nz/search.php?search_query=${encodeURIComponent(q)}&section=product` },
       { d: 'trademe.co.nz',  url: q => `https://www.trademe.co.nz/a/marketplace/gaming/trading-cards/search?search_string=${encodeURIComponent(q)}` },
       { d: 'www.hobbylords.co.nz', url: q => `https://www.hobbylords.co.nz/shop/shop-all/search?product_keyword=${encodeURIComponent(q)}&p=1` },
       { d: 'novagames.co.nz', url: q => `https://novagames.co.nz/search?type=product&options[prefix]=last&q=${encodeURIComponent(q)}` },
     ];
 
-    /* Stores that are coming soon — shown as a preview section */
+    /* Stores that are coming soon - shown as a preview section */
     const COMING_SOON_STORES = [
       { d: 'rawr.cards', url: 'https://www.rawr.cards/' },
     ];
@@ -471,7 +471,7 @@
         .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
-    /* Normalise Shopify price — handles "$10.99", "10.99", "1099" (cents) */
+    /* Normalise Shopify price - handles "$10.99", "10.99", "1099" (cents) */
     function fmtPrice(raw) {
       if (raw == null || raw === '') return '';
       const digits = String(raw).replace(/[^0-9.]/g, '');
@@ -499,7 +499,7 @@
       const m = /^([a-z0-9]{2,5})-([a-z]{2})(\d{1,2})$/i.exec(query.trim());
       if (!m) return '';
       const set = m[1].toUpperCase(), region = m[2].toUpperCase();
-      return `⚠ Partial card numbers don't work — store search engines match whole codes. ` +
+      return `⚠ Partial card numbers don't work - store search engines match whole codes. ` +
         `Try <b>${esc(set)}-${esc(region)}</b> (whole set) or the full number like <b>${esc(set)}-${esc(region)}017</b>.`;
     }
 
@@ -701,7 +701,7 @@
       }
     }
 
-    /* Query www.baydragon.co.nz via AJAX autocomplete (names only — no prices).
+    /* Query www.baydragon.co.nz via AJAX autocomplete (names only - no prices).
        Deduplicates by title; each result links to the full HTML search for that name.
        result.pricingHref triggers a "show with pricing" footer link in renderStore. */
     async function searchBayDragon(store, query, limit, exact) {
@@ -864,10 +864,10 @@
       if (result.ok) {
         inner = result.items.map(r => {
           const badge = r.soldOut
-            ? `<span class="sold-out">${r.price ? r.price : '—'}</span>`
+            ? `<span class="sold-out">${r.price ? r.price : '-'}</span>`
             : r.price
               ? `<span class="price">${esc(r.price)}</span>`
-              : `<span class="no-price">—</span>`;
+              : `<span class="no-price">-</span>`;
           return `<div class="item"><a href="${esc(r.link)}" target="${linkTarget}" rel="noopener">${esc(r.title)}</a>${badge}</div>`;
         }).join('');
         if (result.pricingHref) {
@@ -924,7 +924,7 @@
       const setsSection = card.card_sets?.length ? `
         <details style="margin-top:6px;" open>
           <summary style="cursor:pointer;font-size:11px;color:#888;user-select:none;">
-            ${card.card_sets.length} print${card.card_sets.length !== 1 ? 's' : ''} across sets <span style="color:#555;font-size:10px;">— tap code to reinitiate search </span>
+            ${card.card_sets.length} print${card.card_sets.length !== 1 ? 's' : ''} across sets <span style="color:#555;font-size:10px;">- tap code to reinitiate search </span>
           </summary>
           <div style="overflow-x:auto;margin-top:6px;">
             <table style="border-collapse:collapse;font-size:10px;width:100%;">
@@ -1058,7 +1058,7 @@
       missHeaderNode.className = 'section-header';
       missHeaderNode.textContent = '\u2717 Not Found / No Results';
 
-      /* Render all slots — link-only stores populate immediately, Shopify show placeholder */
+      /* Render all slots - link-only stores populate immediately, Shopify show placeholder */
       const slots = STORES.map(store => {
         const div = document.createElement('div');
         div.className = 'store';
@@ -1088,7 +1088,7 @@
         linkGroupNode = linkDiv;
       }
 
-      /* Render coming-soon group — inserted between YGO panel and external links */
+      /* Render coming-soon group - inserted between YGO panel and external links */
       let comingSoonNode = null;
       if (COMING_SOON_STORES.length) {
         const csDiv = document.createElement('div');
