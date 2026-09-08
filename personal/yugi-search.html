@@ -510,6 +510,17 @@
       return tokens.every(t => haystack.includes(t));
     }
 
+    /* Shopify ORs multi-word queries and caps suggest.json at 10 products, so a 3-word
+       card name gets crowded out by single-term matches and never appears. AND-join the
+       tokens for exact search. Hyphens stay intact - splitting OP18-EN024 loses the hit.
+       Fuzzy search keeps the raw query so it stays fuzzy. */
+    function shopifyQuery(query) {
+      const q = query.trim();
+      if (/\b(AND|OR|NOT)\b|"/.test(q)) return q;   // user supplied their own operators
+      const tokens = q.split(/\s+/).filter(Boolean);
+      return tokens.length > 1 ? tokens.join(' AND ') : q;
+    }
+
     /* Fetch JSON; falls back to public proxies if the worker fails */
     function fetchJSON(url) {
       const proxyList = [
@@ -539,7 +550,7 @@
     async function searchStore(store, query, limit, exact) {
       const domain = store.d;
       const fallback = `https://${domain}/search?q=${encodeURIComponent(query)}`;
-      const apiUrl = `https://${domain}/search/suggest.json?q=${encodeURIComponent(query)}&resources[type]=product&resources[limit]=${limit}`;
+      const apiUrl = `https://${domain}/search/suggest.json?q=${encodeURIComponent(exact ? shopifyQuery(query) : query)}&resources[type]=product&resources[limit]=${limit}`;
       try {
         const data = await fetchJSON(apiUrl);
         const products = data?.resources?.results?.products;
