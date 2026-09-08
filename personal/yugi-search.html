@@ -511,14 +511,16 @@
     }
 
     /* Shopify ORs multi-word queries and caps suggest.json at 10 products, so a 3-word
-       card name gets crowded out by single-term matches and never appears. AND-join the
-       tokens for exact search. Hyphens stay intact - splitting OP18-EN024 loses the hit.
+       card name gets crowded out by single-term matches and never appears in the payload.
+       Wrapping in quotes forces phrase matching. The AND operator does the same job when
+       the store is called directly, but is silently ignored once the request goes through
+       the proxy - quotes survive it, so quotes are the form to use.
+       Single tokens are left alone: quoting kills set-prefix lookups ("LDS3" -> 0 results).
        Fuzzy search keeps the raw query so it stays fuzzy. */
     function shopifyQuery(query) {
-      const q = query.trim();
-      if (/\b(AND|OR|NOT)\b|"/.test(q)) return q;   // user supplied their own operators
-      const tokens = q.split(/\s+/).filter(Boolean);
-      return tokens.length > 1 ? tokens.join(' AND ') : q;
+      const q = query.trim().replace(/\s+/g, ' ');
+      if (q.includes('"') || /\b(AND|OR|NOT)\b/.test(q)) return q;  // user's own operators
+      return q.includes(' ') ? `"${q}"` : q;
     }
 
     /* Fetch JSON; falls back to public proxies if the worker fails */
