@@ -510,17 +510,27 @@
       return tokens.every(t => haystack.includes(t));
     }
 
-    /* Shopify ORs multi-word queries and caps suggest.json at 10 products, so a 3-word
+    /* Shopify ORs multi-word queries and caps suggest.json at 10 products, so a 3+ word
        card name gets crowded out by single-term matches and never appears in the payload.
-       Wrapping in quotes forces phrase matching. The AND operator does the same job when
-       the store is called directly, but is silently ignored once the request goes through
-       the proxy - quotes survive it, so quotes are the form to use.
+       Quoting the *whole* query forces phrase matching, but that only helps when every
+       word is contiguous in the title - it breaks the moment a trailing word (rarity,
+       set qualifier, "(A)"...) isn't part of the card's name, e.g. "chocolate magician
+       gold" is never a substring of "Chocolate Magician Girl ... Gold Rare" because
+       "Girl" sits in between. Quoting only the leading run of words (the part of a query
+       that's almost always the contiguous card name) and leaving the last word bare gets
+       the real match back into the 10-slot window in every case tested, including when
+       the whole query IS one contiguous phrase. The subsequent matchesQuery() filter still
+       does the any-order AND check, so this only needs to get the right candidates
+       returned - it doesn't need to rank them.
        Single tokens are left alone: quoting kills set-prefix lookups ("LDS3" -> 0 results).
        Fuzzy search keeps the raw query so it stays fuzzy. */
     function shopifyQuery(query) {
       const q = query.trim().replace(/\s+/g, ' ');
       if (q.includes('"') || /\b(AND|OR|NOT)\b/.test(q)) return q;  // user's own operators
-      return q.includes(' ') ? `"${q}"` : q;
+      const tokens = q.split(' ');
+      if (tokens.length < 2) return q;
+      const last = tokens.pop();
+      return `"${tokens.join(' ')}" ${last}`;
     }
 
     /* Fetch JSON; falls back to public proxies if the worker fails */
