@@ -61,10 +61,10 @@
   th:nth-child(4), td:nth-child(4) { min-width: 45px; }
   /* Size */
   th:nth-child(5), td:nth-child(5) { min-width: 70px; }
-  /* Time (ms) */
-  th:nth-child(6), td:nth-child(6) { min-width: 85px; }
-  /* Origin */
-  th:nth-child(7), td:nth-child(7) { min-width: 160px; }
+  /* Time (s) */
+  th:nth-child(6), td:nth-child(6) { min-width: 55px; }
+  /* Origin - wrap only at dots, never mid-word */
+  th:nth-child(7), td:nth-child(7) { min-width: 160px; word-break: normal; overflow-wrap: normal; }
   /* Content-Type */
   th:nth-child(8), td:nth-child(8) { min-width: 130px; }
   /* Payload - just fits the View button */
@@ -169,9 +169,9 @@ dropzone.addEventListener("drop", e => {
 });
 fileInput.addEventListener("change", e => handleFile(e.target.files[0]));
 
-function timeColor(ms) {
-    if (ms < 100) return "background-color:#0d2b0d;color:#7dff7d";    // fast
-    if (ms < 1000) return "background-color:#2b2200;color:#ffcc00";   // medium
+function timeColor(s) {
+    if (s < 0.1) return "background-color:#0d2b0d;color:#7dff7d";    // fast
+    if (s < 1) return "background-color:#2b2200;color:#ffcc00";       // medium
     return "background-color:#2b0d0d;color:#ff6666";                   // slow
 }
   
@@ -179,6 +179,19 @@ function statusColor(status) {
     if (status === 200) return "background-color:#0d2b0d;color:#7dff7d";
     if (status >= 201 && status < 300) return "background-color:#0d2b0d;color:#a0e8a0";
     return "background-color:#2b0d0d;color:#ff6666";
+}
+
+function methodColor(method) {
+    switch ((method || '').toUpperCase()) {
+        case 'GET': return "color:#7dff7d;font-weight:600";
+        case 'POST': return "color:#4db8ff;font-weight:600";
+        case 'PUT': return "color:#ffcc00;font-weight:600";
+        case 'PATCH': return "color:#c792ea;font-weight:600";
+        case 'DELETE': return "color:#ff6666;font-weight:600";
+        case 'OPTIONS': return "color:#9aa0a6;font-weight:600";
+        case 'HEAD': return "color:#7de8ff;font-weight:600";
+        default: return "font-weight:600";
+    }
 }
   
 function handleFile(file) {
@@ -243,6 +256,11 @@ function getContentType(e) {
     return h ? h.value : '';
 }
 
+// Only break Origin text at dots, never mid-label
+function wrapOrigin(str) {
+    return escapeHtml(str).replace(/\./g, '.<wbr>');
+}
+
 function formatTimestamp(e) {
     const d = new Date(e.startedDateTime);
     if (!e.startedDateTime || isNaN(d.getTime())) return '';
@@ -291,7 +309,7 @@ function renderTable(entries) {
             ${headerCell('URL', 2)}
             ${headerCell('Status', 3)}
             ${headerCell('Size', 4)}
-            ${headerCell('Time (ms)', 5)}
+            ${headerCell('Time (s)', 5)}
             ${headerCell('Origin', 6)}
             ${headerCell('Content-Type', 7)}
             <th>Payload</th>
@@ -318,12 +336,12 @@ function renderTable(entries) {
         html += `
         <tr>
             <td>${formatTimestamp(e)}</td>
-            <td>${escapeHtml(req?.method || '')}</td>
+            <td style="${methodColor(req?.method)}">${escapeHtml(req?.method || '')}</td>
             <td>${escapeHtml(req?.url || '')}</td>
             <td style="${statusColor(res?.status)}">${res?.status || ''}</td>
             <td>${res?.content?.size || 0}</td>
-            <td style="${timeColor(Math.round(e.time))}">${Math.round(e.time) || 0}</td>
-            <td>${escapeHtml(origin)}</td>
+            <td style="${timeColor((e.time || 0) / 1000)}">${((e.time || 0) / 1000).toFixed(2)}</td>
+            <td>${wrapOrigin(origin)}</td>
             <td>${escapeHtml(contentType)}</td>
             <td>
                 ${(hasJSON || hasParams)
