@@ -46,6 +46,13 @@
     top: 0;
     white-space: nowrap;
   }
+  th.sortable {
+    cursor: pointer;
+    user-select: none;
+  }
+  th.sortable:hover {
+    background: #353535;
+  }
   /* Method */
   th:nth-child(1), td:nth-child(1) { min-width: 60px; }
   /* Status */
@@ -176,8 +183,11 @@ function handleFile(file) {
         try {
             const obj = JSON.parse(evt.target.result);
             har = obj; // store globally
+            currentEntries = (obj.log?.entries || []).slice();
+            sortCol = null;
+            sortDir = 1;
             summarize(obj);
-            renderTable(obj);
+            renderTable(currentEntries);
         } catch (e) {
             alert("Failed to parse HAR: " + e.message);
         }
@@ -219,19 +229,58 @@ function summarize(obj) {
     );
 }
 
-function renderTable(obj) {
-    const entries = obj.log?.entries || [];
-    
+function getOrigin(e) {
+    const h = (e.request?.headers || []).find(h => h.name.toLowerCase() === 'origin');
+    return h ? h.value : '';
+}
+
+function getContentType(e) {
+    const h = (e.response?.headers || []).find(h => h.name.toLowerCase() === 'content-type');
+    return h ? h.value : '';
+}
+
+function getSortValue(e, col) {
+    switch (col) {
+        case 0: return (e.request?.method || '').toLowerCase();
+        case 1: return (e.request?.url || '').toLowerCase();
+        case 2: return e.response?.status || 0;
+        case 3: return e.response?.content?.size || 0;
+        case 4: return e.time || 0;
+        case 5: return getOrigin(e).toLowerCase();
+        case 6: return getContentType(e).toLowerCase();
+        default: return '';
+    }
+}
+
+function sortTable(col) {
+    sortDir = (sortCol === col) ? -sortDir : 1;
+    sortCol = col;
+    currentEntries.sort((a, b) => {
+        const va = getSortValue(a, col);
+        const vb = getSortValue(b, col);
+        if (va < vb) return -1 * sortDir;
+        if (va > vb) return 1 * sortDir;
+        return 0;
+    });
+    renderTable(currentEntries);
+}
+
+function headerCell(label, col) {
+    const arrow = sortCol === col ? (sortDir === 1 ? ' \u25b2' : ' \u25bc') : '';
+    return `<th class="sortable" onclick="sortTable(${col})">${label}${arrow}</th>`;
+}
+
+function renderTable(entries) {
     let html = `
     <table class="wide">
         <tr>
-            <th>Method</th>
-            <th>URL</th>
-            <th>Status</th>
-            <th>Size</th>
-            <th>Time (ms)</th>
-            <th>Origin</th>
-            <th>Content-Type</th>
+            ${headerCell('Method', 0)}
+            ${headerCell('URL', 1)}
+            ${headerCell('Status', 2)}
+            ${headerCell('Size', 3)}
+            ${headerCell('Time (ms)', 4)}
+            ${headerCell('Origin', 5)}
+            ${headerCell('Content-Type', 6)}
             <th>Payload</th>
         </tr>
     `;
@@ -240,13 +289,8 @@ function renderTable(obj) {
         const req = e.request;
         const res = e.response;
 
-        // Extract Origin from request headers (case-insensitive)
-        const originHeader = (req.headers || []).find(h => h.name.toLowerCase() === 'origin');
-        const origin = originHeader ? originHeader.value : '';
-
-        // Extract Content-Type from response headers (case-insensitive)
-        const contentTypeHeader = (res.headers || []).find(h => h.name.toLowerCase() === 'content-type');
-        const contentType = contentTypeHeader ? contentTypeHeader.value : '';
+        const origin = getOrigin(e);
+        const contentType = getContentType(e);
 
         const hasJSON = req?.postData?.text ? true : false;
         const hasParams = req?.postData?.params?.length > 0;
@@ -290,6 +334,10 @@ function togglePayload(i) {
     const row = document.getElementById(`payload-${i}`);
     row.style.display = row.style.display === "none" ? "table-row" : "none";
 }
+
+let currentEntries = [];
+let sortCol = null;
+let sortDir = 1;
 
 function escapeHtml(str) {
     if (!str) return "";
