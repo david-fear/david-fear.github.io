@@ -53,18 +53,22 @@
   th.sortable:hover {
     background: #353535;
   }
+  /* Timestamp */
+  th:nth-child(1), td:nth-child(1) { min-width: 85px; }
   /* Method */
-  th:nth-child(1), td:nth-child(1) { min-width: 60px; }
+  th:nth-child(2), td:nth-child(2) { min-width: 60px; }
   /* Status */
-  th:nth-child(3), td:nth-child(3) { min-width: 55px; }
+  th:nth-child(4), td:nth-child(4) { min-width: 45px; }
   /* Size */
-  th:nth-child(4), td:nth-child(4) { min-width: 70px; }
+  th:nth-child(5), td:nth-child(5) { min-width: 70px; }
   /* Time (ms) */
-  th:nth-child(5), td:nth-child(5) { min-width: 85px; }
+  th:nth-child(6), td:nth-child(6) { min-width: 85px; }
+  /* Origin */
+  th:nth-child(7), td:nth-child(7) { min-width: 160px; }
   /* Content-Type */
-  th:nth-child(7), td:nth-child(7) { min-width: 130px; }
-  /* Payload */
-  th:nth-child(8), td:nth-child(8) { min-width: 80px; }
+  th:nth-child(8), td:nth-child(8) { min-width: 130px; }
+  /* Payload - just fits the View button */
+  th:nth-child(9), td:nth-child(9) { min-width: 0; width: 1%; white-space: nowrap; }
   tr:hover:not(.payload-row) td { background-color: #222; }
   #summary {
     margin-top: 16px;
@@ -239,15 +243,23 @@ function getContentType(e) {
     return h ? h.value : '';
 }
 
+function formatTimestamp(e) {
+    const d = new Date(e.startedDateTime);
+    if (!e.startedDateTime || isNaN(d.getTime())) return '';
+    const pad = (n, len = 2) => String(n).padStart(len, '0');
+    return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}.${pad(d.getMilliseconds(), 3)}`;
+}
+
 function getSortValue(e, col) {
     switch (col) {
-        case 0: return (e.request?.method || '').toLowerCase();
-        case 1: return (e.request?.url || '').toLowerCase();
-        case 2: return e.response?.status || 0;
-        case 3: return e.response?.content?.size || 0;
-        case 4: return e.time || 0;
-        case 5: return getOrigin(e).toLowerCase();
-        case 6: return getContentType(e).toLowerCase();
+        case 0: return e.startedDateTime ? new Date(e.startedDateTime).getTime() : 0;
+        case 1: return (e.request?.method || '').toLowerCase();
+        case 2: return (e.request?.url || '').toLowerCase();
+        case 3: return e.response?.status || 0;
+        case 4: return e.response?.content?.size || 0;
+        case 5: return e.time || 0;
+        case 6: return getOrigin(e).toLowerCase();
+        case 7: return getContentType(e).toLowerCase();
         default: return '';
     }
 }
@@ -274,13 +286,14 @@ function renderTable(entries) {
     let html = `
     <table class="wide">
         <tr>
-            ${headerCell('Method', 0)}
-            ${headerCell('URL', 1)}
-            ${headerCell('Status', 2)}
-            ${headerCell('Size', 3)}
-            ${headerCell('Time (ms)', 4)}
-            ${headerCell('Origin', 5)}
-            ${headerCell('Content-Type', 6)}
+            ${headerCell('Timestamp', 0)}
+            ${headerCell('Method', 1)}
+            ${headerCell('URL', 2)}
+            ${headerCell('Status', 3)}
+            ${headerCell('Size', 4)}
+            ${headerCell('Time (ms)', 5)}
+            ${headerCell('Origin', 6)}
+            ${headerCell('Content-Type', 7)}
             <th>Payload</th>
         </tr>
     `;
@@ -304,6 +317,7 @@ function renderTable(entries) {
 
         html += `
         <tr>
+            <td>${formatTimestamp(e)}</td>
             <td>${escapeHtml(req?.method || '')}</td>
             <td>${escapeHtml(req?.url || '')}</td>
             <td style="${statusColor(res?.status)}">${res?.status || ''}</td>
@@ -319,7 +333,7 @@ function renderTable(entries) {
             </td>
         </tr>
         <tr id="payload-${idx}" class="payload-row" style="display:none;">
-            <td colspan="8">
+            <td colspan="9">
                 <pre>${payloadDisplay}</pre>
             </td>
         </tr>
