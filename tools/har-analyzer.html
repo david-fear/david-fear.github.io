@@ -44,7 +44,20 @@
     letter-spacing: 0.3px;
     position: sticky;
     top: 0;
+    white-space: nowrap;
   }
+  /* Method */
+  th:nth-child(1), td:nth-child(1) { min-width: 60px; }
+  /* Status */
+  th:nth-child(3), td:nth-child(3) { min-width: 55px; }
+  /* Size */
+  th:nth-child(4), td:nth-child(4) { min-width: 70px; }
+  /* Time (ms) */
+  th:nth-child(5), td:nth-child(5) { min-width: 85px; }
+  /* Content-Type */
+  th:nth-child(7), td:nth-child(7) { min-width: 130px; }
+  /* Payload */
+  th:nth-child(8), td:nth-child(8) { min-width: 80px; }
   tr:hover:not(.payload-row) td { background-color: #222; }
   #summary {
     margin-top: 16px;
