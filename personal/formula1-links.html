@@ -132,6 +132,11 @@
       animation: goldPulse 2s ease-in-out infinite;
     }
 
+    /* Dim zero values so they don't compete visually with real scores */
+    .zero-val {
+      color: #808080;
+    }
+
     @keyframes goldPulse {
       0%   { filter: brightness(1);    box-shadow: 0 0 0 rgba(255, 215, 0, 0); }
       50%  { filter: brightness(1.15); box-shadow: 0 0 8px rgba(255, 215, 0, 0.55); }
@@ -618,7 +623,7 @@
           const val = row[r] || 0;
           total += val;
           const isMax = val === maxPerRace[r] && val !== 0;
-          rowHTML += `<td class="${isMax ? 'max-val' : ''}">${val}</td>`;
+          rowHTML += `<td class="${isMax ? 'max-val' : (val === 0 ? 'zero-val' : '')}">${val}</td>`;
         });
         rowHTML += `<td>${total}</td></tr>`;
         bodyHTML += rowHTML;
@@ -926,7 +931,7 @@
           const val = teamRacePoints[team][r] || 0;
           total += val;
           const isMax = val === maxPerRace[r] && val !== 0;
-          rowHTML += `<td class="${isMax ? 'max-val' : ''}">${val}</td>`;
+          rowHTML += `<td class="${isMax ? 'max-val' : (val === 0 ? 'zero-val' : '')}">${val}</td>`;
         });
 
         rowHTML += `<td>${total}</td></tr>`;
