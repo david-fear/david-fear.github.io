@@ -1246,6 +1246,8 @@
     const minVal = Math.min(...values);
     const maxVal = Math.max(...values);
     const pad    = (maxVal - minVal) * 0.15 || 1;
+    const niceMin = Math.floor((minVal - pad) / 10) * 10;
+    const niceMax = Math.ceil((maxVal + pad) / 10) * 10;
 
     const itemColor = item.color || '#00ffcc';
     _charts[item.id] = new Chart(canvas, {
@@ -1282,8 +1284,8 @@
             grid:  { color: '#222' }
           },
           y: {
-            min: minVal - pad,
-            max: maxVal + pad,
+            min: niceMin,
+            max: niceMax,
             ticks: { color: '#888', font: { size: 11 }, maxTicksLimit: 6, callback: v => `$${Math.round(v)}` },
             grid: { color: '#222' }
           }
@@ -1409,6 +1411,8 @@
     const minVal = Math.min(...allValues);
     const maxVal = Math.max(...allValues);
     const pad    = (maxVal - minVal) * 0.15 || 1;
+    const niceMin = Math.floor((minVal - pad) / 10) * 10;
+    const niceMax = Math.ceil((maxVal + pad) / 10) * 10;
 
     _charts[chartKey] = new Chart(canvas, {
       type: 'line',
@@ -1424,8 +1428,8 @@
         scales: {
           x: { ticks: { color: '#666', font: { size: 11 }, maxRotation: 40 }, grid: { color: '#222' } },
           y: {
-            min: minVal - pad,
-            max: maxVal + pad,
+            min: niceMin,
+            max: niceMax,
             ticks: { color: '#666', font: { size: 11 }, callback: v => `$${Math.round(v)}` },
             grid: { color: '#222' }
           }
