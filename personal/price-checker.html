@@ -147,6 +147,58 @@
     .card-actions button:hover { background: #333; color: #ccc; }
     .card-actions .btn-remove:hover { background: #3a1a1a; color: #ff6666; }
 
+    /* ── Colour swatch picker modal ── */
+    #color-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 2003;
+    }
+
+    #color-picker {
+      position: fixed;
+      z-index: 2004;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #1e1e1e;
+      border: 1px solid #444;
+      padding: 10px 12px;
+      width: min(320px, 90vw);
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.7);
+    }
+
+    .color-swatches {
+      display: grid;
+      grid-template-columns: repeat(18, 1fr);
+      gap: 2px;
+    }
+
+    .color-swatch {
+      display: block;
+      width: 100%;
+      aspect-ratio: 1;
+      cursor: pointer;
+      border: 1px solid rgba(0,0,0,0.15);
+    }
+
+    .color-swatch:hover {
+      transform: scale(1.4);
+      position: relative;
+      z-index: 1;
+      border-color: #fff;
+    }
+    .color-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.15);
+      flex-shrink: 0;
+    }
+
     .card-name {
       font-size: 13px;
       line-height: 1.4;
@@ -206,7 +258,7 @@
     /* ── Chart ── */
     .price-chart {
       width: 100% !important;
-      height: 220px !important;
+      height: 320px !important;
       margin-top: 6px;
     }
 
@@ -228,7 +280,7 @@
       font-weight: bold;
     }
 
-    .group-chart { height: 250px !important; }
+    .group-chart { height: 360px !important; }
 
     /* ── Group table ── */
     .group-table {
@@ -246,12 +298,12 @@
       font-size: 10px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      padding: 1px 6px 3px 0;
+      padding: 1px 4px 2px 0;
       border-bottom: 1px solid #222;
     }
 
     .group-table td {
-      padding: 2px 6px 2px 0;
+      padding: 1px 4px 1px 0;
       vertical-align: middle;
       border-bottom: 1px solid #1a1a1a;
     }
@@ -287,6 +339,12 @@
 
     .group-table .gt-actions { white-space: nowrap; }
 
+    .group-table .card-actions button {
+      padding: 1px 4px;
+      font-size: 10px;
+      line-height: 1.3;
+    }
+
     /* ── History table ── */
     .hist-table {
       width: 100%;
@@ -309,15 +367,27 @@
 
     .muted { color: #555; font-style: italic; font-size: 13px; }
 
-    /* ── Group dropdown ── */
+    /* ── Group dropdown (centered modal) ── */
+    #group-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 1999;
+    }
+
     #group-dropdown {
       position: fixed;
       z-index: 2000;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       background: #1e1e1e;
       border: 1px solid #444;
       padding: 10px 12px;
-      min-width: 230px;
-      max-width: 290px;
+      width: 90%;
+      max-width: 340px;
+      max-height: 80vh;
+      overflow-y: auto;
       box-shadow: 0 4px 20px rgba(0,0,0,0.7);
       font-size: 12px;
       color: #ccc;
@@ -360,6 +430,56 @@
       color: #eee;
       padding: 4px 6px;
       font-size: 12px;
+    }
+
+    /* ── Rename modal ── */
+    #rename-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 2001;
+    }
+
+    #rename-modal {
+      position: fixed;
+      z-index: 2002;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #1e1e1e;
+      border: 1px solid #444;
+      padding: 14px 16px;
+      width: 90%;
+      max-width: 320px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.7);
+      font-size: 13px;
+      color: #ccc;
+    }
+
+    #rename-modal label {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      font-size: 11px;
+      color: #888;
+      margin-bottom: 10px;
+    }
+
+    #rename-modal input {
+      background: #111;
+      border: 1px solid #333;
+      color: #eee;
+      padding: 6px 8px;
+      font-size: 13px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    #rename-modal .rename-actions {
+      display: flex;
+      gap: 6px;
+      justify-content: flex-end;
+      margin-top: 4px;
     }
 
     /* ── Disclaimer ── */
@@ -411,6 +531,9 @@
 
 <header>
   <h1>NZ Price Tracker</h1>
+  <div style="background:#7a6000; color:#ffe066; border:1px solid #ffe066; padding:7px 12px; font-size:12px; margin-bottom:8px; text-align:center;">
+    &#9989; Switched corsproxy (disabled anon use) to CloudFlare Proxy 25 Aug. If any issues, please lemme know via buymeacoffee below so i can resolve - thnx =)
+  </div>
   <p>Track product prices over time from NZ retail sites. History stored in your browser.</p>
 </header>
 
@@ -422,64 +545,104 @@
     <div class="add-form">
       <label class="url-label">
         Copy Product URL, and paste it here:
-        <input id="add-url" type="url" placeholder="https://www.thewarehouse.co.nz/p/…" autocomplete="off" />
+        <input id="add-url" type="url" placeholder="https://www.thewarehouse.co.nz/p/…" oninput="onUrlChange(this)" autocomplete="off" />
       </label>
       <label class="name-label">
         <span>Custom name <span style="color:#888;">(optional)</span></span>
         <input id="add-name" type="text" placeholder="e.g. Gaming Mouse" autocomplete="off" />
       </label>
+      <label id="storeid-row" class="storeid-label">
+        <span id="storeid-store-label">Store ID (UUID)</span>
+        <input id="add-storeid" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" autocomplete="off" />
+      </label>
       <button onclick="addItem()">+ Add &amp; Fetch</button>
     </div>
-    <div id="add-status" style="font-size:12px; color:#888; min-height:16px;"></div>
-    <p style="font-size:12px; color:#666;">
-      Try an example:
-      <a href="#" onclick="tryExample('https://www.liquorland.co.nz/jim-beam-bourbon-1125lt-080686002123');return false;" style="color:#88aaff;">Jim Beam (Liquorland)</a> &bull;
-      <a href="#" onclick="tryExample('https://www.superliquor.co.nz/jim-beam-white-label-bourbon-1125-litre-2');return false;" style="color:#88aaff;">Jim Beam (Super Liquor)</a> &bull;
-      <a href="#" onclick="tryExample('https://www.thewarehouse.co.nz/p/gamenote-wired-gaming-mouse-black/R3016083.html');return false;" style="color:#88aaff;">Gaming Mouse (The Warehouse)</a> &bull;
-      <a href="#" onclick="tryExample('https://www.jbhifi.co.nz/products/playstation-5-grand-theft-auto-vi-code-in-box');return false;" style="color:#88aaff;">GTA VI (JB Hi-Fi)</a>
-    </p>
-    <p style="font-size:12px; color:#888;">Available Sites: 
-      <a href="https://www.thewarehouse.co.nz" target="_blank">The Warehouse</a>
-      &bull;
-      <a href="https://www.jbhifi.co.nz" target="_blank">JB Hi-Fi</a>
-      &bull;
-      <a href="https://www.briscoes.co.nz" target="_blank">Briscoes</a>
-      &bull;
-      <a href="https://www.woolworths.co.nz" target="_blank">Woolworths NZ</a>
-      &bull;
-      <a href="https://www.rebelsport.co.nz" target="_blank">Rebel Sport</a>
-      &bull;
-      <a href="https://theclubroom.co.nz" target="_blank">The Club Room</a>
-      &bull;
-      <a href="https://www.golfhq.co.nz" target="_blank">Golf HQ</a>
-      &bull;
-      <a href="https://www.liquorland.co.nz" target="_blank">Liquorland</a>
-      &bull;
-      <a href="https://www.superliquor.co.nz" target="_blank">Super Liquor</a>
-      &bull;
-      <a href="https://www.bigbarrel.co.nz" target="_blank">Big Barrel</a>
-    </p>
+    <div style="font-size:12px; min-height:16px; display:flex; gap:16px; flex-wrap:wrap; align-items:center;">
+      <span id="add-status" style="color:#888;"></span>
+      <span id="refresh-status"></span>
+    </div>
+    <div style="display:flex; gap:20px; align-items:flex-start; flex-wrap:wrap; margin-top:0px;">
+      <div style="flex:1; min-width:200px;">
+    <details class="support-info" style="margin-top:0; margin-bottom:0;">
+      <summary>Help &amp; Examples</summary>
+      <div class="support-content" style="padding-top:6px; padding-left:10px; border-left:2px solid #2a2a2a;">
+
+    <details class="support-info" style="margin-top:0; margin-bottom:0;">
+      <summary>Try an example</summary>
+      <div class="support-content" style="padding-top:4px;">
+        <p style="color:#888; margin:0 0 6px;">Click a link to add that item immediately.</p>
+        <b>Bourbon - Jim Beam 1.125L</b> &bull; <a href="#" onclick="tryExample('https://onekawa.shop.thebottleo.co.nz/lines/jim-beam-1-125l');return false;" style="color:#88aaff;">Jim Beam (The Bottle-O)</a> &bull;
+        <a href="#" onclick="tryExample('https://bigbarrel.co.nz/en/jim-beam-bourbon-1125ml');return false;" style="color:#88aaff;">Jim Beam (Big Barrel)</a> &bull;
+        <a href="#" onclick="tryExample('https://www.superliquor.co.nz/jim-beam-white-label-bourbon-1125-litre-2');return false;" style="color:#88aaff;">Jim Beam (Super Liquor)</a> &bull;
+        <a href="#" onclick="tryExample('https://www.liquorland.co.nz/jim-beam-bourbon-1125lt-080686002123');return false;" style="color:#88aaff;">Jim Beam (Liquorland)</a> &bull;
+        <br /><b>Bourbon - Jim Beam 1.75L</b> &bull;
+        <a href="#" onclick="tryExample('https://www.liquorland.co.nz/jim-beam-bourbon-175lt-080686001102');return false;" style="color:#88aaff;">Jim Beam 1.75L (Liquorland)</a> &bull;
+        <a href="#" onclick="tryExample('https://www.superliquor.co.nz/jim-beam-white-label-bourbon-175-litre-2');return false;" style="color:#88aaff;">Jim Beam 1.75L (Super Liquor)</a> &bull;
+        <a href="#" onclick="tryExample('https://bigbarrel.co.nz/en/jim-beam-bourbon-handle-1750ml');return false;" style="color:#88aaff;">Jim Beam 1.75L (Big Barrel)</a> &bull;
+        <br /><b>Rum - Appleton's 1L</b> &bull;
+        <a href="#" onclick="tryExample('https://www.liquorland.co.nz/appleton-estate-signature-blend-rum-1lt-125153');return false;" style="color:#88aaff;">Appleton's (Liquorland)</a> &bull;
+        <a href="#" onclick="tryExample('https://www.superliquor.co.nz/appleton-estate-signature-1-litre');return false;" style="color:#88aaff;">Appleton's (Super Liquor)</a> &bull;
+        <a href="#" onclick="tryExample('https://bigbarrel.co.nz/en/appleton-estate-signature-rum-1000ml');return false;" style="color:#88aaff;">Appleton's (Big Barrel)</a> &bull;
+        <a href="#" onclick="tryExample('http://onekawa.shop.thebottleo.co.nz/lines/appleton-estate-signature-blend-rum-40-1litre');return false;" style="color:#88aaff;">Appleton's (The Bottle-O)</a> &bull;
+        <br /><b>JBHiFi</b> &bull;<a href="#" onclick="tryExample('https://www.jbhifi.co.nz/products/samsung-galaxy-tab-a11-11-wi-fi-256gb-grey');return false;" style="color:#88aaff;">Galaxy Tab A11 (JB Hi-Fi)</a> &bull;
+        <a href="#" onclick="tryExample('https://www.jbhifi.co.nz/products/playstation-5-grand-theft-auto-vi-code-in-box');return false;" style="color:#88aaff;">GTA VI (JB Hi-Fi)</a>
+      </div>
+    </details>
+
+    <details class="support-info" style="margin-top:4px; margin-bottom:0;">
+      <summary>DUPE.COM &ndash; find cheaper alternatives</summary>
+      <div class="support-content" style="padding-top:4px;">
+        <p style="margin:0 0 6px;"><a href="https://dupe.com" target="_blank" rel="noopener" style="color:#88aaff;">DUPE.COM</a> finds cheaper alternatives to any product. To use it, take the product URL and put <code>dupe.com/</code> in front:</p>
+        <p style="margin:0 0 4px; color:#888;">Take any product URL, e.g.</p>
+        <code style="display:block; margin-bottom:4px;">https://www.platypusshoes.co.nz/mens-bb480-bb480pen-blu.html</code>
+        <p style="margin:0 0 4px; color:#888;">Prepend <strong style="color:#ccc;">dupe.com/</strong> to get:</p>
+        <code style="display:block; margin-bottom:6px;"><a href="https://dupe.com/https://www.platypusshoes.co.nz/mens-bb480-bb480pen-blu.html" target="_blank" rel="noopener" style="color:#7dff7d;">dupe.com/https://www.platypusshoes.co.nz/mens-bb480-bb480pen-blu.html</a></code>
+        <p style="margin:0; color:#888;">Works with most NZ and international retail sites.</p>
+      </div>
+    </details>
+    <details class="support-info" style="margin-top:4px; margin-bottom:0;">
+      <summary>Available Sites</summary>
+      <div class="support-content" style="padding-top:4px;">
+        <a href="https://www.thewarehouse.co.nz" target="_blank">The Warehouse</a> &bull;
+        <a href="https://www.jbhifi.co.nz" target="_blank">JB Hi-Fi</a> &bull;
+        <a href="https://www.briscoes.co.nz" target="_blank">Briscoes</a> &bull;
+        <a href="https://www.rebelsport.co.nz" target="_blank">Rebel Sport</a> &bull;
+        <a href="https://theclubroom.co.nz" target="_blank">The Club Room</a> &bull;
+        <a href="https://www.golfhq.co.nz" target="_blank">Golf HQ</a> &bull;
+        <a href="https://thegolfshop.co.nz" target="_blank">The Golf Shop</a> &bull;
+        <a href="https://www.prodrive.co.nz" target="_blank">Pro Drive Golf</a> &bull;
+        <a href="https://www.liquorland.co.nz" target="_blank">Liquorland</a>† &bull;
+        <a href="https://www.superliquor.co.nz" target="_blank">Super Liquor</a> &bull;
+        <a href="https://www.bigbarrel.co.nz" target="_blank">Big Barrel</a> &bull;
+        <a href="https://www.farmers.co.nz" target="_blank">Farmers</a> &bull;
+        <a href="https://www.chemistwarehouse.co.nz" target="_blank">Chemist Warehouse</a> &bull; and others
+        <p style="margin-top:6px; color:#666;">† Liquorland: only some products work. Pages with 13-digit EAN barcodes in the URL tend to succeed; shorter product codes are blocked by Liquorland's anti-bot protection.</p>
+      </div>
+    </details>
     <details class="support-info" style="margin-top:6px; margin-bottom:0;">
       <summary>How it works &amp; known limitations</summary>
       <div class="support-content">
 
         <h4>❌ Known not to work</h4>
         <ul>
-          <li><strong>Mitre 10</strong> — Cloudflare blocks all CORS proxy IPs</li>
-          <li><strong>PB Tech</strong> — WAF blocks all CORS proxies</li>
-          <li><strong>Noel Leeming</strong> — WAF blocks all CORS proxies</li>
-          <li><strong>Kmart</strong> — Akamai CDN blocks all CORS proxies</li>
-          <li><strong>Harvey Norman</strong> — Imperva/Incapsula bot challenge</li>
-          <li><strong>Bunnings</strong> — Cloudflare bot protection</li>
-          <li><strong>Mighty Ape</strong> — Cloudflare (HTTP 403 via proxy)</li>
-          <li><strong>Pak'nSave</strong> — SPA; price not in static HTML</li>
+          <li><strong>Liquorland</strong>: partially working. 13-digit EAN barcode URLs (e.g. <code>…-5013626111284</code>) may succeed; shorter product code URLs are now blocked</li>
+          <li><strong>Farmers</strong>: Previously blocked by Akamai</li>
+          <li><strong>Mitre 10</strong>: Cloudflare blocks all CORS proxy IPs</li>
+          <li><strong>PB Tech</strong>: WAF blocks all CORS proxies</li>
+          <li><strong>Noel Leeming</strong>: WAF blocks all CORS proxies</li>
+          <li><strong>Kmart</strong>: Akamai CDN blocks all CORS proxies</li>
+          <li><strong>Harvey Norman</strong>: Imperva/Incapsula bot challenge</li>
+          <li><strong>Bunnings</strong>: Cloudflare bot protection</li>
+          <li><strong>The Warehouse</strong>: Cloudflare Managed Challenge (requires real browser JS execution — no proxy can bypass this)</li>
+          <li><strong>Mighty Ape</strong>: Cloudflare (HTTP 403 via proxy)</li>
+          <li><strong>Warehouse Stationery</strong>: bot protection aborts all CORS proxy connections</li>
         </ul>
 
         <h4>ℹ️ Storage</h4>
-        <p>History is stored in <strong>localStorage</strong> — it stays on your device and is never sent anywhere. One entry is recorded per item per day, updated on page load.</p>
+        <p>History is stored in <strong>localStorage</strong>. It stays on your device and is never sent anywhere. One entry is recorded per item per day, updated on page load.</p>
 
         <h4>⚠️ Fair use</h4>
-        <p>Personal use only. Fetching is done via the public CORS proxy <a href="https://corsproxy.io" target="_blank">corsproxy.io</a>. Retail sites' Terms of Service may restrict automated access — use responsibly.</p>
+        <p>Personal use only. Fetching is done via public CORS proxies (<a href="https://api.allorigins.win" target="_blank">allorigins.win</a> et al). Retail sites' Terms of Service may restrict automated access. Use responsibly.</p>
 
         <h4>🗑️ Deleting data</h4>
         <p>Use the <strong>✕</strong> button on a card to remove that item. To wipe everything at once:</p>
@@ -491,14 +654,23 @@
 
       </div>
     </details>
+    <details class="support-info" style="margin-top:6px; margin-bottom:0;">
+      <summary>Example screenshot</summary>
+      <div style="margin-top:8px;">
+        <img src="https://david-fear.github.io/images/price-checker-examples.png" alt="Price checker example screenshot" style="max-width:100%; height:auto; border:1px solid #333; display:block;" />
+      </div>
+    </details>
+      </div>
+    </details>
+      </div>
+      <div class="top-actions" style="margin:0; flex-shrink:0; flex-direction:column; align-items:flex-start;">
+        <button onclick="refreshForce()">↻ Refresh today's prices</button>
+      </div>
+    </div>
   </section>
 
   <!-- ── Item list ── -->
   <section>
-    <div class="top-actions">
-      <button onclick="refreshAll()">↻ Refresh today's prices</button>
-      <span id="refresh-status"></span>
-    </div>
     <div class="items-grid" id="items-grid">
       <p class="muted">No items tracked yet.</p>
     </div>
@@ -531,18 +703,26 @@
   /* ─────────────────────────────────────────────────────────────────────────
      NZ Price Tracker
      Storage : localStorage key "pricetracker_v1"
-     CORS    : corsproxy.io
+     CORS    : allorigins.win (primary), codetabs, corsproxy.io
      Prices  : JSON-LD → Next.js __NEXT_DATA__ → meta tags → CSS selectors
   ───────────────────────────────────────────────────────────────────────── */
 
-  // Proxies tried in order; next is used on 413 (size limit) or 403 (IP blocked)
+  // Proxies tried in order; winner is cached per hostname in localStorage
   const PROXIES = [
-    url => 'https://corsproxy.io/?' + encodeURIComponent(url),
+    url => 'https://df-proxy.david-fear.workers.dev/?url=' + encodeURIComponent(url),
     url => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url),
     url => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(url),
+    url => 'https://corsproxy.org/?' + encodeURIComponent(url),
   ];
+  const PROXY_CACHE_LS  = 'pricetracker_proxycache_v1';
+  const PROXY_CACHE_TTL = 7 * 24 * 60 * 60 * 1000; // re-test after 7 days
   const STORE_KEY  = 'pricetracker_v1';
-  const TIMEOUT_MS = 10000;
+  const TIMEOUT_MS = 6000;
+
+  // Override Chart.js canvas font so it matches the page instead of the browser default
+  Chart.defaults.font.family = "'Segoe UI', Arial, sans-serif";
+  Chart.defaults.font.size   = 12;
+  Chart.defaults.font.weight = '400';
 
   // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -553,8 +733,8 @@
   }
 
   function today() {
-    const d = new Date();
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    // Always use NZ local date regardless of the machine's system timezone
+    return new Date().toLocaleDateString('en-CA', { timeZone: 'Pacific/Auckland' });
   }
 
   function uid() {
@@ -594,12 +774,37 @@
     localStorage.setItem(STORE_KEY, JSON.stringify(data));
   }
 
+  // ── Per-hostname proxy cache ───────────────────────────────────────────────
+
+  function proxyCacheGet(hostname) {
+    try {
+      const e = JSON.parse(localStorage.getItem(PROXY_CACHE_LS) || '{}')[hostname];
+      return e && Date.now() - e.ts < PROXY_CACHE_TTL ? e.idx : -1;
+    } catch { return -1; }
+  }
+
+  function proxyCacheSet(hostname, idx) {
+    try {
+      const c = JSON.parse(localStorage.getItem(PROXY_CACHE_LS) || '{}');
+      c[hostname] = { idx, ts: Date.now() };
+      localStorage.setItem(PROXY_CACHE_LS, JSON.stringify(c));
+    } catch {}
+  }
+
+  // Detects a Cloudflare JS challenge page (not a real response)
+  function isCFChallenge(text) {
+    return /cf_chl_opt|challenge-platform/i.test(text) &&
+           /Just a moment|Enable JavaScript and cookies/i.test(text);
+  }
+
   // ── Store detection ────────────────────────────────────────────────────────
 
   function detectStore(url) {
     try {
       const h = new URL(url).hostname.toLowerCase().replace(/^www\./, '');
       if (h.includes('thewarehouse.co.nz'))                       return 'The Warehouse';
+      if (h.includes('paknsave.co.nz'))                            return "Pak'nSave";
+      if (h.includes('newworld.co.nz'))                            return 'New World';
       if (h.includes('woolworths.co.nz') || h.includes('countdown.co.nz')) return 'Woolworths NZ';
       if (h.includes('mitre10.co.nz'))                            return 'Mitre 10';
       if (h.includes('pbtech.co.nz'))                             return 'PB Tech';
@@ -612,11 +817,20 @@
       if (h.includes('rebelsport.co.nz'))                         return 'Rebel Sport';
       if (h.includes('theclubroom.co.nz'))                         return '(Golf) The Club Room';
       if (h.includes('golfhq.co.nz'))                              return 'Golf HQ';
+      if (h.includes('thegolfshop.co.nz'))                          return 'The Golf Shop';
+      if (h.includes('prodrive.co.nz'))                             return 'Pro Drive Golf';
       if (h.includes('liquorland.co.nz'))                          return 'Liquorland';
       if (h.includes('superliquor.co.nz'))                         return 'Super Liquor';
       if (h.includes('bigbarrel.co.nz'))                           return 'Big Barrel';
+      if (h.includes('farmers.co.nz'))                             return 'Farmers';
+      if (h.includes('chemistwarehouse.co.nz'))                    return 'Chemist Warehouse';
+      if (h.includes('warehousestationery.co.nz'))                  return 'Warehouse Stationery';
       return new URL(url).hostname.replace(/^www\./, '').replace(/\.[a-z]{2,}(\.[a-z]{2})?$/i, '');
     } catch { return 'Unknown'; }
+  }
+
+  function needsStoreId(store) {
+    return ["Pak'nSave", 'New World'].includes(store);
   }
 
   // ── Price extraction from HTML (JSON-LD → __NEXT_DATA__ → meta → selectors) ─
@@ -636,6 +850,7 @@
 
     let price = null;
     let name  = null;
+    let jsonLdOffersWasArray = false;
 
     // 1. JSON-LD (most reliable — used by The Warehouse, most schema-compliant retailers)
     for (const el of doc.querySelectorAll('script[type="application/ld+json"]')) {
@@ -647,15 +862,34 @@
           if (obj.name && !name) name = String(obj.name);
           const offers = obj.offers;
           if (offers && price == null) {
-            const o = Array.isArray(offers) ? offers[0] : offers;
-            if (o?.price != null) {
-              const p = parseFloat(String(o.price).replace(/[^0-9.]/g, ''));
-              if (!isNaN(p) && p > 0) price = p;
+            if (Array.isArray(offers)) {
+              jsonLdOffersWasArray = true;
+              const o = offers[0];
+              if (o?.price != null) {
+                const p = parseFloat(String(o.price).replace(/[^0-9.]/g, ''));
+                if (!isNaN(p) && p > 0) price = p;
+              }
+            } else {
+              if (offers.price != null) {
+                const p = parseFloat(String(offers.price).replace(/[^0-9.]/g, ''));
+                if (!isNaN(p) && p > 0) price = p;
+              }
             }
           }
         };
         walkLD(JSON.parse(el.textContent));
       } catch { /* malformed JSON-LD — skip */ }
+    }
+
+    // When JSON-LD lists offers as an array (product with variants), offers[0] is not
+    // necessarily the page's displayed default variant. Shopify sets og:price:amount
+    // to the default variant's price, so prefer it in that case.
+    if (jsonLdOffersWasArray && price != null) {
+      const metaEl = doc.querySelector('meta[property="og:price:amount"], meta[property="product:price:amount"]');
+      if (metaEl) {
+        const metaPrice = parseFloat((metaEl.getAttribute('content') || '').replace(/[^0-9.]/g, ''));
+        if (!isNaN(metaPrice) && metaPrice > 0) price = metaPrice;
+      }
     }
 
     // 2. Next.js __NEXT_DATA__ (common in React/Next storefronts)
@@ -666,9 +900,11 @@
         try {
           const json = JSON.parse(ndMatch[1]);
           const str  = JSON.stringify(json);
-          // Look for "price":"24.00" or "price":24
-          const pm = str.match(/"price"\s*:\s*"?(\d+(?:\.\d{1,2})?)"?/);
-          if (pm) { const p = parseFloat(pm[1]); if (!isNaN(p) && p > 0) price = p; }
+          // Try common price field names in priority order (sale/current first, then generic)
+          for (const key of ['salePrice', 'nowPrice', 'currentPrice', 'specialPrice', 'price', 'priceNow', 'promoPrice']) {
+            const pm = str.match(new RegExp('"' + key + '"\\s*:\\s*"?(\\d+(?:\\.\\d{1,2})?)"?'));
+            if (pm) { const p = parseFloat(pm[1]); if (!isNaN(p) && p > 0) { price = p; break; } }
+          }
           if (!name) {
             const nm = str.match(/"(?:productName|displayName|name)"\s*:\s*"([^"]{3,120})"/);
             if (nm) name = nm[1];
@@ -714,34 +950,89 @@
     return { price: price ?? null, name: name ?? null };
   }
 
+  // ── Pak'nSave / New World API ─────────────────────────────────────────────
+
+  async function fetchPakNSavePrice(item) {
+    if (!item.storeId) throw new Error("Store ID required — see 'How it works' above.");
+
+    const urlPath   = new URL(item.url).pathname;
+    const rawSlug   = urlPath.split('/').pop().split('?')[0];
+    const productId = rawSlug
+      .replace(/pns$|nw$|fg$/i, '')
+      .replace(/_/g, '-')
+      .toUpperCase()
+      .replace(/-+$/, '');
+
+    const apiUrl  = `https://api-prod.paknsave.co.nz/v1/edge/store/${encodeURIComponent(item.storeId)}/decorateProducts`;
+    const proxied = PROXIES[0](apiUrl);
+
+    const ctrl = new AbortController();
+    const tid  = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
+    let resp;
+    try {
+      resp = await fetch(proxied, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ productIds: [productId] }),
+        signal:  ctrl.signal
+      });
+    } finally { clearTimeout(tid); }
+
+    if (!resp.ok) throw new Error(`API HTTP ${resp.status}`);
+    const data    = await resp.json();
+    const product = data.products?.[0];
+    if (!product) throw new Error(`Product ${productId} not found — check Store ID and URL`);
+
+    const price = product.singlePrice?.price ?? product.price?.price ?? null;
+    if (price == null) throw new Error('Price field missing in API response');
+
+    const nameParts = [product.brand, product.name, product.displayName].filter(Boolean);
+    return {
+      price: price / 100,
+      name:  nameParts.join(' ') || product.productId
+    };
+  }
+
   // ── Generic HTML fetch ─────────────────────────────────────────────────────
 
-  async function fetchHTMLPrice(item, proxies = PROXIES) {
+  async function fetchHTMLPrice(item) {
+    let hostname = '';
+    try { hostname = new URL(item.url).hostname; } catch {}
+
+    const cachedIdx = hostname ? proxyCacheGet(hostname) : -1;
+    const order = cachedIdx >= 0
+      ? [cachedIdx, ...PROXIES.map((_, i) => i).filter(i => i !== cachedIdx)]
+      : PROXIES.map((_, i) => i);
+
     let lastError = new Error('All proxies failed');
-    for (const buildUrl of proxies) {
+    for (const idx of order) {
+      const buildUrl = PROXIES[idx];
       const ctrl = new AbortController();
       const tid  = setTimeout(() => ctrl.abort(), TIMEOUT_MS);
       try {
         const resp = await fetch(buildUrl(item.url), { signal: ctrl.signal });
         if (resp.ok) {
-          const text = await resp.text();  // timeout still active while reading body
+          const text = await resp.text();
           clearTimeout(tid);
-          // corsproxy.io returns 200 with a JSON error body when response exceeds 1 MB
           if (text.trimStart().startsWith('{') && text.includes('size limit')) {
             lastError = new Error('Response too large for proxy');
-            continue;  // try next proxy
+            continue;
           }
+          if (isCFChallenge(text)) {
+            lastError = new Error('Cloudflare challenge');
+            continue;
+          }
+          if (hostname) proxyCacheSet(hostname, idx);
           return parseHTMLForProduct(text);
         }
         clearTimeout(tid);
         lastError = new Error(`HTTP ${resp.status}`);
-        // Retry on proxy-specific failures: size limits, IP blocks, server/gateway errors
-        const retryable = resp.status === 403 || resp.status === 413 || resp.status === 429 || resp.status >= 500;
+        const retryable = resp.status === 403 || resp.status === 408 || resp.status === 413 || resp.status === 429 || resp.status >= 500;
         if (!retryable) break;
       } catch (e) {
         clearTimeout(tid);
         lastError = e;
-        continue;  // network / timeout — try next proxy
+        continue;
       }
     }
     throw lastError;
@@ -750,6 +1041,10 @@
   // ── Main fetch dispatcher ──────────────────────────────────────────────────
 
   async function fetchCurrentPrice(item) {
+    const store = item.store || detectStore(item.url);
+    if (store === "Pak'nSave" || store === 'New World') {
+      return await fetchPakNSavePrice(item);
+    }
     return await fetchHTMLPrice(item);
   }
 
@@ -760,6 +1055,66 @@
 
   // Line colours for grouped-item charts (one per store)
   const GROUP_COLORS = ['#00ffcc', '#ff9900', '#ff66cc', '#66ccff', '#ffff66', '#cc66ff'];
+
+  // 216 colours as a proper HSL grid: row 0 = grays, rows 1-11 = spectrum dark→light
+  const PALETTE_216 = (() => {
+    function hslToHex(h, s, l) {
+      s /= 100; l /= 100;
+      const a = s * Math.min(l, 1 - l);
+      const f = n => {
+        const k = (n + h / 30) % 12;
+        const c = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+        return Math.round(255 * c).toString(16).padStart(2, '0');
+      };
+      return `#${f(0)}${f(8)}${f(4)}`;
+    }
+    const cols = 18, rows = 12, colors = [];
+    for (let i = 0; i < cols; i++)
+      colors.push(hslToHex(0, 0, Math.round(i * 100 / (cols - 1))));
+    for (let row = 1; row < rows; row++) {
+      const l = 10 + (row - 1) * 8;
+      for (let col = 0; col < cols; col++)
+        colors.push(hslToHex(col * 20, 100, l));
+    }
+    return colors;
+  })();
+
+  function openColorPicker(e, itemId) {
+    e.stopPropagation();
+    closeColorPicker();
+    const data = loadData();
+    const item = data.items.find(i => i.id === itemId);
+    const current = (item?.color || '#00ffcc').toLowerCase();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'color-overlay';
+    overlay.addEventListener('click', closeColorPicker);
+    document.body.appendChild(overlay);
+
+    const swatches = PALETTE_216.map(c =>
+      `<span class="color-swatch" style="background:${c};${c===current?'outline:2px solid #fff;outline-offset:-2px;':''}" title="${c}" onclick="pickColor('${itemId}','${c}')"></span>`
+    ).join('');
+
+    const picker = document.createElement('div');
+    picker.id = 'color-picker';
+    picker.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span style="font-size:12px;color:#aaa;">Pick a colour</span>
+        <button onclick="closeColorPicker()" style="background:none;border:none;color:#888;font-size:16px;cursor:pointer;padding:0 4px;line-height:1;">&#x2715;</button>
+      </div>
+      <div class="color-swatches">${swatches}</div>`;
+    document.body.appendChild(picker);
+  }
+
+  function closeColorPicker() {
+    document.getElementById('color-overlay')?.remove();
+    document.getElementById('color-picker')?.remove();
+  }
+
+  function pickColor(itemId, color) {
+    closeColorPicker();
+    setItemColor(itemId, color);
+  }
 
   function hexToRgba(hex, alpha) {
     const r = parseInt(hex.slice(1, 3), 16);
@@ -836,7 +1191,7 @@
     // History table (last 8 entries, newest first)
     let histHtml = '';
     if (history.length) {
-      const rows = [...history].reverse().slice(0, 8).map(h =>
+      const rows = [...history].reverse().map(h =>
         `<tr><td>${esc(h.date)}</td><td style="color:#7dff7d">$${parseFloat(h.price).toFixed(2)}</td></tr>`
       ).join('');
       histHtml = `<details style="margin-top:4px;"><summary style="font-size:11px;color:#bbb;cursor:pointer;font-weight:bold;">${history.length} price record${history.length !== 1 ? 's' : ''}</summary>
@@ -856,6 +1211,7 @@
           <button onclick="refreshItem('${esc(item.id)}')" title="Refresh now">↻</button>
           <button onclick="renameItem('${esc(item.id)}')" title="Rename">✎ Rename</button>
           <button onclick="groupItem(event,'${esc(item.id)}')" title="Add to group" style="font-size:12px;">↦ Group</button>
+          <button onclick="openColorPicker(event,'${esc(item.id)}')" title="Change line colour"><span class="color-dot" style="background:${item.color||'#00ffcc'}"></span></button>
           <button class="btn-remove" onclick="removeItem('${esc(item.id)}')" title="Remove">✕</button>
         </div>
       </div>
@@ -868,6 +1224,7 @@
         ${item.error ? `<span class="error-badge" title="${esc(item.error)}">⚠ ${esc(item.error)}</span>` : ''}
       </div>
       ${history.length >= 2 ? `<canvas id="${canvasId}" class="price-chart"></canvas>` : history.length === 1 ? `<div style="font-size:10px;color:#444;margin-top:4px;font-style:italic;">Graph appears once a second day's price is recorded.</div>` : ''}
+      <div style="font-size:11px;margin-top:6px;"><a href="https://dupe.com/search?q=${encodeURIComponent(item.name || '')}" target="_blank" rel="noopener" style="color:#88aaff;">View on DUPE.COM ↗</a></div>
       ${histHtml}
     `;
     return div;
@@ -890,15 +1247,16 @@
     const maxVal = Math.max(...values);
     const pad    = (maxVal - minVal) * 0.15 || 1;
 
+    const itemColor = item.color || '#00ffcc';
     _charts[item.id] = new Chart(canvas, {
       type: 'line',
       data: {
         labels,
         datasets: [{
           data: values,
-          borderColor: '#00ffcc',
-          backgroundColor: 'rgba(0,255,204,0.08)',
-          pointBackgroundColor: '#00ffcc',
+          borderColor: itemColor,
+          backgroundColor: hexToRgba(itemColor, 0.08),
+          pointBackgroundColor: itemColor,
           pointRadius: 4,
           tension: 0.3,
           borderWidth: 2
@@ -916,13 +1274,17 @@
         },
         scales: {
           x: {
-            ticks: { color: '#666', font: { size: 11 }, maxRotation: 40 },
+            ticks: {
+              color: '#888', font: { size: 11 }, maxRotation: 45, minRotation: 0,
+              autoSkip: true, maxTicksLimit: 10,
+              callback: function(val) { const l = this.getLabelForValue(val); return l ? l.slice(5) : l; }
+            },
             grid:  { color: '#222' }
           },
           y: {
             min: minVal - pad,
             max: maxVal + pad,
-            ticks: { color: '#666', font: { size: 11 }, callback: v => `$${v.toFixed(2)}` },
+            ticks: { color: '#888', font: { size: 11 }, maxTicksLimit: 6, callback: v => `$${v.toFixed(2)}` },
             grid: { color: '#222' }
           }
         }
@@ -943,7 +1305,7 @@
       const history = item.history || [];
       const latest  = history.at(-1);
       const prev    = history.length >= 2 ? history.at(-2) : null;
-      const color   = GROUP_COLORS[idx % GROUP_COLORS.length];
+      const color   = item.color || GROUP_COLORS[idx % GROUP_COLORS.length];
 
       let priceCell  = '';
 
@@ -961,7 +1323,9 @@
           <td class="gt-name"><a href="${esc(item.url)}" target="_blank">${esc(item.name || item.url)}</a>${item.error ? ` <span class="error-badge" title="${esc(item.error)}">⚠</span>` : ''}</td>
           <td class="gt-price">${priceCell}</td>
           <td class="gt-actions"><div class="card-actions">
+            <button onclick="renameGroupedItem('${esc(item.id)}')" title="Rename store / item" style="font-size:11px;">✎</button>
             <button onclick="ungroupItem('${esc(item.id)}')" title="Remove from group" style="font-size:11px;">↩</button>
+            <button onclick="openColorPicker(event,'${esc(item.id)}')" title="Change line colour" style="padding:1px 4px;"><span class="color-dot" style="background:${color}"></span></button>
             <button class="btn-remove" onclick="removeItem('${esc(item.id)}')" title="Remove">✕</button>
           </div></td>
         </tr>`;
@@ -974,7 +1338,7 @@
     let histHtml = '';
     if (allDates.length) {
       const headerCells = groupItems.map((item, idx) =>
-        `<th style="color:${GROUP_COLORS[idx % GROUP_COLORS.length]}">${esc(item.store)}</th>`
+        `<th style="color:${item.color || GROUP_COLORS[idx % GROUP_COLORS.length]}">${esc(item.store)}</th>`
       ).join('');
       const rows = allDates.map(date => {
         const cells = groupItems.map(item => {
@@ -997,10 +1361,9 @@
     div.dataset.groupId = group.id;
     div.innerHTML = `
       <div class="card-header">
-        <span class="group-name-badge">⊞ ${esc(group.name)}</span>
+        <span class="group-name-badge">∑ ${esc(group.name)}</span>
         <div class="card-actions">
           <button onclick="renameGroup('${esc(group.id)}')" title="Rename group">✎ Rename</button>
-          <button class="btn-remove" onclick="ungroupAll('${esc(group.id)}')" title="Dissolve group">↩ Ungroup all</button>
         </div>
       </div>
       <table class="group-table">
@@ -1024,7 +1387,7 @@
     if (allDates.length < 2) return;
 
     const datasets = groupItems.map((item, idx) => {
-      const color  = GROUP_COLORS[idx % GROUP_COLORS.length];
+      const color  = item.color || GROUP_COLORS[idx % GROUP_COLORS.length];
       const values = allDates.map(date => {
         const entry = (item.history || []).find(h => h.date === date);
         return entry?.price != null ? parseFloat(entry.price) : null;
@@ -1115,25 +1478,17 @@
         <button onclick="createGroupWithName('${esc(id)}')" style="padding:4px 10px;">OK</button>
       </div>`;
 
+    const overlay = document.createElement('div');
+    overlay.id = 'group-overlay';
+    overlay.addEventListener('click', closeGroupDropdown);
+    document.body.appendChild(overlay);
+
     const dd = document.createElement('div');
     dd.id = 'group-dropdown';
     dd.innerHTML = html;
     document.body.appendChild(dd);
 
-    // Position below the clicked button (fixed = viewport coords, no scroll offset)
-    const rect = e.target.getBoundingClientRect();
-    let top  = rect.bottom + 4;
-    let left = rect.left;
-    const ddW = 290;
-    if (left + ddW > window.innerWidth - 8) left = window.innerWidth - ddW - 8;
-    if (top < 0) top = rect.top - dd.offsetHeight - 4;  // flip above if cut off
-    dd.style.top  = top  + 'px';
-    dd.style.left = left + 'px';
-
     document.getElementById('group-name-input').focus();
-
-    // Close on outside click
-    setTimeout(() => document.addEventListener('click', _groupDropdownOutsideClick), 0);
   }
 
   function _groupDropdownOutsideClick(e) {
@@ -1142,6 +1497,8 @@
   }
 
   function closeGroupDropdown() {
+    const overlay = document.getElementById('group-overlay');
+    if (overlay) overlay.remove();
     const dd = document.getElementById('group-dropdown');
     if (dd) dd.remove();
     document.removeEventListener('click', _groupDropdownOutsideClick);
@@ -1166,7 +1523,7 @@
     if (!data.groups) data.groups = [];
     const group = {
       id:   'group_' + Date.now() + '_' + Math.random().toString(36).slice(2, 5),
-      name: `${item1.store} vs ${item2.store}`
+      name: `NEW GROUP: ${(item1.name || item1.store).slice(0, 40)}`
     };
     data.groups.push(group);
     item1.groupId = group.id;
@@ -1212,17 +1569,92 @@
     render();
   }
 
+  // ── Rename modal ─────────────────────────────────────────────────────────────────────────────
+
+  function openRenameModal(title, fields, onSave) {
+    closeRenameModal();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'rename-overlay';
+    overlay.addEventListener('click', closeRenameModal);
+    document.body.appendChild(overlay);
+
+    const fieldsHtml = fields.map((f, i) => `
+      <label>
+        ${esc(f.label)}
+        <input id="rename-field-${i}" type="text" value="${esc(f.value)}" />
+      </label>`).join('');
+
+    const modal = document.createElement('div');
+    modal.id = 'rename-modal';
+    modal.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <strong>${esc(title)}</strong>
+        <button onclick="closeRenameModal()" style="background:none;border:none;color:#888;font-size:16px;cursor:pointer;padding:0 4px;line-height:1;">✕</button>
+      </div>
+      ${fieldsHtml}
+      <div class="rename-actions">
+        <button onclick="closeRenameModal()" style="background:#252525;border:1px solid #333;color:#888;padding:5px 14px;font-size:12px;cursor:pointer;">Cancel</button>
+        <button id="rename-save-btn" style="padding:5px 14px;font-size:12px;cursor:pointer;">Save</button>
+      </div>`;
+    document.body.appendChild(modal);
+
+    document.getElementById('rename-save-btn').addEventListener('click', () => {
+      const values = fields.map((_, i) => document.getElementById(`rename-field-${i}`).value.trim());
+      closeRenameModal();
+      onSave(values);
+    });
+
+    modal.querySelectorAll('input').forEach(inp => {
+      inp.addEventListener('keydown', e => {
+        if (e.key === 'Enter')  document.getElementById('rename-save-btn').click();
+        if (e.key === 'Escape') closeRenameModal();
+      });
+    });
+
+    const first = document.getElementById('rename-field-0');
+    if (first) { first.focus(); first.select(); }
+  }
+
+  function closeRenameModal() {
+    document.getElementById('rename-overlay')?.remove();
+    document.getElementById('rename-modal')?.remove();
+  }
+
+  function renameGroupedItem(itemId) {
+    const data = loadData();
+    const item = data.items.find(i => i.id === itemId);
+    if (!item) return;
+    openRenameModal(
+      'Rename',
+      [
+        { label: 'Store',     value: item.store || '' },
+        { label: 'Item name', value: item.name  || '' }
+      ],
+      ([newStore, newName]) => {
+        if (newStore) item.store = newStore;
+        item.name       = newName || (item.customName ? item.name : '');
+        item.customName = !!newName;
+        saveData(data);
+        render();
+      }
+    );
+  }
+
   function renameGroup(groupId) {
     const data  = loadData();
     const group = (data.groups || []).find(g => g.id === groupId);
     if (!group) return;
-    const newName = prompt('Rename group:', group.name);
-    if (newName === null) return;
-    const trimmed = newName.trim();
-    if (!trimmed) return;
-    group.name = trimmed;
-    saveData(data);
-    render();
+    openRenameModal(
+      'Rename group',
+      [{ label: 'Group name', value: group.name }],
+      ([newName]) => {
+        if (!newName) return;
+        group.name = newName;
+        saveData(data);
+        render();
+      }
+    );
   }
 
   function ungroupAll(groupId) {
@@ -1237,41 +1669,58 @@
   // ── Actions ────────────────────────────────────────────────────────────────
 
   async function refreshItem(id, force = true) {
-    const data = loadData();
-    const item = data.items.find(i => i.id === id);
+    // ── Initial check ────────────────────────────────────────────────────────
+    let data = loadData();
+    let item = data.items.find(i => i.id === id);
     if (!item) return;
 
     const todayStr = today();
-    const lastEntry = (item.history || []).find(h => h.date === todayStr);
-    if (!force && lastEntry) return;  // already have today's price
+    const hasToday = !!(item.history || []).find(h => h.date === todayStr);
+    if (!force && (hasToday || item.checkedDate === todayStr)) return;
+
+    // Mark loading — snapshot the fields needed for the fetch before going async
+    const fetchUrl     = item.url;
+    const fetchStore   = item.store;
+    const fetchStoreId = item.storeId;
+    const fetchCustom  = item.customName;
 
     item.status = 'loading';
     item.error  = null;
     saveData(data);
     render();
 
+    // ── Fetch ─────────────────────────────────────────────────────────────────
+    let price = null;
+    let name  = null;
+    let fetchError = null;
+
     try {
-      const { price, name } = await fetchCurrentPrice(item);
-
-      if (!item.history) item.history = [];
-
-      if (price != null) {
-        const existing = item.history.find(h => h.date === todayStr);
-        if (existing) {
-          existing.price = price;
-        } else {
-          item.history.push({ date: todayStr, price });
-        }
-      }
-
-      if (name && !item.customName) item.name = name;
-      item.status = null;
-      item.error  = (price == null) ? 'Price not found in page. Site may have bot protection or structure has changed.' : null;
-
+      const result = await fetchCurrentPrice({ url: fetchUrl, store: fetchStore, storeId: fetchStoreId });
+      price = result.price;
+      name  = result.name;
     } catch (e) {
-      item.status = null;
-      item.error  = e.message;
+      fetchError = e.message;
     }
+
+    // ── Write results onto FRESH data to avoid overwriting concurrent saves ───
+    data = loadData();
+    item = data.items.find(i => i.id === id);
+    if (!item) return;
+
+    if (!item.history) item.history = [];
+    if (price != null) {
+      const existing = item.history.find(h => h.date === todayStr);
+      if (existing) {
+        existing.price = price;
+      } else {
+        item.history.push({ date: todayStr, price });
+      }
+    }
+
+    if (name && !fetchCustom) item.name = name;
+    item.status      = null;
+    item.checkedDate = todayStr;
+    item.error       = fetchError ?? (price == null ? 'Price not found in page. Site may have bot protection or structure has changed.' : null);
 
     saveData(data);
     render();
@@ -1281,11 +1730,23 @@
     const data = loadData();
     const item = data.items.find(i => i.id === id);
     if (!item) return;
-    const newName = prompt('Rename item:', item.name || '');
-    if (newName === null) return;  // cancelled
-    const trimmed = newName.trim();
-    item.name = trimmed || (item.customName ? item.name : '');
-    item.customName = !!trimmed;
+    openRenameModal(
+      'Rename item',
+      [{ label: 'Item name', value: item.name || '' }],
+      ([newName]) => {
+        item.name       = newName || (item.customName ? item.name : '');
+        item.customName = !!newName;
+        saveData(data);
+        render();
+      }
+    );
+  }
+
+  function setItemColor(id, color) {
+    const data = loadData();
+    const item = data.items.find(i => i.id === id);
+    if (!item) return;
+    item.color = color;
     saveData(data);
     render();
   }
@@ -1305,54 +1766,93 @@
     if (!data.items.length) { status.textContent = ''; return; }
 
     const todayStr   = today();
-    const pending    = data.items.filter(i => !(i.history || []).find(h => h.date === todayStr));
+    const pending    = data.items.filter(i => {
+      const hasToday = !!(i.history || []).find(h => h.date === todayStr);
+      return !hasToday && i.checkedDate !== todayStr;
+    });
     const alreadyDone = data.items.length - pending.length;
 
     if (!pending.length) {
+      status.style.color = '#ffcc00';
       status.textContent = `✓ All ${data.items.length} item${data.items.length !== 1 ? 's' : ''} already checked today.`;
       return;
     }
 
-    status.textContent = `Checking ${pending.length} item${pending.length !== 1 ? 's' : ''} not yet fetched today…`;
-    let fetched = 0;
-    let errors  = 0;
+    // Group by domain — stagger within a domain, run domains concurrently
+    const byDomain = {};
     for (const item of pending) {
-      await refreshItem(item.id, false);
-      const fresh = loadData().items.find(i => i.id === item.id);
-      if (fresh?.error) errors++;
-      else fetched++;
-      if (pending.indexOf(item) < pending.length - 1)
-        await new Promise(r => setTimeout(r, 1000));
+      let domain;
+      try { domain = new URL(item.url).hostname; } catch { domain = 'unknown'; }
+      if (!byDomain[domain]) byDomain[domain] = [];
+      byDomain[domain].push(item);
     }
 
+    let fetched = 0;
+    let errors  = 0;
+    let done    = 0;
+    const total = pending.length;
+
+    const domainPromises = Object.values(byDomain).map(items =>
+      items.reduce((chain, item, idx) =>
+        chain.then(async () => {
+          if (idx > 0) await new Promise(r => setTimeout(r, 600));
+          await refreshItem(item.id, false);
+          const fresh = loadData().items.find(x => x.id === item.id);
+          if (fresh?.error) errors++; else fetched++;
+          done++;
+          status.style.color = '#ffcc00';
+          status.textContent = `Fetching ${done} of ${total}\u2026`;
+        }), Promise.resolve())
+    );
+
+    await Promise.all(domainPromises);
+
+    status.style.color = '#ffcc00';
     const parts = [];
     if (fetched)      parts.push(`${fetched} price${fetched !== 1 ? 's' : ''} fetched`);
     if (alreadyDone)  parts.push(`${alreadyDone} already up to date`);
     if (errors)       parts.push(`${errors} error${errors !== 1 ? 's' : ''}`);
     status.textContent = `✓ ${parts.join(' · ')}`;
-    setTimeout(() => { status.textContent = ''; }, 8000);
   }
 
   async function refreshForce() {
     const data   = loadData();
     const status = document.getElementById('refresh-status');
     if (!data.items.length) return;
-    status.textContent = `Re-checking all ${data.items.length} item${data.items.length !== 1 ? 's' : ''}…`;
+
+    const byDomain = {};
+    for (const item of data.items) {
+      let domain;
+      try { domain = new URL(item.url).hostname; } catch { domain = 'unknown'; }
+      if (!byDomain[domain]) byDomain[domain] = [];
+      byDomain[domain].push(item);
+    }
+
     let fetched = 0;
     let errors  = 0;
-    for (const item of data.items) {
-      await refreshItem(item.id, true);
-      const fresh = loadData().items.find(i => i.id === item.id);
-      if (fresh?.error) errors++;
-      else fetched++;
-      if (data.items.indexOf(item) < data.items.length - 1)
-        await new Promise(r => setTimeout(r, 1000));
-    }
+    let done    = 0;
+    const total = data.items.length;
+
+    const domainPromises = Object.values(byDomain).map(items =>
+      items.reduce((chain, item, idx) =>
+        chain.then(async () => {
+          if (idx > 0) await new Promise(r => setTimeout(r, 600));
+          await refreshItem(item.id, true);
+          const fresh = loadData().items.find(x => x.id === item.id);
+          if (fresh?.error) errors++; else fetched++;
+          done++;
+          status.style.color = '#ffcc00';
+          status.textContent = `Fetching ${done} of ${total}\u2026`;
+        }), Promise.resolve())
+    );
+
+    await Promise.all(domainPromises);
+
+    status.style.color = '#ffcc00';
     const parts = [];
     if (fetched) parts.push(`${fetched} updated`);
     if (errors)  parts.push(`${errors} error${errors !== 1 ? 's' : ''}`);
     status.textContent = `✓ ${parts.join(' · ')}`;
-    setTimeout(() => { status.textContent = ''; }, 8000);
   }
 
   // ── Add item ────────────────────────────────────────────────────────────────
@@ -1369,23 +1869,31 @@
     const statusEl  = document.getElementById('add-status');
 
     const url = urlInput.value.trim();
-    if (!url) { statusEl.textContent = 'Please enter a URL.'; return; }
+    if (!url) { statusEl.style.color = '#888'; statusEl.textContent = 'Please enter a URL.'; return; }
 
     let urlObj;
     try { urlObj = new URL(url); } catch {
-      statusEl.textContent = 'Invalid URL — please paste the full product URL including https://';
+      statusEl.style.color = '#888'; statusEl.textContent = 'Invalid URL — please paste the full product URL including https://';
       return;
     }
     if (!['http:', 'https:'].includes(urlObj.protocol)) {
-      statusEl.textContent = 'URL must start with https://';
+      statusEl.style.color = '#888'; statusEl.textContent = 'URL must start with https://';
       return;
     }
 
-    const store    = detectStore(url);
-    const custName = nameInput.value.trim();
+    const store       = detectStore(url);
+    const storeIdInput = document.getElementById('add-storeid');
+    const storeId      = storeIdInput?.value.trim() || '';
+    const custName     = nameInput.value.trim();
+
+    if (needsStoreId(store) && !storeId) {
+      statusEl.style.color = '#888'; statusEl.textContent = `${store} requires a Store ID — see 'How it works' above for how to find it.`;
+      return;
+    }
 
     const data = loadData();
     if (data.items.some(i => i.url === url)) {
+      statusEl.style.color = '#ffcc00';
       statusEl.textContent = 'This URL is already being tracked.';
       return;
     }
@@ -1395,7 +1903,8 @@
       url,
       name:       custName || nameFromUrl(url),
       customName: !!custName,
-      store,
+      store:      store.replace(/\s+/g, ''),
+      storeId:    storeId || null,
       history:    [],
       status:     null,
       error:      null
@@ -1406,19 +1915,41 @@
 
     urlInput.value  = '';
     nameInput.value = '';
-    statusEl.textContent = '';
+    if (storeIdInput) storeIdInput.value = '';
+    document.getElementById('storeid-row').style.display = 'none';
+    statusEl.style.color = '#888'; statusEl.textContent = '';
 
     render();
     await refreshItem(newItem.id, true);
   }
 
   // Allow Enter key to submit from either input field
+  function onUrlChange(input) {
+    const store = detectStore(input.value);
+    const row   = document.getElementById('storeid-row');
+    const label = document.getElementById('storeid-store-label');
+    if (needsStoreId(store)) {
+      row.style.display = '';
+      label.textContent = `${store} Store ID (UUID):`;
+    } else {
+      row.style.display = 'none';
+    }
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
-    ['add-url', 'add-name'].forEach(id => {
-      document.getElementById(id).addEventListener('keydown', e => {
+    ['add-url', 'add-name', 'add-storeid'].forEach(id => {
+      document.getElementById(id)?.addEventListener('keydown', e => {
         if (e.key === 'Enter') addItem();
       });
     });
+    // Clear any stuck "loading" status from a previous interrupted fetch
+    const _startupData = loadData();
+    let _startupDirty = false;
+    for (const _item of _startupData.items) {
+      if (_item.status === 'loading') { _item.status = null; _startupDirty = true; }
+    }
+    if (_startupDirty) saveData(_startupData);
+
     render();
     refreshAll();
   });
@@ -1426,3 +1957,4 @@
 
 </body>
 </html>
+
