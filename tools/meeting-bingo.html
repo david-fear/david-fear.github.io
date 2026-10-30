@@ -155,14 +155,28 @@
     .room-name-field input:focus-visible { outline: 3px solid var(--coral); outline-offset: 2px; }
     .room-message { min-height: 1.2em; margin: 5px 0 0; line-height: 1.35; }
     .room-players { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px; margin: 5px 0 0; padding: 0; list-style: none; }
-    .room-player { display: flex; align-items: center; justify-content: space-between; gap: 5px; min-width: 0; min-height: 27px; padding: 3px 6px; border-left: 3px solid var(--primary); background: #202020; font-size: 11px; }
+    .room-player { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 5px; min-width: 0; min-height: 27px; padding: 3px 6px; border-left: 3px solid var(--primary); background: #202020; font-size: 11px; }
     .room-player[data-bingo="true"] { border-left-color: #f32936; }
     .room-player-name { min-width: 0; padding: 2px 4px; border-radius: 3px; overflow-wrap: anywhere; }
-    .room-player[data-bingo="true"] .room-player-name { animation: player-bingo-flash 700ms ease-in-out infinite alternate; }
     .room-player-status { flex: 0 0 auto; color: var(--muted); font-size: 10px; text-align: right; white-space: nowrap; }
-    @keyframes player-bingo-flash {
-      from { background: rgb(243 41 54 / 15%); color: var(--text); }
-      to { background: #f32936; color: #fff; }
+    .room-bingo-stamp {
+      position: absolute;
+      z-index: 1;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      border: 2px solid #f32936;
+      background: rgb(20 20 20 / 78%);
+      color: #f32936;
+      font-family: "Luckiest Guy", Impact, sans-serif;
+      font-size: 17px;
+      line-height: 1;
+      pointer-events: none;
+      animation: room-bingo-flash 650ms steps(2, end) infinite alternate;
+    }
+    .room-bingo-stamp span { transform: rotate(-7deg); text-shadow: 1px 1px 0 #111; }
+    @keyframes room-bingo-flash {
+      to { background: rgb(243 41 54 / 24%); color: #ff5964; }
     }
 
     @media (max-width: 980px) {
@@ -173,7 +187,7 @@
 
     @media (prefers-reduced-motion: reduce) {
       .bingo-overlay span { animation: none; transform: rotate(-18deg) scale(1); }
-      .room-player[data-bingo="true"] .room-player-name { animation: none; background: #f32936; color: #fff; }
+      .room-bingo-stamp { animation: none; }
     }
   </style>
 </head>
@@ -443,6 +457,15 @@
           status.textContent = `${progress} · disconnects in ${timeLeft}`;
         }
         row.append(name, status);
+        if (player.bingo) {
+          const stamp = document.createElement('span');
+          stamp.className = 'room-bingo-stamp';
+          stamp.setAttribute('aria-hidden', 'true');
+          const stampText = document.createElement('span');
+          stampText.textContent = 'BINGO!';
+          stamp.append(stampText);
+          row.append(stamp);
+        }
         list.append(row);
       });
       if (!players.some(player => player.id === playerId)) {
