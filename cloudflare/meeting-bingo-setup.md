@@ -1,11 +1,13 @@
 # Meeting Bingo Cloudflare setup
 
-This adds a separate Worker and D1 database for anonymous room progress. It does not modify `df-proxy` or store names, cards, or phrase contents.
+This adds a separate Worker and D1 database for one global live bingo room. It does not modify `df-proxy`. The page shares each connected player's name, marked count, and bingo status; each player's card stays local.
 
 ## Create the database
 
 1. In Cloudflare, open **Workers & Pages > D1 SQL Database** and create a database named `meeting-bingo`.
 2. Open its SQL console and run the contents of `meeting-bingo-schema.sql`.
+
+If you already ran an earlier version of the bingo schema, run this updated schema too. It drops the obsolete `bingo_players` and `bingo_rooms` tables, permanently deleting their old room data, then creates `bingo_live_players` for the single global room.
 
 ## Create the Worker
 
@@ -16,4 +18,6 @@ This adds a separate Worker and D1 database for anonymous room progress. It does
 
 The bingo page is configured for that Worker URL and only allows browser requests from `https://david-fear.github.io`. If Cloudflare assigns a different `workers.dev` URL, update `ROOM_API_URL` near the top of the bingo page's game script.
 
-Keep the account on Cloudflare's no-cost Workers and D1 plans and do not attach a paid plan. The API stores an eight-character room code, the player names entered for that room, per-tab IDs, marked counts, bingo status, and timestamps. Players inactive for five minutes are removed; rooms older than one day are cleaned up when a new room is created. Anyone with a room code can see and submit progress for that room, so use it only for this casual game and do not put private information in it.
+All connected visitors join the same global room; there are no room codes or room creation. The Worker endpoints are `POST /api/live/connect`, `GET /api/live/state?playerId=...`, `POST /api/live/progress`, and `DELETE /api/live/players/{playerId}`. Players inactive for ten minutes are removed on the next room request; away players see a countdown to that expiry in the roster.
+
+Keep the account on Cloudflare's no-cost Workers and D1 plans and do not attach a paid plan. This room is public to anyone who can open the page and submit API requests; names, marked counts, and bingo status are visible to all room participants. Use only for casual play, not private information.

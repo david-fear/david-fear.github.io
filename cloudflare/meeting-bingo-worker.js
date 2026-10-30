@@ -1,8 +1,6 @@
 const ALLOWED_ORIGIN = 'https://david-fear.github.io';
-const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const MAX_PLAYERS = 32;
-const PLAYER_TIMEOUT_SECONDS = 300;
-const ROOM_TTL_SECONDS = 86400;
+const PLAYER_TIMEOUT_SECONDS = 600;
 
 function responseHeaders() {
   return {
@@ -29,16 +27,6 @@ function cleanPlayerName(value) {
   return value.replace(/[\u0000-\u001f\u007f]/g, '').trim().slice(0, 24);
 }
 
-function validRoomCode(value) {
-  return typeof value === 'string' && /^[A-HJ-NP-Z2-9]{8}$/.test(value);
-}
-
-function makeRoomCode() {
-  const bytes = new Uint8Array(8);
-  crypto.getRandomValues(bytes);
-  return Array.from(bytes, byte => CODE_CHARS[byte % CODE_CHARS.length]).join('');
-}
-
 async function readBody(request) {
   try {
     return await request.json();
@@ -55,38 +43,32 @@ function readProgress(body) {
   return { marked, bingo: body.bingo ? 1 : 0 };
 }
 
-async function upsertPlayer(db, roomCode, playerId, playerName, progress, now) {
+async function upsertPlayer(db, playerId, playerName, progress, now) {
   await db.prepare(`
-    INSERT INTO bingo_players (room_code, player_id, player_name, marked, bingo, joined_at, last_seen)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-    ON CONFLICT(room_code, player_id) DO UPDATE SET
+    INSERT INTO bingo_live_players (player_id, player_name, marked, bingo, joined_at, last_seen)
+    VALUES (?, ?, ?, ?, ?, ?)
+    ON CONFLICT(player_id) DO UPDATE SET
       player_name = excluded.player_name,
       marked = excluded.marked,
       bingo = excluded.bingo,
       last_seen = excluded.last_seen
-  `).bind(roomCode, playerId, playerName, progress.marked, progress.bingo, now, now).run();
+  `).bind(playerId, playerName, progress.marked, progress.bingo, now, now).run();
 }
 
-async function roomExists(db, roomCode) {
-  return Boolean(await db.prepare('SELECT room_code FROM bingo_rooms WHERE room_code = ?').bind(roomCode).first());
-}
-
-async function roomState(db, roomCode, playerId) {
+async function liveRoomState(db, playerId) {
   const now = Math.floor(Date.now() / 1000);
   if (playerId && validPlayerId(playerId)) {
-    await db.prepare('UPDATE bingo_players SET last_seen = ? WHERE room_code = ? AND player_id = ?')
-      .bind(now, roomCode, playerId).run();
+    await db.prepare('UPDATE bingo_live_players SET last_seen = ? WHERE player_id = ?')
+      .bind(now, playerId).run();
   }
-  await db.prepare('DELETE FROM bingo_players WHERE room_code = ? AND last_seen < ?')
-    .bind(roomCode, now - PLAYER_TIMEOUT_SECONDS).run();
+  await db.prepare('DELETE FROM bingo_live_players WHERE last_seen < ?')
+    .bind(now - PLAYER_TIMEOUT_SECONDS).run();
   const players = await db.prepare(`
     SELECT player_id, player_name, marked, bingo, joined_at, last_seen
-    FROM bingo_players
-    WHERE room_code = ?
+    FROM bingo_live_players
     ORDER BY joined_at, player_id
-  `).bind(roomCode).all();
+  `).all();
   return {
-    roomCode,
     players: players.results.map(player => ({
       id: player.player_id,
       name: player.player_name,
@@ -94,62 +76,33 @@ async function roomState(db, roomCode, playerId) {
       bingo: Boolean(player.bingo),
       joinedAt: player.joined_at,
       online: now - player.last_seen <= 20
+      disconnectAt: player.last_seen + PLAYER_TIMEOUT_SECONDS,
     }))
   };
 }
 
-async function createRoom(db, body) {
+async function connectToLiveRoom(db, body) {
   if (!validPlayerId(body?.playerId)) return jsonResponse({ error: 'Invalid player session.' }, 400);
   const playerName = cleanPlayerName(body?.playerName);
-  if (!playerName) return jsonResponse({ error: 'Enter your name before creating a room.' }, 400);
+  if (!playerName) return jsonResponse({ error: 'Enter your name before connecting.' }, 400);
   const progress = readProgress(body);
   if (!progress) return jsonResponse({ error: 'Invalid progress data.' }, 400);
 
   const now = Math.floor(Date.now() / 1000);
-  const cutoff = now - ROOM_TTL_SECONDS;
-  await db.prepare('DELETE FROM bingo_players WHERE room_code IN (SELECT room_code FROM bingo_rooms WHERE created_at < ?)')
-    .bind(cutoff).run();
-  await db.prepare('DELETE FROM bingo_rooms WHERE created_at < ?').bind(cutoff).run();
-
-  let roomCode;
-  for (let attempt = 0; attempt < 8; attempt++) {
-    const candidate = makeRoomCode();
-    if (!await roomExists(db, candidate)) {
-      roomCode = candidate;
-      break;
-    }
-  }
-  if (!roomCode) return jsonResponse({ error: 'Could not create a room. Please try again.' }, 503);
-
-  await db.prepare('INSERT INTO bingo_rooms (room_code, created_at) VALUES (?, ?)').bind(roomCode, now).run();
-  await upsertPlayer(db, roomCode, body.playerId, playerName, progress, now);
-  return jsonResponse(await roomState(db, roomCode, body.playerId), 201);
-}
-
-async function joinRoom(db, roomCode, body) {
-  if (!validRoomCode(roomCode) || !validPlayerId(body?.playerId)) {
-    return jsonResponse({ error: 'Enter a valid room code.' }, 400);
-  }
-  const playerName = cleanPlayerName(body?.playerName);
-  if (!playerName) return jsonResponse({ error: 'Enter your name before joining a room.' }, 400);
-  if (!await roomExists(db, roomCode)) return jsonResponse({ error: 'Room not found. Check the code and try again.' }, 404);
-  const progress = readProgress(body);
-  if (!progress) return jsonResponse({ error: 'Invalid progress data.' }, 400);
-
-  const existing = await db.prepare('SELECT player_id FROM bingo_players WHERE room_code = ? AND player_id = ?')
-    .bind(roomCode, body.playerId).first();
-  const count = await db.prepare('SELECT COUNT(*) AS player_count FROM bingo_players WHERE room_code = ?')
-    .bind(roomCode).first();
+  await db.prepare('DELETE FROM bingo_live_players WHERE last_seen < ?')
+    .bind(now - PLAYER_TIMEOUT_SECONDS).run();
+  const existing = await db.prepare('SELECT player_id FROM bingo_live_players WHERE player_id = ?')
+    .bind(body.playerId).first();
+  const count = await db.prepare('SELECT COUNT(*) AS player_count FROM bingo_live_players').first();
   if (!existing && count.player_count >= MAX_PLAYERS) {
-    return jsonResponse({ error: 'This room is full.' }, 409);
+    return jsonResponse({ error: 'The live room is full.' }, 409);
   }
-
-  await upsertPlayer(db, roomCode, body.playerId, playerName, progress, Math.floor(Date.now() / 1000));
-  return jsonResponse(await roomState(db, roomCode, body.playerId));
+  await upsertPlayer(db, body.playerId, playerName, progress, now);
+  return jsonResponse(await liveRoomState(db, body.playerId));
 }
 
-async function updateProgress(db, roomCode, body) {
-  if (!validRoomCode(roomCode) || !validPlayerId(body?.playerId)) {
+async function updateProgress(db, body) {
+  if (!validPlayerId(body?.playerId)) {
     return jsonResponse({ error: 'Invalid room or player session.' }, 400);
   }
   const playerName = cleanPlayerName(body?.playerName);
@@ -158,19 +111,17 @@ async function updateProgress(db, roomCode, body) {
   if (!progress) return jsonResponse({ error: 'Invalid progress data.' }, 400);
   const now = Math.floor(Date.now() / 1000);
   const result = await db.prepare(`
-    UPDATE bingo_players
+    UPDATE bingo_live_players
     SET player_name = ?, marked = ?, bingo = ?, last_seen = ?
-    WHERE room_code = ? AND player_id = ?
-  `).bind(playerName, progress.marked, progress.bingo, now, roomCode, body.playerId).run();
-  if (!result.meta.changes) return jsonResponse({ error: 'You are not in this room. Join again.' }, 404);
-  return jsonResponse(await roomState(db, roomCode, body.playerId));
+    WHERE player_id = ?
+  `).bind(playerName, progress.marked, progress.bingo, now, body.playerId).run();
+  if (!result.meta.changes) return jsonResponse({ error: 'Your live session expired. Connect again.' }, 404);
+  return jsonResponse(await liveRoomState(db, body.playerId));
 }
 
-async function leaveRoom(db, roomCode, playerId) {
-  if (!validRoomCode(roomCode) || !validPlayerId(playerId)) {
-    return jsonResponse({ error: 'Invalid room or player session.' }, 400);
-  }
-  await db.prepare('DELETE FROM bingo_players WHERE room_code = ? AND player_id = ?').bind(roomCode, playerId).run();
+async function disconnectPlayer(db, playerId) {
+  if (!validPlayerId(playerId)) return jsonResponse({ error: 'Invalid player session.' }, 400);
+  await db.prepare('DELETE FROM bingo_live_players WHERE player_id = ?').bind(playerId).run();
   return jsonResponse({ ok: true });
 }
 
@@ -186,30 +137,22 @@ export default {
     if (!env.BINGO_DB) return jsonResponse({ error: 'D1 binding BINGO_DB is missing.' }, 500);
     const url = new URL(request.url);
     const parts = url.pathname.split('/').filter(Boolean);
-    if (parts[0] !== 'api' || parts[1] !== 'rooms') return jsonResponse({ error: 'Not found.' }, 404);
+    if (parts[0] !== 'api' || parts[1] !== 'live') return jsonResponse({ error: 'Not found.' }, 404);
 
     try {
-      if (parts.length === 2 && request.method === 'POST') {
-        return await createRoom(env.BINGO_DB, await readBody(request));
+      if (parts.length === 3 && parts[2] === 'connect' && request.method === 'POST') {
+        return await connectToLiveRoom(env.BINGO_DB, await readBody(request));
       }
-      if (parts.length === 4) {
-        const [, , roomCode, action] = parts;
-        if (action === 'join' && request.method === 'POST') {
-          return await joinRoom(env.BINGO_DB, roomCode.toUpperCase(), await readBody(request));
-        }
-        if (action === 'progress' && request.method === 'POST') {
-          return await updateProgress(env.BINGO_DB, roomCode.toUpperCase(), await readBody(request));
-        }
-        if (action === 'state' && request.method === 'GET') {
-          const code = roomCode.toUpperCase();
-          if (!validRoomCode(code) || !await roomExists(env.BINGO_DB, code)) {
-            return jsonResponse({ error: 'Room not found.' }, 404);
-          }
-          return jsonResponse(await roomState(env.BINGO_DB, code, url.searchParams.get('playerId')));
-        }
+      if (parts.length === 3 && parts[2] === 'progress' && request.method === 'POST') {
+        return await updateProgress(env.BINGO_DB, await readBody(request));
       }
-      if (parts.length === 5 && parts[3] === 'players' && request.method === 'DELETE') {
-        return await leaveRoom(env.BINGO_DB, parts[2].toUpperCase(), parts[4]);
+      if (parts.length === 3 && parts[2] === 'state' && request.method === 'GET') {
+        const playerId = url.searchParams.get('playerId');
+        if (!validPlayerId(playerId)) return jsonResponse({ error: 'Invalid player session.' }, 400);
+        return jsonResponse(await liveRoomState(env.BINGO_DB, playerId));
+      }
+      if (parts.length === 4 && parts[2] === 'players' && request.method === 'DELETE') {
+        return await disconnectPlayer(env.BINGO_DB, parts[3]);
       }
       return jsonResponse({ error: 'Not found.' }, 404);
     } catch (error) {

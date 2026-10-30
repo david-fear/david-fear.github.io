@@ -139,8 +139,8 @@
     .room-summary, .room-help, .room-message { color: var(--muted); font-size: 12px; }
     .room-help { margin: 5px 0 0; }
     .room-controls { display: flex; align-items: end; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-    .room-name-field, .room-code-field { display: grid; gap: 4px; color: var(--muted); font-size: 11px; font-weight: 700; }
-    .room-name-field input, .room-code-field input {
+    .room-name-field { display: grid; gap: 4px; color: var(--muted); font-size: 11px; font-weight: 700; }
+    .room-name-field input {
       min-height: 38px;
       padding: 8px 10px;
       border: 1px solid #555;
@@ -151,8 +151,7 @@
       font-size: 13px;
     }
     .room-name-field input { width: 200px; }
-    .room-code-field input { width: 150px; letter-spacing: 0.12em; text-transform: uppercase; }
-    .room-name-field input:focus-visible, .room-code-field input:focus-visible { outline: 3px solid var(--coral); outline-offset: 2px; }
+    .room-name-field input:focus-visible { outline: 3px solid var(--coral); outline-offset: 2px; }
     .room-message { min-height: 1.2em; margin: 8px 0 0; }
     .room-players { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 7px; margin: 10px 0 0; padding: 0; list-style: none; }
     .room-player { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 38px; padding: 7px 10px; border-left: 3px solid var(--primary); background: #202020; font-size: 12px; }
@@ -195,23 +194,18 @@
         <h2 id="room-title">Live room</h2>
         <div class="room-meta">
           <span class="room-connection" id="room-connection" data-state="offline" role="status" aria-live="polite">OFFLINE</span>
-          <span class="room-summary" id="room-summary">Solo play</span>
+          <span class="room-summary" id="room-summary">One room · 0 online</span>
         </div>
       </div>
-      <p class="room-help">Create a room and share its code to see everyone's marked count and bingo status.</p>
+      <p class="room-help">Everyone connects to the same live room. Names, marked counts, and bingo status are shared.</p>
       <div class="room-controls">
         <label class="room-name-field" for="player-name">Your name
           <input id="player-name" maxlength="24" autocomplete="nickname" placeholder="Name" required />
         </label>
-        <button type="button" id="create-room">Create room</button>
-        <label class="room-code-field" for="room-code-input">Room code
-          <input id="room-code-input" maxlength="8" autocomplete="off" placeholder="ABCD2345" />
-        </label>
-        <button type="button" class="quiet" id="join-room">Join room</button>
-        <button type="button" class="quiet" id="copy-room-link" hidden>Copy invite</button>
-        <button type="button" class="quiet" id="leave-room" hidden>Leave room</button>
+        <button type="button" id="connect-live-room">Connect</button>
+        <button type="button" class="quiet" id="leave-live-room" hidden>Disconnect</button>
       </div>
-      <p class="room-message" id="room-message" aria-live="polite">Room sharing requires the Cloudflare setup described in cloudflare/meeting-bingo-setup.md.</p>
+      <p class="room-message" id="room-message" aria-live="polite">Enter your name to connect to the one live room.</p>
       <ul class="room-players" id="room-players" aria-label="Player progress"></ul>
     </section>
     <div class="email-suggestion-wrap">
@@ -257,33 +251,24 @@
     const ROOM_API_URL = 'https://meeting-bingo-api.david-fear.workers.dev';
     const playerId = crypto.randomUUID();
     const playerNameInput = document.getElementById('player-name');
-    const roomCodeInput = document.getElementById('room-code-input');
     const roomConnection = document.getElementById('room-connection');
-    const createRoomButton = document.getElementById('create-room');
-    const joinRoomButton = document.getElementById('join-room');
+    const connectLiveRoomButton = document.getElementById('connect-live-room');
     let card = [];
     let marked = new Set();
     let freeSpaces = new Set();
     let celebrationActive = false;
     let confettiInterval = null;
-    let activeRoom = '';
+    let liveConnected = false;
     let roomPollInterval = null;
 
-    const inviteRoom = new URLSearchParams(window.location.search).get('room');
-    if (inviteRoom) {
-      roomCodeInput.value = inviteRoom.toUpperCase();
-      document.getElementById('room-message').textContent = 'Invite code loaded. Enter your name, then join.';
-    }
-
     function updateRoomButtons() {
-      const disabled = !playerNameInput.value.trim() || Boolean(activeRoom);
-      createRoomButton.disabled = disabled;
-      joinRoomButton.disabled = disabled;
+      connectLiveRoomButton.disabled = !playerNameInput.value.trim() || liveConnected || roomConnection.dataset.state === 'connecting';
     }
 
     function setRoomConnection(state) {
       roomConnection.dataset.state = state;
       roomConnection.textContent = state.toUpperCase();
+      updateRoomButtons();
     }
 
     playerNameInput.addEventListener('input', updateRoomButtons);
@@ -409,18 +394,12 @@
 
     function activateRoom(data) {
       if (roomPollInterval) window.clearInterval(roomPollInterval);
-      activeRoom = data.roomCode;
+      liveConnected = true;
       setRoomConnection('online');
-      roomCodeInput.value = activeRoom;
       playerNameInput.disabled = true;
       updateRoomButtons();
-      document.getElementById('room-summary').textContent = `Room ${activeRoom}`;
       document.getElementById('room-message').textContent = 'Connected. Progress updates automatically.';
-      document.getElementById('copy-room-link').hidden = false;
-      document.getElementById('leave-room').hidden = false;
-      const invite = new URL(window.location.href);
-      invite.searchParams.set('room', activeRoom);
-      window.history.replaceState(null, '', invite);
+      document.getElementById('leave-live-room').hidden = false;
       renderRoomPlayers(data.players);
       roomPollInterval = window.setInterval(refreshRoom, 5000);
     }
@@ -429,7 +408,7 @@
       const list = document.getElementById('room-players');
       list.replaceChildren();
       const onlineCount = players.filter(player => player.online).length;
-      document.getElementById('room-summary').textContent = `Room ${activeRoom} · ${onlineCount} here`;
+      document.getElementById('room-summary').textContent = `One room · ${onlineCount} online`;
       players.forEach(player => {
         const row = document.createElement('li');
         row.className = 'room-player';
@@ -438,20 +417,33 @@
         name.textContent = `${player.name}${player.id === playerId ? ' (you)' : ''}${player.online ? '' : ' · away'}`;
         const status = document.createElement('span');
         status.className = 'room-player-status';
-        status.textContent = player.bingo ? 'BINGO!' : `${player.marked}/22`;
+        const progress = player.bingo ? 'BINGO!' : `${player.marked}/22`;
+        if (player.online) {
+          status.textContent = progress;
+        } else {
+          const secondsLeft = Math.max(0, player.disconnectAt - Math.floor(Date.now() / 1000));
+          const timeLeft = `${Math.floor(secondsLeft / 60)}:${String(secondsLeft % 60).padStart(2, '0')}`;
+          status.textContent = `${progress} · disconnects in ${timeLeft}`;
+        }
         row.append(name, status);
         list.append(row);
       });
       if (!players.some(player => player.id === playerId)) {
+        liveConnected = false;
+        if (roomPollInterval) window.clearInterval(roomPollInterval);
+        roomPollInterval = null;
+        playerNameInput.disabled = false;
         setRoomConnection('offline');
+        updateRoomButtons();
         document.getElementById('room-message').textContent = 'Your room session expired. Join the room again.';
+        document.getElementById('leave-live-room').hidden = true;
       }
     }
 
     async function refreshRoom() {
-      if (!activeRoom) return;
+      if (!liveConnected) return;
       try {
-        const data = await roomRequest(`/api/rooms/${activeRoom}/state?playerId=${encodeURIComponent(playerId)}`);
+        const data = await roomRequest(`/api/live/state?playerId=${encodeURIComponent(playerId)}`);
         setRoomConnection('online');
         renderRoomPlayers(data.players);
       } catch (error) {
@@ -460,9 +452,9 @@
     }
 
     async function updateRoomProgress() {
-      if (!activeRoom) return;
+      if (!liveConnected) return;
       try {
-        const data = await roomRequest(`/api/rooms/${activeRoom}/progress`, { method: 'POST', body: currentProgress() });
+        const data = await roomRequest('/api/live/progress', { method: 'POST', body: currentProgress() });
         setRoomConnection('online');
         renderRoomPlayers(data.players);
       } catch (error) {
@@ -470,64 +462,32 @@
       }
     }
 
-    document.getElementById('create-room').addEventListener('click', async () => {
+    connectLiveRoomButton.addEventListener('click', async () => {
       if (!requirePlayerName()) return;
       setRoomConnection('connecting');
       try {
-        const data = await roomRequest('/api/rooms', { method: 'POST', body: currentProgress() });
+        const data = await roomRequest('/api/live/connect', { method: 'POST', body: currentProgress() });
         activateRoom(data);
       } catch (error) {
         showRoomError(error);
       }
     });
 
-    document.getElementById('join-room').addEventListener('click', async () => {
-      if (!requirePlayerName()) return;
-      const roomCode = roomCodeInput.value.trim().toUpperCase();
-      if (!/^[A-HJ-NP-Z2-9]{8}$/.test(roomCode)) {
-        document.getElementById('room-message').textContent = 'Enter the 8-character room code.';
-        return;
-      }
-      setRoomConnection('connecting');
-      try {
-        const data = await roomRequest(`/api/rooms/${roomCode}/join`, { method: 'POST', body: currentProgress() });
-        activateRoom(data);
-      } catch (error) {
-        showRoomError(error);
-      }
-    });
-
-    document.getElementById('copy-room-link').addEventListener('click', async () => {
-      const invite = new URL(window.location.href);
-      invite.searchParams.set('room', activeRoom);
-      try {
-        await navigator.clipboard.writeText(invite.toString());
-        document.getElementById('room-message').textContent = 'Invite link copied.';
-      } catch {
-        document.getElementById('room-message').textContent = `Share room code ${activeRoom}.`;
-      }
-    });
-
-    document.getElementById('leave-room').addEventListener('click', async () => {
-      const roomCode = activeRoom;
-      if (!roomCode) return;
+    document.getElementById('leave-live-room').addEventListener('click', async () => {
+      if (!liveConnected) return;
       if (roomPollInterval) window.clearInterval(roomPollInterval);
       roomPollInterval = null;
-      activeRoom = '';
+      liveConnected = false;
       setRoomConnection('offline');
       try {
-        await roomRequest(`/api/rooms/${roomCode}/players/${encodeURIComponent(playerId)}`, { method: 'DELETE' });
+        await roomRequest(`/api/live/players/${encodeURIComponent(playerId)}`, { method: 'DELETE' });
       } catch { /* switch to solo mode even when the network is unavailable */ }
       playerNameInput.disabled = false;
       updateRoomButtons();
-      document.getElementById('room-summary').textContent = 'Solo play';
-      document.getElementById('room-message').textContent = 'You left the room.';
+      document.getElementById('room-summary').textContent = 'One room';
+      document.getElementById('room-message').textContent = 'Disconnected from the live room.';
       document.getElementById('room-players').replaceChildren();
-      document.getElementById('copy-room-link').hidden = true;
-      document.getElementById('leave-room').hidden = true;
-      const invite = new URL(window.location.href);
-      invite.searchParams.delete('room');
-      window.history.replaceState(null, '', invite);
+      document.getElementById('leave-live-room').hidden = true;
     });
 
     function startBingoCelebration() {
