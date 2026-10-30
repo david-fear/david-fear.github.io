@@ -73,9 +73,9 @@
       border-radius: 4px;
       background: #1b1b1b;
       color: var(--ink);
-      font-size: 12px;
+      font-size: 15px;
       font-weight: 400;
-      line-height: 1.25;
+      line-height: 1.2;
       text-align: center;
       overflow-wrap: anywhere;
     }
@@ -86,7 +86,7 @@
     .square.free, .square.free:hover { border-color: #515960; background: #30363c; color: var(--text); }
     .bingo-overlay {
       position: absolute;
-      z-index: 5;
+      z-index: 30;
       inset: 0;
       display: grid;
       place-items: center;
@@ -108,8 +108,8 @@
       z-index: 20;
       top: -20px;
       left: var(--confetti-left);
-      width: 9px;
-      height: 15px;
+      width: var(--confetti-width);
+      height: var(--confetti-height);
       border-radius: 2px;
       background: var(--confetti-color);
       pointer-events: none;
@@ -123,12 +123,12 @@
     @keyframes confetti-fall {
       to { transform: translate3d(var(--confetti-drift), 110vh, 0) rotate(var(--confetti-spin)); }
     }
-    .email-suggestion { display: block; width: max-content; max-width: 100%; margin: 18px auto 0; text-align: center; }
-    .footer-note { margin: 18px 0 0; color: #a7b3a9; font-size: 11px; text-align: right; }
+    .email-suggestion-wrap { display: flex; justify-content: center; width: 100%; margin-top: 18px; }
+    .email-suggestion { max-width: 100%; text-align: center; }
 
     @media (max-width: 980px) {
       body { padding-top: 20px; padding-right: 20px; padding-bottom: 20px; }
-      .square { height: 94px; padding: 6px; font-size: 11px; }
+      .square { height: 94px; padding: 6px; font-size: 13px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -157,8 +157,9 @@
       </section>
 
     </div>
-    <a class="button email-suggestion" href="mailto:david.fear@magiqsoftware.com?subject=Buzzword%20Bingo%20New%20Suggestion&amp;body=Suggested%20new%20bingo%20item%3A%0A%0A">Email a suggested new item</a>
-    <p class="footer-note">Cards and marks stay in this browser. No account, server, or downloads.</p>
+    <div class="email-suggestion-wrap">
+      <a class="button email-suggestion" href="mailto:david.fear@magiqsoftware.com?subject=Buzzword%20Bingo%20New%20Suggestion&amp;body=Suggested%20new%20bingo%20item%3A%0A%0A">Email a suggested new item</a>
+    </div>
   </main>
 
   <script>
@@ -293,12 +294,16 @@
 
     function celebrateBingo() {
       const colors = ['#f32936', '#ffd166', '#4db8ff', '#69d2a3', '#d7ed69'];
-      for (let index = 0; index < 48; index++) {
+      for (let index = 0; index < 120; index++) {
         const piece = document.createElement('span');
         piece.className = 'confetti-piece';
+        const fallAngle = (Math.random() * 20 - 10) * Math.PI / 180;
+        const fallDistance = window.innerHeight * 1.1;
         piece.style.setProperty('--confetti-left', `${Math.random() * 100}vw`);
+        piece.style.setProperty('--confetti-width', `${6 + Math.random() * 5}px`);
+        piece.style.setProperty('--confetti-height', `${10 + Math.random() * 7}px`);
         piece.style.setProperty('--confetti-color', colors[index % colors.length]);
-        piece.style.setProperty('--confetti-drift', `${Math.random() * 260 - 130}px`);
+        piece.style.setProperty('--confetti-drift', `${Math.tan(fallAngle) * fallDistance}px`);
         piece.style.setProperty('--confetti-spin', `${Math.random() * 1080 - 540}deg`);
         piece.style.setProperty('--confetti-duration', `${2.8 + Math.random() * 2.2}s`);
         piece.style.setProperty('--confetti-delay', `${Math.random() * 700}ms`);
