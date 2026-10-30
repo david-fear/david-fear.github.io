@@ -29,7 +29,7 @@
     }
 
     .app { width: min(1250px, 100%); margin: 0 auto; }
-    .game-layout { display: block; }
+    .game-layout { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 16px; align-items: start; }
     .board-wrap, .panel { margin: 0; border: 1px solid var(--line); border-radius: 7px; background: var(--paper); color: var(--ink); }
     .board-wrap { position: relative; padding: 17px; }
     .board-top {
@@ -126,40 +126,42 @@
     }
     .email-suggestion-wrap { display: flex; justify-content: center; width: 100%; margin-top: 18px; }
     .email-suggestion { max-width: 100%; text-align: center; }
-    .live-room { margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--line); }
-    .room-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-    .room-heading h2 { margin: 0; font-size: 15px; }
-    .room-meta { display: flex; align-items: center; gap: 12px; }
+    .live-room { position: sticky; top: 12px; margin: 0; padding: 10px; border: 1px solid var(--line); border-radius: 7px; background: var(--paper); color: var(--ink); }
+    .room-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+    .room-heading h3 { margin: 0; font-size: 14px; }
+    .room-meta { display: flex; align-items: center; gap: 7px; }
     .room-connection { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: 0.06em; }
     .room-connection::before { width: 8px; height: 8px; border-radius: 50%; background: #7b8580; content: ""; }
     .room-connection[data-state="connecting"]::before { background: #f0bf4c; }
     .room-connection[data-state="online"] { color: #69d2a3; }
     .room-connection[data-state="online"]::before { background: #69d2a3; box-shadow: 0 0 7px rgb(105 210 163 / 55%); }
     .room-connection[data-state="offline"]::before { background: #f32936; }
-    .room-summary, .room-help, .room-message { color: var(--muted); font-size: 12px; }
-    .room-help { margin: 5px 0 0; }
-    .room-controls { display: flex; align-items: end; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-    .room-name-field { display: grid; gap: 4px; color: var(--muted); font-size: 11px; font-weight: 700; }
+    .room-summary, .room-help, .room-message { color: var(--muted); font-size: 11px; }
+    .room-help { margin: 3px 0 0; line-height: 1.35; }
+    .room-controls { display: flex; align-items: end; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .room-name-field { display: grid; flex: 1 1 140px; min-width: 0; gap: 3px; color: var(--muted); font-size: 10px; font-weight: 700; }
     .room-name-field input {
-      min-height: 38px;
-      padding: 8px 10px;
+      min-height: 34px;
+      width: 100%;
+      padding: 6px 8px;
       border: 1px solid #555;
       border-radius: 4px;
       background: #1b1b1b;
       color: var(--text);
       font: inherit;
-      font-size: 13px;
+      font-size: 12px;
     }
-    .room-name-field input { width: 200px; }
     .room-name-field input:focus-visible { outline: 3px solid var(--coral); outline-offset: 2px; }
-    .room-message { min-height: 1.2em; margin: 8px 0 0; }
-    .room-players { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 7px; margin: 10px 0 0; padding: 0; list-style: none; }
-    .room-player { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 38px; padding: 7px 10px; border-left: 3px solid var(--primary); background: #202020; font-size: 12px; }
+    .room-message { min-height: 1.2em; margin: 5px 0 0; line-height: 1.35; }
+    .room-players { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px; margin: 5px 0 0; padding: 0; list-style: none; }
+    .room-player { display: flex; align-items: center; justify-content: space-between; gap: 5px; min-width: 0; min-height: 27px; padding: 3px 6px; border-left: 3px solid var(--primary); background: #202020; font-size: 11px; }
     .room-player[data-bingo="true"] { border-left-color: #f32936; }
-    .room-player-status { color: var(--muted); text-align: right; }
+    .room-player > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+    .room-player-status { flex: 0 0 auto; color: var(--muted); font-size: 10px; text-align: right; white-space: nowrap; }
 
     @media (max-width: 980px) {
       body { padding-top: 20px; padding-right: 20px; padding-bottom: 20px; }
+      .game-layout { grid-template-columns: minmax(0, 1fr) 230px; gap: 12px; }
       .square { height: 94px; padding: 6px; font-size: 13px; }
     }
 
@@ -187,17 +189,14 @@
         <div class="board" id="board" aria-label="Bingo card"></div>
         <div class="bingo-overlay" id="bingo-overlay" aria-hidden="true" hidden><span>BINGO!</span></div>
       </section>
-
-    </div>
-    <section class="live-room" aria-labelledby="room-title">
+      <section class="live-room" aria-labelledby="room-title">
       <div class="room-heading">
-        <h2 id="room-title">Live room</h2>
+        <h3 id="room-title">Live&nbsp;room</h3>
         <div class="room-meta">
           <span class="room-connection" id="room-connection" data-state="offline" role="status" aria-live="polite">OFFLINE</span>
           <span class="room-summary" id="room-summary">One room · 0 online</span>
         </div>
       </div>
-      <p class="room-help">Everyone connects to the same live room. Names, marked counts, and bingo status are shared.</p>
       <div class="room-controls">
         <label class="room-name-field" for="player-name">Your name
           <input id="player-name" maxlength="24" autocomplete="nickname" placeholder="Name" required />
@@ -205,9 +204,10 @@
         <button type="button" id="connect-live-room">Connect</button>
         <button type="button" class="quiet" id="leave-live-room" hidden>Disconnect</button>
       </div>
-      <p class="room-message" id="room-message" aria-live="polite">Enter your name to connect to the one live room.</p>
+      <p class="room-message" id="room-message" aria-live="polite">Enter name to connect to the live room.</p>
       <ul class="room-players" id="room-players" aria-label="Player progress"></ul>
-    </section>
+      </section>
+    </div>
     <div class="email-suggestion-wrap">
       <a class="button email-suggestion" href="mailto:david.fear@magiqsoftware.com?subject=Buzzword%20Bingo%20New%20Suggestion&amp;body=Suggested%20new%20bingo%20item%3A%0A%0A">Email a suggested new item</a>
     </div>
