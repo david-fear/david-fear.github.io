@@ -68,17 +68,20 @@ async function liveRoomState(db, playerId) {
     FROM bingo_live_players
     ORDER BY joined_at, player_id
   `).all();
-  return {
-    players: players.results.map(player => ({
-      id: player.player_id,
-      name: player.player_name,
-      marked: player.marked,
-      bingo: Boolean(player.bingo),
-      joinedAt: player.joined_at,
-      online: now - player.last_seen <= 20
-      disconnectAt: player.last_seen + PLAYER_TIMEOUT_SECONDS,
-    }))
-  };
+  const formattedPlayers = [];
+  for (const player of players.results) {
+    const lastSeen = Number(player.last_seen);
+    const formattedPlayer = {};
+    formattedPlayer.id = player.player_id;
+    formattedPlayer.name = player.player_name;
+    formattedPlayer.marked = player.marked;
+    formattedPlayer.bingo = Boolean(player.bingo);
+    formattedPlayer.joinedAt = player.joined_at;
+    formattedPlayer.online = lastSeen + 20 > now;
+    formattedPlayer.disconnectAt = lastSeen + PLAYER_TIMEOUT_SECONDS;
+    formattedPlayers.push(formattedPlayer);
+  }
+  return { players: formattedPlayers };
 }
 
 async function connectToLiveRoom(db, body) {
