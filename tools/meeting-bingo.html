@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <title>Meeting Bingo</title>
+  <link rel="stylesheet" href="https://david-fear.github.io/stylesheet.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preload" href="https://fonts.gstatic.com/s/luckiestguy/v25/_gP_1RrxsjcxVyin9l9n_j2hTd52.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap" />
+  <style>
+    :root {
+      --ink: var(--text);
+      --forest: var(--primary);
+      --forest-light: var(--primary-light);
+      --paper: var(--card-bg);
+      --paper-dim: #3a3a3a;
+      --lime: #d7ed69;
+      --coral: #ff775e;
+      --muted: #a7b3a9;
+      --line: rgb(230 232 235 / 42%);
+    }
+
+    body {
+      min-width: 760px;
+      min-height: 100vh;
+    }
+
+    .app { width: min(1250px, 100%); margin: 0 auto; }
+    .game-layout { display: block; }
+    .board-wrap, .panel { margin: 0; border: 1px solid var(--line); border-radius: 7px; background: var(--paper); color: var(--ink); }
+    .board-wrap { position: relative; padding: 17px; }
+    .board-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .board-top h2 { margin: 0; font-size: 15px; }
+    .board-top p { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
+    .actions { display: flex; gap: 7px; }
+    button {
+      min-height: 38px;
+      padding: 8px 12px;
+      border: 1px solid var(--forest);
+      border-radius: 4px;
+      background: var(--forest);
+      color: var(--text);
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    button:hover { background: var(--forest-light); }
+    button:focus-visible { outline: 3px solid var(--coral); outline-offset: 2px; }
+    button.quiet { background: transparent; color: var(--forest); }
+    button.quiet:hover { background: var(--paper-dim); }
+    .letters, .board { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 5px; }
+    .letters { margin-bottom: 5px; }
+    .letters span { padding: 2px; color: var(--muted); font-size: 11px; font-weight: 900; text-align: center; }
+    .square {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      height: 110px;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 8px;
+      border: 1px solid #555;
+      border-radius: 4px;
+      background: #1b1b1b;
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 1.25;
+      text-align: center;
+      overflow-wrap: anywhere;
+    }
+    .square:hover { border-color: var(--primary); background: #242424; }
+    .square.marked { border-color: #8bd2ff; background: var(--primary); color: #102331; box-shadow: inset 0 0 0 2px var(--card-bg); }
+    .square-prefix { color: var(--primary); }
+    .square.marked .square-prefix { color: #102331; }
+    .square.free, .square.free:hover { border-color: #515960; background: #30363c; color: var(--text); }
+    .bingo-overlay {
+      position: absolute;
+      z-index: 5;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      border-radius: 7px;
+      pointer-events: none;
+    }
+    .bingo-overlay[hidden] { display: none; }
+    .bingo-overlay span {
+      color: #f32936;
+      font-family: "Luckiest Guy", Impact, sans-serif;
+      font-size: clamp(5rem, 15vw, 12rem);
+      font-weight: 400;
+      line-height: 1;
+      transform: rotate(-18deg) scale(0.3);
+      animation: bingo-pop 650ms cubic-bezier(0.18, 1.65, 0.38, 1) forwards;
+    }
+    .confetti-piece {
+      position: fixed;
+      z-index: 20;
+      top: -20px;
+      left: var(--confetti-left);
+      width: 9px;
+      height: 15px;
+      border-radius: 2px;
+      background: var(--confetti-color);
+      pointer-events: none;
+      animation: confetti-fall var(--confetti-duration) linear var(--confetti-delay) forwards;
+    }
+    @keyframes bingo-pop {
+      65% { transform: rotate(-6deg) scale(1.18); }
+      82% { transform: rotate(-21deg) scale(0.96); }
+      100% { transform: rotate(-18deg) scale(1); }
+    }
+    @keyframes confetti-fall {
+      to { transform: translate3d(var(--confetti-drift), 110vh, 0) rotate(var(--confetti-spin)); }
+    }
+    .email-suggestion { display: block; width: max-content; max-width: 100%; margin: 18px auto 0; text-align: center; }
+    .footer-note { margin: 18px 0 0; color: #a7b3a9; font-size: 11px; text-align: right; }
+
+    @media (max-width: 980px) {
+      body { padding-top: 20px; padding-right: 20px; padding-bottom: 20px; }
+      .square { height: 94px; padding: 6px; font-size: 11px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .bingo-overlay span { animation: none; transform: rotate(-18deg) scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <div id="menu-container"></div>
+  <main class="app">
+    <div class="game-layout">
+      <section class="board-wrap" aria-labelledby="card-title">
+        <div class="board-top">
+          <div>
+            <h2 id="card-title">Your card</h2>
+            <p id="marked-count">0 of 22 marked</p>
+          </div>
+          <div class="actions">
+            <button type="button" class="quiet" id="clear-card">Clear marks</button>
+            <button type="button" id="new-card">New random card</button>
+          </div>
+        </div>
+        <div class="letters" aria-hidden="true"><span>B</span><span>I</span><span>N</span><span>G</span><span>O</span></div>
+        <div class="board" id="board" aria-label="Bingo card"></div>
+        <div class="bingo-overlay" id="bingo-overlay" aria-hidden="true" hidden><span>BINGO!</span></div>
+      </section>
+
+    </div>
+    <a class="button email-suggestion" href="mailto:david.fear@magiqsoftware.com?subject=Buzzword%20Bingo%20New%20Suggestion&amp;body=Suggested%20new%20bingo%20item%3A%0A%0A">Email a suggested new item</a>
+    <p class="footer-note">Cards and marks stay in this browser. No account, server, or downloads.</p>
+  </main>
+
+  <script>
+    const defaultPhrases = [
+      'Chat: A non-american asks a question',
+      'Says/Chat: Asks about bonus',
+      'Chat: Someone mentions American Football',
+      'Chat: Someone mentions Baseball',
+      'You turned up late to this meeting',
+      'Action: On their phone',
+      'Chat: #OneTeam',
+      'Says: #OneTeam',
+      'Says: "A big round of applause to all of you"',
+      'Action: Someone still has their old Springbrook background',
+      'Says: AI First',
+      'Says: Superbowl',
+      'Says: NZ without mentioning Australia',
+      'Says: Australia without mentioning NZ',
+      'Action: Maniacal Smiling',
+      'Wearing: Overly massive glasses frames',
+      'Chat: Praying Hands',
+      'Says: Pace and Urgency',
+      'Says: Breakneck Pace',
+      'Says: Imperial Measurement',
+      'Situation: Two people in the same room',
+      'Situation: Employee with a real window',
+      'Wearing: Massive Ring on Finger',
+      'Says: Hand on Heart',
+      'Says: "Springbok"',
+      'Wearing: Hideous Top',
+      'Says: Religeon - "God" or "Bless"',
+      'Wearing: Denim'
+    ];
+
+    const board = document.getElementById('board');
+    const phrases = [...defaultPhrases];
+    let card = [];
+    let marked = new Set();
+    let freeSpaces = new Set();
+    let celebrationActive = false;
+    let confettiInterval = null;
+
+    makeCard();
+
+    function shuffle(items) {
+      const result = [...items];
+      for (let index = result.length - 1; index > 0; index--) {
+        const other = Math.floor(Math.random() * (index + 1));
+        [result[index], result[other]] = [result[other], result[index]];
+      }
+      return result;
+    }
+
+    function makeCard() {
+      let positions;
+      do {
+        const rows = shuffle([0, 1, 2, 3, 4]).slice(0, 3);
+        const columns = shuffle([0, 1, 2, 3, 4]).slice(0, 3);
+        positions = rows.map((row, index) => row * 5 + columns[index]);
+      } while (positions.some(position => {
+        const row = Math.floor(position / 5);
+        const column = position % 5;
+        return row === column || row + column === 4;
+      }));
+      freeSpaces = new Set(positions);
+      const chosen = shuffle([...new Set(phrases)]).slice(0, 22);
+      let phraseIndex = 0;
+      card = Array.from({ length: 25 }, (_, index) => freeSpaces.has(index) ? 'FREE SPACE' : chosen[phraseIndex++]);
+      marked = new Set(freeSpaces);
+      render();
+    }
+
+    function getBingoLine() {
+      for (let row = 0; row < 5; row++) {
+        const line = Array.from({ length: 5 }, (_, col) => row * 5 + col);
+        if (line.every(index => marked.has(index))) return 'row';
+      }
+      for (let col = 0; col < 5; col++) {
+        const line = Array.from({ length: 5 }, (_, row) => row * 5 + col);
+        if (line.every(index => marked.has(index))) return 'column';
+      }
+      const diagonals = [[0, 6, 12, 18, 24], [4, 8, 12, 16, 20]];
+      if (diagonals.some(line => line.every(index => marked.has(index)))) return 'diagonal';
+      return null;
+    }
+
+    function render() {
+      board.replaceChildren();
+      card.forEach((phrase, index) => {
+        const square = document.createElement('button');
+        square.type = 'button';
+        square.className = `square${freeSpaces.has(index) ? ' free' : ''}${marked.has(index) ? ' marked' : ''}`;
+        square.setAttribute('aria-label', phrase);
+        const colonIndex = phrase.indexOf(':');
+        if (colonIndex === -1) {
+          square.textContent = phrase;
+        } else {
+          const prefix = document.createElement('span');
+          prefix.className = 'square-prefix';
+          prefix.textContent = phrase.slice(0, colonIndex + 1);
+          const detail = document.createElement('span');
+          detail.textContent = phrase.slice(colonIndex + 1).trim();
+          square.append(prefix, detail);
+        }
+        square.setAttribute('aria-pressed', String(marked.has(index)));
+        square.addEventListener('click', () => {
+          if (freeSpaces.has(index)) return;
+          marked.has(index) ? marked.delete(index) : marked.add(index);
+          render();
+        });
+        board.append(square);
+      });
+      const phraseCount = 25 - freeSpaces.size;
+      document.getElementById('marked-count').textContent = `${marked.size - freeSpaces.size} of ${phraseCount} marked`;
+      const bingoLine = getBingoLine();
+      document.getElementById('bingo-overlay').hidden = !bingoLine;
+      if (bingoLine && !celebrationActive) startBingoCelebration();
+      if (!bingoLine && celebrationActive) stopBingoCelebration();
+      celebrationActive = Boolean(bingoLine);
+    }
+
+    function startBingoCelebration() {
+      celebrateBingo();
+      confettiInterval = window.setInterval(celebrateBingo, 1600);
+    }
+
+    function stopBingoCelebration() {
+      window.clearInterval(confettiInterval);
+      confettiInterval = null;
+      document.querySelectorAll('.confetti-piece').forEach(piece => piece.remove());
+    }
+
+    function celebrateBingo() {
+      const colors = ['#f32936', '#ffd166', '#4db8ff', '#69d2a3', '#d7ed69'];
+      for (let index = 0; index < 48; index++) {
+        const piece = document.createElement('span');
+        piece.className = 'confetti-piece';
+        piece.style.setProperty('--confetti-left', `${Math.random() * 100}vw`);
+        piece.style.setProperty('--confetti-color', colors[index % colors.length]);
+        piece.style.setProperty('--confetti-drift', `${Math.random() * 260 - 130}px`);
+        piece.style.setProperty('--confetti-spin', `${Math.random() * 1080 - 540}deg`);
+        piece.style.setProperty('--confetti-duration', `${2.8 + Math.random() * 2.2}s`);
+        piece.style.setProperty('--confetti-delay', `${Math.random() * 700}ms`);
+        piece.addEventListener('animationend', () => piece.remove(), { once: true });
+        document.body.append(piece);
+      }
+    }
+
+    document.getElementById('new-card').addEventListener('click', makeCard);
+    document.getElementById('clear-card').addEventListener('click', () => {
+      marked = new Set(freeSpaces);
+      render();
+    });
+  </script>
+  <script>
+    fetch('https://david-fear.github.io/components/menu.html')
+      .then(response => response.text())
+      .then(markup => {
+        const container = document.getElementById('menu-container');
+        container.innerHTML = markup;
+        const toggle = document.getElementById('menu-toggle');
+        const menu = document.getElementById('menu-nav');
+        if (!toggle || !menu) return;
+        toggle.addEventListener('click', () => {
+          const expanded = toggle.getAttribute('aria-expanded') === 'true';
+          toggle.setAttribute('aria-expanded', String(!expanded));
+          menu.toggleAttribute('hidden', expanded);
+        });
+        toggle.addEventListener('keydown', event => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            toggle.click();
+          }
+        });
+      })
+      .catch(error => console.error('Failed to load menu:', error));
+  </script>
+</body>
+</html>
