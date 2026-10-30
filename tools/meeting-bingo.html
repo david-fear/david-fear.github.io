@@ -54,6 +54,7 @@
       cursor: pointer;
     }
     button:hover { background: var(--forest-light); }
+    button:disabled { opacity: 0.45; cursor: not-allowed; }
     button:focus-visible { outline: 3px solid var(--coral); outline-offset: 2px; }
     button.quiet { background: transparent; color: var(--forest); }
     button.quiet:hover { background: var(--paper-dim); }
@@ -125,6 +126,38 @@
     }
     .email-suggestion-wrap { display: flex; justify-content: center; width: 100%; margin-top: 18px; }
     .email-suggestion { max-width: 100%; text-align: center; }
+    .live-room { margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--line); }
+    .room-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+    .room-heading h2 { margin: 0; font-size: 15px; }
+    .room-meta { display: flex; align-items: center; gap: 12px; }
+    .room-connection { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: 0.06em; }
+    .room-connection::before { width: 8px; height: 8px; border-radius: 50%; background: #7b8580; content: ""; }
+    .room-connection[data-state="connecting"]::before { background: #f0bf4c; }
+    .room-connection[data-state="online"] { color: #69d2a3; }
+    .room-connection[data-state="online"]::before { background: #69d2a3; box-shadow: 0 0 7px rgb(105 210 163 / 55%); }
+    .room-connection[data-state="offline"]::before { background: #f32936; }
+    .room-summary, .room-help, .room-message { color: var(--muted); font-size: 12px; }
+    .room-help { margin: 5px 0 0; }
+    .room-controls { display: flex; align-items: end; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .room-name-field, .room-code-field { display: grid; gap: 4px; color: var(--muted); font-size: 11px; font-weight: 700; }
+    .room-name-field input, .room-code-field input {
+      min-height: 38px;
+      padding: 8px 10px;
+      border: 1px solid #555;
+      border-radius: 4px;
+      background: #1b1b1b;
+      color: var(--text);
+      font: inherit;
+      font-size: 13px;
+    }
+    .room-name-field input { width: 200px; }
+    .room-code-field input { width: 150px; letter-spacing: 0.12em; text-transform: uppercase; }
+    .room-name-field input:focus-visible, .room-code-field input:focus-visible { outline: 3px solid var(--coral); outline-offset: 2px; }
+    .room-message { min-height: 1.2em; margin: 8px 0 0; }
+    .room-players { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 7px; margin: 10px 0 0; padding: 0; list-style: none; }
+    .room-player { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 38px; padding: 7px 10px; border-left: 3px solid var(--primary); background: #202020; font-size: 12px; }
+    .room-player[data-bingo="true"] { border-left-color: #f32936; }
+    .room-player-status { color: var(--muted); text-align: right; }
 
     @media (max-width: 980px) {
       body { padding-top: 20px; padding-right: 20px; padding-bottom: 20px; }
@@ -157,6 +190,30 @@
       </section>
 
     </div>
+    <section class="live-room" aria-labelledby="room-title">
+      <div class="room-heading">
+        <h2 id="room-title">Live room</h2>
+        <div class="room-meta">
+          <span class="room-connection" id="room-connection" data-state="offline" role="status" aria-live="polite">OFFLINE</span>
+          <span class="room-summary" id="room-summary">Solo play</span>
+        </div>
+      </div>
+      <p class="room-help">Create a room and share its code to see everyone's marked count and bingo status.</p>
+      <div class="room-controls">
+        <label class="room-name-field" for="player-name">Your name
+          <input id="player-name" maxlength="24" autocomplete="nickname" placeholder="Name" required />
+        </label>
+        <button type="button" id="create-room">Create room</button>
+        <label class="room-code-field" for="room-code-input">Room code
+          <input id="room-code-input" maxlength="8" autocomplete="off" placeholder="ABCD2345" />
+        </label>
+        <button type="button" class="quiet" id="join-room">Join room</button>
+        <button type="button" class="quiet" id="copy-room-link" hidden>Copy invite</button>
+        <button type="button" class="quiet" id="leave-room" hidden>Leave room</button>
+      </div>
+      <p class="room-message" id="room-message" aria-live="polite">Room sharing requires the Cloudflare setup described in cloudflare/meeting-bingo-setup.md.</p>
+      <ul class="room-players" id="room-players" aria-label="Player progress"></ul>
+    </section>
     <div class="email-suggestion-wrap">
       <a class="button email-suggestion" href="mailto:david.fear@magiqsoftware.com?subject=Buzzword%20Bingo%20New%20Suggestion&amp;body=Suggested%20new%20bingo%20item%3A%0A%0A">Email a suggested new item</a>
     </div>
@@ -197,11 +254,40 @@
 
     const board = document.getElementById('board');
     const phrases = [...defaultPhrases];
+    const ROOM_API_URL = 'https://meeting-bingo-api.david-fear.workers.dev';
+    const playerId = crypto.randomUUID();
+    const playerNameInput = document.getElementById('player-name');
+    const roomCodeInput = document.getElementById('room-code-input');
+    const roomConnection = document.getElementById('room-connection');
+    const createRoomButton = document.getElementById('create-room');
+    const joinRoomButton = document.getElementById('join-room');
     let card = [];
     let marked = new Set();
     let freeSpaces = new Set();
     let celebrationActive = false;
     let confettiInterval = null;
+    let activeRoom = '';
+    let roomPollInterval = null;
+
+    const inviteRoom = new URLSearchParams(window.location.search).get('room');
+    if (inviteRoom) {
+      roomCodeInput.value = inviteRoom.toUpperCase();
+      document.getElementById('room-message').textContent = 'Invite code loaded. Enter your name, then join.';
+    }
+
+    function updateRoomButtons() {
+      const disabled = !playerNameInput.value.trim() || Boolean(activeRoom);
+      createRoomButton.disabled = disabled;
+      joinRoomButton.disabled = disabled;
+    }
+
+    function setRoomConnection(state) {
+      roomConnection.dataset.state = state;
+      roomConnection.textContent = state.toUpperCase();
+    }
+
+    playerNameInput.addEventListener('input', updateRoomButtons);
+    updateRoomButtons();
 
     makeCard();
 
@@ -280,7 +366,169 @@
       if (bingoLine && !celebrationActive) startBingoCelebration();
       if (!bingoLine && celebrationActive) stopBingoCelebration();
       celebrationActive = Boolean(bingoLine);
+      updateRoomProgress();
     }
+
+    function currentProgress() {
+      return {
+        playerId,
+        playerName: playerNameInput.value.trim().slice(0, 24),
+        marked: marked.size - freeSpaces.size,
+        bingo: Boolean(getBingoLine())
+      };
+    }
+
+    function requirePlayerName() {
+      const name = playerNameInput.value.trim();
+      if (!name) {
+        document.getElementById('room-message').textContent = 'Enter your name before creating or joining a room.';
+        playerNameInput.focus();
+        return false;
+      }
+      return true;
+    }
+
+    async function roomRequest(path, options = {}) {
+      const requestOptions = { method: options.method || 'GET', cache: 'no-store' };
+      if (options.body) {
+        requestOptions.headers = { 'Content-Type': 'application/json' };
+        requestOptions.body = JSON.stringify(options.body);
+      }
+      const response = await fetch(`${ROOM_API_URL}${path}`, requestOptions);
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || `Room request failed (${response.status}).`);
+      return data;
+    }
+
+    function showRoomError(error) {
+      setRoomConnection('offline');
+      document.getElementById('room-message').textContent = error instanceof TypeError
+        ? 'Room service is unavailable. Check that the Cloudflare Worker is deployed.'
+        : error.message;
+    }
+
+    function activateRoom(data) {
+      if (roomPollInterval) window.clearInterval(roomPollInterval);
+      activeRoom = data.roomCode;
+      setRoomConnection('online');
+      roomCodeInput.value = activeRoom;
+      playerNameInput.disabled = true;
+      updateRoomButtons();
+      document.getElementById('room-summary').textContent = `Room ${activeRoom}`;
+      document.getElementById('room-message').textContent = 'Connected. Progress updates automatically.';
+      document.getElementById('copy-room-link').hidden = false;
+      document.getElementById('leave-room').hidden = false;
+      const invite = new URL(window.location.href);
+      invite.searchParams.set('room', activeRoom);
+      window.history.replaceState(null, '', invite);
+      renderRoomPlayers(data.players);
+      roomPollInterval = window.setInterval(refreshRoom, 5000);
+    }
+
+    function renderRoomPlayers(players) {
+      const list = document.getElementById('room-players');
+      list.replaceChildren();
+      const onlineCount = players.filter(player => player.online).length;
+      document.getElementById('room-summary').textContent = `Room ${activeRoom} · ${onlineCount} here`;
+      players.forEach(player => {
+        const row = document.createElement('li');
+        row.className = 'room-player';
+        row.dataset.bingo = String(player.bingo);
+        const name = document.createElement('span');
+        name.textContent = `${player.name}${player.id === playerId ? ' (you)' : ''}${player.online ? '' : ' · away'}`;
+        const status = document.createElement('span');
+        status.className = 'room-player-status';
+        status.textContent = player.bingo ? 'BINGO!' : `${player.marked}/22`;
+        row.append(name, status);
+        list.append(row);
+      });
+      if (!players.some(player => player.id === playerId)) {
+        setRoomConnection('offline');
+        document.getElementById('room-message').textContent = 'Your room session expired. Join the room again.';
+      }
+    }
+
+    async function refreshRoom() {
+      if (!activeRoom) return;
+      try {
+        const data = await roomRequest(`/api/rooms/${activeRoom}/state?playerId=${encodeURIComponent(playerId)}`);
+        setRoomConnection('online');
+        renderRoomPlayers(data.players);
+      } catch (error) {
+        showRoomError(error);
+      }
+    }
+
+    async function updateRoomProgress() {
+      if (!activeRoom) return;
+      try {
+        const data = await roomRequest(`/api/rooms/${activeRoom}/progress`, { method: 'POST', body: currentProgress() });
+        setRoomConnection('online');
+        renderRoomPlayers(data.players);
+      } catch (error) {
+        showRoomError(error);
+      }
+    }
+
+    document.getElementById('create-room').addEventListener('click', async () => {
+      if (!requirePlayerName()) return;
+      setRoomConnection('connecting');
+      try {
+        const data = await roomRequest('/api/rooms', { method: 'POST', body: currentProgress() });
+        activateRoom(data);
+      } catch (error) {
+        showRoomError(error);
+      }
+    });
+
+    document.getElementById('join-room').addEventListener('click', async () => {
+      if (!requirePlayerName()) return;
+      const roomCode = roomCodeInput.value.trim().toUpperCase();
+      if (!/^[A-HJ-NP-Z2-9]{8}$/.test(roomCode)) {
+        document.getElementById('room-message').textContent = 'Enter the 8-character room code.';
+        return;
+      }
+      setRoomConnection('connecting');
+      try {
+        const data = await roomRequest(`/api/rooms/${roomCode}/join`, { method: 'POST', body: currentProgress() });
+        activateRoom(data);
+      } catch (error) {
+        showRoomError(error);
+      }
+    });
+
+    document.getElementById('copy-room-link').addEventListener('click', async () => {
+      const invite = new URL(window.location.href);
+      invite.searchParams.set('room', activeRoom);
+      try {
+        await navigator.clipboard.writeText(invite.toString());
+        document.getElementById('room-message').textContent = 'Invite link copied.';
+      } catch {
+        document.getElementById('room-message').textContent = `Share room code ${activeRoom}.`;
+      }
+    });
+
+    document.getElementById('leave-room').addEventListener('click', async () => {
+      const roomCode = activeRoom;
+      if (!roomCode) return;
+      if (roomPollInterval) window.clearInterval(roomPollInterval);
+      roomPollInterval = null;
+      activeRoom = '';
+      setRoomConnection('offline');
+      try {
+        await roomRequest(`/api/rooms/${roomCode}/players/${encodeURIComponent(playerId)}`, { method: 'DELETE' });
+      } catch { /* switch to solo mode even when the network is unavailable */ }
+      playerNameInput.disabled = false;
+      updateRoomButtons();
+      document.getElementById('room-summary').textContent = 'Solo play';
+      document.getElementById('room-message').textContent = 'You left the room.';
+      document.getElementById('room-players').replaceChildren();
+      document.getElementById('copy-room-link').hidden = true;
+      document.getElementById('leave-room').hidden = true;
+      const invite = new URL(window.location.href);
+      invite.searchParams.delete('room');
+      window.history.replaceState(null, '', invite);
+    });
 
     function startBingoCelebration() {
       celebrateBingo();
