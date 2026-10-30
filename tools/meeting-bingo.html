@@ -216,7 +216,7 @@
         <h3 id="room-title">Live&nbsp;room</h3>
         <div class="room-meta">
           <span class="room-connection" id="room-connection" data-state="offline" role="status" aria-live="polite">OFFLINE</span>
-          <span class="room-summary" id="room-summary">Room · 0 online</span>
+          <span class="room-summary" id="room-summary">Room · 0 active</span>
         </div>
       </div>
       <div class="room-controls">
@@ -438,7 +438,7 @@
       const list = document.getElementById('room-players');
       list.replaceChildren();
       const onlineCount = players.filter(player => player.online).length;
-      document.getElementById('room-summary').textContent = `Room · ${onlineCount} online`;
+      document.getElementById('room-summary').textContent = `Room · ${onlineCount} active`;
       players.forEach(player => {
         const row = document.createElement('li');
         row.className = 'room-player';
