@@ -26,7 +26,7 @@
     /* --- button grid --- */
     .button-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
       gap: 8px;
       flex: 1;
       position: relative;
@@ -36,15 +36,15 @@
     /* --- buttons --- */
     button {
       width: 100%;
-      font-size: 1.1em;
-      padding: 16px 12px;
+      font-size: 0.95em;
+      padding: 8px 10px;
       border: 1px solid rgba(77, 184, 255, 0.2);
       border-radius: 8px;
       transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
     }
     button:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 22px rgba(77, 184, 255, 0.6), 0 4px 14px rgba(0, 0, 0, 0.4);
+      transform: scale(1.02);
+      box-shadow: 0 0 16px rgba(77, 184, 255, 0.5), 0 3px 10px rgba(0, 0, 0, 0.4);
       border-color: rgba(77, 184, 255, 0.9);
     }
 
@@ -98,6 +98,13 @@
     section:nth-of-type(4) button:hover { box-shadow: 0 0 22px rgba(251, 191, 36, 0.7), 0 4px 14px rgba(0,0,0,0.4); border-color: #fbbf24; }
     section:nth-of-type(5) button:hover { box-shadow: 0 0 22px rgba(248, 113, 113, 0.7), 0 4px 14px rgba(0,0,0,0.4); border-color: #f87171; }
     section:nth-of-type(6) button:hover { box-shadow: 0 0 22px rgba(107, 114, 128, 0.7), 0 4px 14px rgba(0,0,0,0.4); border-color: #9ca3af; }
+    section:nth-of-type(6) button:hover { box-shadow: 0 0 22px rgba(107, 114, 128, 0.7), 0 4px 14px rgba(0,0,0,0.4); border-color: #9ca3af; }
+
+    .gpu-testing { border-left-color: #22d3ee; }
+    .gpu-testing h2 { color: #22d3ee; }
+    .gpu-testing button { background: #22d3ee; border-color: rgba(34, 211, 238, 0.3); color: #111; }
+    .gpu-testing button:hover { box-shadow: 0 0 16px rgba(34, 211, 238, 0.7), 0 3px 10px rgba(0,0,0,0.4); border-color: #22d3ee; }
+    .gpu-reminder { grid-column: 1 / -1; color: #e6e6e6; font-size: 0.9em; }
   </style>
 </head>
 
@@ -210,10 +217,34 @@
     </div>
   </section>
 
+  <section class="gpu-testing">
+    <h2>GPU Testing</h2>
+    <div class="button-grid">
+      <button onclick="window.open('https://testufo.com/refreshrate', '_blank', 'noopener,noreferrer')">TestUFO Refresh Rate</button>
+      <button onclick="window.open('https://screenhz.com/benchmark/', '_blank', 'noopener,noreferrer')">ScreenHz Benchmark</button>
+      <button onclick="window.open('https://browserbench.org/MotionMark', '_blank', 'noopener,noreferrer')">MotionMark</button>
+      <button onclick="window.open('https://web.gpuscore.com', '_blank', 'noopener,noreferrer')">GPUScore</button>
+      <button onclick="window.open('https://testufo.com/', '_blank', 'noopener,noreferrer')">TestUFO</button>
+      <button onclick="window.open('https://fpsrate.com/fps-test/', '_blank', 'noopener,noreferrer')">FPS Rate Test</button>
+      <button onclick="window.open('https://www.shadertoy.com/', '_blank', 'noopener,noreferrer')">Shadertoy</button>
+      <button onclick="window.open('https://webglsamples.org/aquarium/aquarium.html', '_blank', 'noopener,noreferrer')">WebGL Aquarium</button>
+      <button onclick="window.open('https://webgpu.github.io/webgpu-samples/sample/workloadSimulator/?animate&showStats&use2D', '_blank', 'noopener,noreferrer')">WebGPU Workload Simulator</button>
+      <button onclick="window.open('https://webgpu.github.io/webgpu-samples/?sample=animometer', '_blank', 'noopener,noreferrer')">WebGPU Animometer</button>
+      <p class="gpu-reminder">Reminder: check <code>chrome://gpu/</code></p>
+    </div>
+  </section>
+
   <!-- Footer placeholder -->
   <div id="footer-container"></div>
 
   <script>
+    document.querySelectorAll('button[onclick]').forEach(button => {
+      const destination = button.getAttribute('onclick').match(/window\.location\.href='([^']+)'/);
+      if (destination) {
+        button.onclick = () => window.open(destination[1], '_blank', 'noopener,noreferrer');
+      }
+    });
+
     fetch('https://david-fear.github.io/components/footer.html')
       .then(response => response.text())
       .then(data => {
