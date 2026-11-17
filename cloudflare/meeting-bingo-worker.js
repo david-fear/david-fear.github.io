@@ -1,5 +1,5 @@
 const ALLOWED_ORIGIN = 'https://david-fear.github.io';
-const MAX_PLAYERS = 32;
+const MAX_PLAYERS = 64;
 const PLAYER_TIMEOUT_SECONDS = 600;
 
 function responseHeaders() {
@@ -96,6 +96,15 @@ async function connectToLiveRoom(db, body) {
     .bind(now - PLAYER_TIMEOUT_SECONDS).run();
   const existing = await db.prepare('SELECT player_id FROM bingo_live_players WHERE player_id = ?')
     .bind(body.playerId).first();
+  const nameInUse = await db.prepare(`
+    SELECT player_id
+    FROM bingo_live_players
+    WHERE player_id != ? AND player_name COLLATE NOCASE = ?
+    LIMIT 1
+  `).bind(body.playerId, playerName).first();
+  if (nameInUse) {
+    return jsonResponse({ error: 'That name is already in use. Use another.' }, 409);
+  }
   const count = await db.prepare('SELECT COUNT(*) AS player_count FROM bingo_live_players').first();
   if (!existing && count.player_count >= MAX_PLAYERS) {
     return jsonResponse({ error: 'The live room is full.' }, 409);

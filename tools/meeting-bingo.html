@@ -311,10 +311,22 @@
       "Wearing: Denim"
     ];
 
+    function getPlayerId() {
+      try {
+        const savedPlayerId = localStorage.getItem('meetingBingoPlayerId');
+        if (savedPlayerId && /^[a-zA-Z0-9_-]{20,64}$/.test(savedPlayerId)) return savedPlayerId;
+        const newPlayerId = crypto.randomUUID();
+        localStorage.setItem('meetingBingoPlayerId', newPlayerId);
+        return newPlayerId;
+      } catch {
+        return crypto.randomUUID();
+      }
+    }
+
     const board = document.getElementById('board');
     const phrases = [...defaultPhrases];
     const ROOM_API_URL = 'https://meeting-bingo-api.david-fear.workers.dev';
-    const playerId = crypto.randomUUID();
+    const playerId = getPlayerId();
     const playerNameInput = document.getElementById('player-name');
     const roomConnection = document.getElementById('room-connection');
     const joinDialog = document.getElementById('join-dialog');
