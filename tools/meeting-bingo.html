@@ -29,7 +29,7 @@
     }
 
     .app { width: min(1250px, 100%); margin: 0 auto; }
-    .game-layout { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 16px; align-items: start; }
+    .game-layout { display: grid; grid-template-columns: minmax(0, 1fr) 220px; gap: 16px; align-items: start; }
     .board-wrap, .panel { margin: 0; border: 1px solid var(--line); border-radius: 7px; background: var(--paper); color: var(--ink); }
     .board-wrap { position: relative; padding: 17px; }
     .board-top {
@@ -124,13 +124,18 @@
     @keyframes confetti-fall {
       to { transform: translate3d(var(--confetti-drift), 110vh, 0) rotate(var(--confetti-spin)); }
     }
-    .room-rail { position: sticky; top: 12px; display: grid; align-self: start; gap: 8px; min-width: 0; }
+    .room-rail { position: sticky; top: 12px; display: grid; align-self: start; gap: 8px; width: 220px; min-width: 0; }
+    .join-dialog { width: min(390px, calc(100% - 32px)); padding: 20px; border: 1px solid var(--line); border-radius: 7px; background: var(--paper); color: var(--ink); }
+    .join-dialog::backdrop { background: rgb(0 0 0 / 72%); }
+    .join-dialog h2 { margin: 0 0 5px; font-size: 19px; }
+    .join-dialog p { margin: 0 0 14px; color: var(--muted); font-size: 12px; }
+    .join-dialog-actions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
+    .join-dialog-actions button { flex: 1 1 140px; }
     .live-room, .suggestion-panel { margin: 0; padding: 10px; border: 1px solid var(--line); border-radius: 7px; background: var(--paper); color: var(--ink); }
     .email-suggestion-title { margin: 0 0 6px; color: var(--muted); font-size: 11px; }
     .email-suggestion { max-width: 100%; padding: 6px 8px; font-size: 11px; line-height: 1.2; text-align: center; }
     .room-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
     .room-heading h3 { margin: 0; font-size: 14px; }
-    .room-meta { display: flex; align-items: center; gap: 7px; }
     .room-connection { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: 0.06em; }
     .room-connection::before { width: 8px; height: 8px; border-radius: 50%; background: #7b8580; content: ""; }
     .room-connection[data-state="connecting"]::before { background: #f0bf4c; }
@@ -138,9 +143,8 @@
     .room-connection[data-state="online"]::before { background: #69d2a3; box-shadow: 0 0 7px rgb(105 210 163 / 55%); }
     .room-connection[data-state="offline"]::before { background: #f32936; }
     .room-summary, .room-help, .room-message { color: var(--muted); font-size: 11px; }
-    .room-help { margin: 3px 0 0; line-height: 1.35; }
-    .room-controls { display: flex; align-items: end; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-    .room-name-field { display: grid; flex: 1 1 140px; min-width: 0; gap: 3px; color: var(--muted); font-size: 10px; font-weight: 700; }
+    .room-summary { margin: 5px 0 0; }
+    .room-name-field { display: grid; min-width: 0; gap: 5px; color: var(--muted); font-size: 12px; font-weight: 700; }
     .room-name-field input {
       min-height: 34px;
       width: 100%;
@@ -155,6 +159,8 @@
     .room-name-field input:focus-visible { outline: 3px solid var(--coral); outline-offset: 2px; }
     .room-message { min-height: 1.2em; margin: 5px 0 0; line-height: 1.35; }
     .room-players { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px; margin: 5px 0 0; padding: 0; list-style: none; }
+    .room-actions { display: flex; justify-content: flex-end; margin-top: 5px; }
+    .room-actions button { min-height: 32px; padding: 5px 9px; }
     .room-player { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 5px; min-width: 0; min-height: 27px; padding: 3px 6px; border-left: 3px solid var(--primary); background: #202020; font-size: 11px; }
     .room-player[data-bingo="true"] { border-left-color: #f32936; }
     .room-player-name { position: relative; z-index: 2; min-width: 0; padding: 2px 4px; border-radius: 3px; overflow-wrap: anywhere; }
@@ -181,7 +187,7 @@
 
     @media (max-width: 980px) {
       body { padding-top: 20px; padding-right: 20px; padding-bottom: 20px; }
-      .game-layout { grid-template-columns: minmax(0, 1fr) 230px; gap: 12px; }
+      .game-layout { grid-template-columns: minmax(0, 1fr) 220px; gap: 12px; }
       .square { height: 94px; padding: 6px; font-size: 13px; }
     }
 
@@ -193,6 +199,18 @@
 </head>
 <body>
   <div id="menu-container"></div>
+  <dialog class="join-dialog" id="join-dialog" aria-labelledby="join-title">
+    <h2 id="join-title">Join meeting bingo</h2>
+    <p>Connect to see everyone’s progress, or play on your own.</p>
+    <label class="room-name-field" for="player-name">Your name
+      <input id="player-name" maxlength="24" autocomplete="nickname" placeholder="Name" required autofocus />
+    </label>
+    <div class="join-dialog-actions">
+      <button type="button" class="quiet" id="play-offline">Play offline</button>
+      <button type="button" id="connect-live-room">Connect</button>
+    </div>
+    <p class="room-message" id="join-message" aria-live="polite" hidden></p>
+  </dialog>
   <main class="app">
     <div class="game-layout">
       <section class="board-wrap" aria-labelledby="card-title">
@@ -214,20 +232,15 @@
       <section class="live-room" aria-labelledby="room-title">
       <div class="room-heading">
         <h3 id="room-title">Live&nbsp;room</h3>
-        <div class="room-meta">
-          <span class="room-connection" id="room-connection" data-state="offline" role="status" aria-live="polite">OFFLINE</span>
-          <span class="room-summary" id="room-summary">Room · 0 active</span>
-        </div>
+        <span class="room-connection" id="room-connection" data-state="offline" role="status" aria-live="polite">OFFLINE</span>
       </div>
-      <div class="room-controls">
-        <label class="room-name-field" for="player-name">Your name
-          <input id="player-name" maxlength="24" autocomplete="nickname" placeholder="Name" required />
-        </label>
-        <button type="button" id="connect-live-room">Connect</button>
-        <button type="button" class="quiet" id="leave-live-room" hidden>Disconnect</button>
-      </div>
+      <p class="room-summary" id="room-summary">Room · 0 active</p>
       <p class="room-message" id="room-message" aria-live="polite" hidden></p>
       <ul class="room-players" id="room-players" aria-label="Player progress"></ul>
+      <div class="room-actions" id="room-actions">
+        <button type="button" class="quiet" id="reconnect-live-room">Connect</button>
+        <button type="button" class="quiet" id="leave-live-room" hidden>Disconnect</button>
+      </div>
       </section>
       <section class="suggestion-panel" aria-labelledby="suggestion-title">
         <h3 class="email-suggestion-title" id="suggestion-title">Suggestions</h3>
@@ -276,7 +289,9 @@
     const playerId = crypto.randomUUID();
     const playerNameInput = document.getElementById('player-name');
     const roomConnection = document.getElementById('room-connection');
+    const joinDialog = document.getElementById('join-dialog');
     const connectLiveRoomButton = document.getElementById('connect-live-room');
+    const reconnectLiveRoomButton = document.getElementById('reconnect-live-room');
     let card = [];
     let marked = new Set();
     let freeSpaces = new Set();
@@ -286,7 +301,9 @@
     let roomPollInterval = null;
 
     function updateRoomButtons() {
-      connectLiveRoomButton.disabled = !playerNameInput.value.trim() || liveConnected || roomConnection.dataset.state === 'connecting';
+      const disabled = !playerNameInput.value.trim() || liveConnected || roomConnection.dataset.state === 'connecting';
+      connectLiveRoomButton.disabled = disabled;
+      reconnectLiveRoomButton.disabled = disabled;
     }
 
     function setRoomConnection(state) {
@@ -295,10 +312,19 @@
       updateRoomButtons();
     }
 
-    playerNameInput.addEventListener('input', updateRoomButtons);
+    try {
+      playerNameInput.value = localStorage.getItem('meetingBingoPlayerName') || '';
+    } catch { /* Continue without a remembered name when storage is unavailable. */ }
+    playerNameInput.addEventListener('input', () => {
+      try {
+        localStorage.setItem('meetingBingoPlayerName', playerNameInput.value.trim().slice(0, 24));
+      } catch { /* The name remains available for this visit. */ }
+      updateRoomButtons();
+    });
     updateRoomButtons();
 
     makeCard();
+    joinDialog.showModal();
 
     function shuffle(items) {
       const result = [...items];
@@ -420,16 +446,20 @@
       const element = document.getElementById('room-message');
       element.textContent = message;
       element.hidden = !message;
+      const dialogMessage = document.getElementById('join-message');
+      dialogMessage.textContent = message;
+      dialogMessage.hidden = !message;
     }
 
     function activateRoom(data) {
       if (roomPollInterval) window.clearInterval(roomPollInterval);
       liveConnected = true;
       setRoomConnection('online');
-      playerNameInput.disabled = true;
       updateRoomButtons();
+      joinDialog.close();
       showRoomMessage('');
       document.getElementById('leave-live-room').hidden = false;
+      reconnectLiveRoomButton.hidden = true;
       renderRoomPlayers(data.players);
       roomPollInterval = window.setInterval(refreshRoom, 2500);
     }
@@ -472,11 +502,11 @@
         liveConnected = false;
         if (roomPollInterval) window.clearInterval(roomPollInterval);
         roomPollInterval = null;
-        playerNameInput.disabled = false;
         setRoomConnection('offline');
         updateRoomButtons();
         showRoomMessage('Your session expired. Connect again.');
         document.getElementById('leave-live-room').hidden = true;
+        reconnectLiveRoomButton.hidden = false;
       }
     }
 
@@ -502,7 +532,7 @@
       }
     }
 
-    connectLiveRoomButton.addEventListener('click', async () => {
+    async function connectToRoom() {
       if (!requirePlayerName()) return;
       setRoomConnection('connecting');
       try {
@@ -511,7 +541,11 @@
       } catch (error) {
         showRoomError(error);
       }
-    });
+    }
+
+    connectLiveRoomButton.addEventListener('click', connectToRoom);
+    reconnectLiveRoomButton.addEventListener('click', () => joinDialog.showModal());
+    document.getElementById('play-offline').addEventListener('click', () => joinDialog.close());
 
     document.getElementById('leave-live-room').addEventListener('click', async () => {
       if (!liveConnected) return;
@@ -522,12 +556,12 @@
       try {
         await roomRequest(`/api/live/players/${encodeURIComponent(playerId)}`, { method: 'DELETE' });
       } catch { /* switch to solo mode even when the network is unavailable */ }
-      playerNameInput.disabled = false;
       updateRoomButtons();
       document.getElementById('room-summary').textContent = 'Room';
       showRoomMessage('');
       document.getElementById('room-players').replaceChildren();
       document.getElementById('leave-live-room').hidden = true;
+      reconnectLiveRoomButton.hidden = false;
     });
 
     function startBingoCelebration() {
