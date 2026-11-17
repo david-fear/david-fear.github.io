@@ -125,7 +125,7 @@
       to { transform: translate3d(var(--confetti-drift), 110vh, 0) rotate(var(--confetti-spin)); }
     }
     .room-rail { position: sticky; top: 12px; display: grid; align-self: start; gap: 8px; width: 220px; min-width: 0; }
-    .join-dialog { width: min(390px, calc(100% - 32px)); padding: 20px; border: 1px solid var(--line); border-radius: 7px; background: var(--paper); color: var(--ink); }
+    .join-dialog { position: fixed; inset: 0; width: min(390px, calc(100% - 32px)); max-height: calc(100vh - 32px); margin: auto; overflow-y: auto; padding: 20px; border: 1px solid var(--line); border-radius: 7px; background: var(--paper); color: var(--ink); }
     .join-dialog::backdrop { background: rgb(0 0 0 / 72%); }
     .join-dialog h2 { margin: 0 0 5px; font-size: 19px; }
     .join-dialog p { margin: 0 0 14px; color: var(--muted); font-size: 12px; }
@@ -478,7 +478,7 @@
         name.textContent = `${player.name}${player.id === playerId ? ' (you)' : ''}${player.online ? '' : ' · away'}`;
         const status = document.createElement('span');
         status.className = 'room-player-status';
-        const progress = player.bingo ? 'BINGO!' : `${player.marked}/22`;
+        const progress = `${player.marked}/22`;
         if (player.online) {
           status.textContent = progress;
         } else {
