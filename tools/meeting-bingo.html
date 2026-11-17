@@ -132,15 +132,17 @@
     #join-message:not([hidden]) { display: block; min-height: 0; margin: 0; padding: 10px 12px; border: 1px solid #ff775e; border-left: 4px solid #ff775e; border-radius: 4px; background: #3a1c1c; color: #fff; font-size: 14px; font-weight: 800; line-height: 1.35; }
     .join-dialog-actions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
     .join-dialog-actions button { flex: 1 1 140px; }
-    .bingo-video-dialog { position: fixed; inset: 0; width: min(720px, calc(100% - 32px)); max-height: calc(100vh - 32px); margin: auto; overflow-y: auto; padding: 16px; border: 1px solid var(--line); border-radius: 7px; background: var(--paper); color: var(--ink); }
-    .bingo-video-dialog::backdrop { background: rgb(0 0 0 / 78%); }
-    .bingo-video-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
-    .bingo-video-heading h2 { margin: 0; color: #f32936; font-family: "Luckiest Guy", Impact, sans-serif; font-size: 30px; font-weight: 400; }
-    .bingo-video-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; }
-    .bingo-video-actions button { min-height: 34px; padding: 5px 10px; }
+    .bingo-video-panel { margin: 0; padding: 10px; border: 1px solid var(--line); border-radius: 7px; background: var(--paper); color: var(--ink); }
+    .bingo-video-panel[hidden] { display: none; }
+    .bingo-video-preloader { position: fixed; top: 0; left: -10000px; width: 220px; height: 124px; overflow: hidden; visibility: hidden; pointer-events: none; }
+    .bingo-video-preloader iframe { display: block; width: 100%; height: 100%; border: 0; }
+    .bingo-video-heading { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 8px; }
+    .bingo-video-heading h3 { margin: 0; color: #f32936; font-family: "Luckiest Guy", Impact, sans-serif; font-size: 17px; font-weight: 400; }
+    .bingo-video-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 5px; }
+    .bingo-video-actions button { min-height: 28px; padding: 4px 7px; font-size: 10px; }
     .bingo-video-frame { width: 100%; aspect-ratio: 16 / 9; background: #000; }
     .bingo-video-frame iframe { display: block; width: 100%; height: 100%; border: 0; }
-    .bingo-video-help { margin: 8px 0 0; color: var(--muted); font-size: 11px; }
+    .bingo-video-help { margin: 6px 0 0; color: var(--muted); font-size: 10px; line-height: 1.3; }
     .live-room, .suggestion-panel { margin: 0; padding: 10px; border: 1px solid var(--line); border-radius: 7px; background: var(--paper); color: var(--ink); }
     .email-suggestion-title { margin: 0 0 6px; color: var(--muted); font-size: 11px; }
     .email-suggestion { max-width: 100%; padding: 6px 8px; font-size: 11px; line-height: 1.2; text-align: center; }
@@ -230,17 +232,6 @@
     <br id="join-message-break" hidden />
     <p class="room-message" id="join-message" aria-live="polite" hidden></p>
   </dialog>
-  <dialog class="bingo-video-dialog" id="bingo-video-dialog" aria-labelledby="bingo-video-title">
-    <div class="bingo-video-heading">
-      <h2 id="bingo-video-title">BINGO!</h2>
-      <div class="bingo-video-actions">
-        <button type="button" class="quiet" id="toggle-video-mute" aria-pressed="false" disabled>MUTE VIDEO</button>
-        <button type="button" class="quiet" id="close-bingo-video">Close</button>
-      </div>
-    </div>
-    <div class="bingo-video-frame" id="bingo-video-frame"></div>
-    <p class="bingo-video-help">If playback does not start, press play in the video.</p>
-  </dialog>
   <main class="app">
     <div class="game-layout">
       <section class="board-wrap" aria-labelledby="card-title">
@@ -259,6 +250,18 @@
         <div class="bingo-overlay" id="bingo-overlay" aria-hidden="true" hidden><span>BINGO!</span></div>
       </section>
       <aside class="room-rail">
+      <section class="bingo-video-panel" id="bingo-video-panel" aria-labelledby="bingo-video-title" hidden>
+        <div class="bingo-video-heading">
+          <h3 id="bingo-video-title">BINGO!</h3>
+          <div class="bingo-video-actions">
+            <button type="button" class="quiet" id="toggle-video-mute" aria-pressed="true" disabled>UNMUTE VIDEO</button>
+            <button type="button" class="quiet" id="close-bingo-video">Close</button>
+          </div>
+        </div>
+        <div class="bingo-video-frame" id="bingo-video-frame"></div>
+        <p class="bingo-video-help">Video starts muted.</p>
+      </section>
+      <div class="bingo-video-preloader" id="bingo-video-preloader" aria-hidden="true"><div id="bingo-video-player"></div></div>
       <section class="live-room" aria-labelledby="room-title">
       <div class="room-heading">
         <h3 id="room-title">Live&nbsp;room</h3>
@@ -334,10 +337,11 @@
     const joinDialog = document.getElementById('join-dialog');
     const connectLiveRoomButton = document.getElementById('connect-live-room');
     const reconnectLiveRoomButton = document.getElementById('reconnect-live-room');
-    const bingoVideoDialog = document.getElementById('bingo-video-dialog');
+    const bingoVideoPanel = document.getElementById('bingo-video-panel');
     let bingoVideoPlayer = null;
     let youtubeApiPromise = null;
-    let bingoVideoMuted = false;
+    let bingoVideoMuted = true;
+    let bingoVideoReady = false;
     let card = [];
     let marked = new Set();
     let freeSpaces = new Set();
@@ -372,6 +376,7 @@
 
     makeCard();
     joinDialog.showModal();
+    preloadBingoVideo();
 
     function shuffle(items) {
       const result = [...items];
@@ -638,40 +643,59 @@
       return youtubeApiPromise;
     }
 
-    function openBingoVideo() {
-      bingoVideoDialog.showModal();
-      bingoVideoMuted = false;
-      updateVideoMuteButton();
-      document.getElementById('toggle-video-mute').disabled = true;
-      const frame = document.getElementById('bingo-video-frame');
-      frame.replaceChildren();
-      const playerElement = document.createElement('div');
-      playerElement.id = 'bingo-video-player';
-      frame.append(playerElement);
+    function preloadBingoVideo() {
       loadYouTubeApi().then(() => {
-        if (!bingoVideoDialog.open) return;
+        if (bingoVideoPlayer) return;
         bingoVideoPlayer = new window.YT.Player('bingo-video-player', {
+          width: '220',
+          height: '124',
           videoId: 'IxX_QHay02M',
-          playerVars: { autoplay: 1, controls: 1, playsinline: 1, rel: 0 },
+          playerVars: { autoplay: 0, controls: 1, playsinline: 1, rel: 0 },
           events: {
             onReady: event => {
+              bingoVideoReady = true;
               event.target.setVolume(30);
-              event.target.playVideo();
-              document.getElementById('toggle-video-mute').disabled = false;
+              event.target.mute();
+              event.target.cueVideoById('IxX_QHay02M');
+              if (!bingoVideoPanel.hidden) startBingoVideo();
             }
           }
         });
       }).catch(() => {
-        document.querySelector('.bingo-video-help').textContent = 'The video could not be loaded. Check your connection and try again.';
+        document.querySelector('.bingo-video-help').textContent = 'The video could not be preloaded. Check your connection.';
       });
     }
 
+    function openBingoVideo() {
+      bingoVideoPanel.hidden = false;
+      updateVideoMuteButton();
+      document.getElementById('toggle-video-mute').disabled = !bingoVideoReady;
+      if (bingoVideoReady) startBingoVideo();
+    }
+
+    function startBingoVideo() {
+      if (!bingoVideoPlayer || bingoVideoPanel.hidden) return;
+      const frame = document.getElementById('bingo-video-frame');
+      frame.append(bingoVideoPlayer.getIframe());
+      bingoVideoPlayer.setSize(frame.clientWidth, frame.clientHeight);
+      bingoVideoMuted = true;
+      bingoVideoPlayer.setVolume(30);
+      bingoVideoPlayer.mute();
+      bingoVideoPlayer.playVideo();
+      updateVideoMuteButton();
+      document.getElementById('toggle-video-mute').disabled = false;
+    }
+
     function stopBingoVideo() {
-      if (bingoVideoPlayer) {
-        bingoVideoPlayer.destroy();
-        bingoVideoPlayer = null;
+      bingoVideoPanel.hidden = true;
+      if (bingoVideoPlayer && bingoVideoReady) {
+        bingoVideoPlayer.stopVideo();
+        bingoVideoPlayer.setVolume(30);
+        bingoVideoPlayer.mute();
+        document.getElementById('bingo-video-preloader').append(bingoVideoPlayer.getIframe());
+        bingoVideoPlayer.cueVideoById('IxX_QHay02M');
       }
-      bingoVideoMuted = false;
+      bingoVideoMuted = true;
       updateVideoMuteButton();
       document.getElementById('toggle-video-mute').disabled = true;
     }
@@ -693,8 +717,7 @@
       }
       updateVideoMuteButton();
     });
-    document.getElementById('close-bingo-video').addEventListener('click', () => bingoVideoDialog.close());
-    bingoVideoDialog.addEventListener('close', stopBingoVideo);
+    document.getElementById('close-bingo-video').addEventListener('click', stopBingoVideo);
 
     function stopBingoCelebration() {
       window.clearInterval(confettiInterval);
